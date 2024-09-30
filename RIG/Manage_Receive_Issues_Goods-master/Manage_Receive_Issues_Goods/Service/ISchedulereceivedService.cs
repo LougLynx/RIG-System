@@ -15,5 +15,6 @@ namespace Manage_Receive_Issues_Goods.Services
         Task<IEnumerable<Actualreceived>> GetAllActualReceivedAsync();
         DateTime GetDateForWeekday(int year, int weekOfYear, int weekdayId);
         int GetWeekOfYear(DateTime date);
+        Task<IEnumerable<Supplier>> GetSuppliersForTodayAsync();
     }
 }

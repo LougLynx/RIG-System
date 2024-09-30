@@ -50,6 +50,15 @@ namespace Manage_Receive_Issues_Goods.Services
             return await _repository.GetAllActualReceivedAsync();
         }
 
+        public async Task<IEnumerable<Supplier>> GetSuppliersForTodayAsync()
+        {
+            int currentWeekday = (int)DateTime.Now.DayOfWeek; // Lấy thứ hiện tại (0 = Sunday, 1 = Monday, ...)
+            if (currentWeekday == 0) currentWeekday = 7; // Chuyển đổi 0 (Chủ Nhật) thành 7 cho phù hợp với bảng Weekday
+
+            return await _repository.GetSuppliersForTodayAsync(currentWeekday);
+        }
+
+
         // Hàm tính toán ngày giao hàng cụ thể cho một lịch trình nhận hàng
         public DateTime GetDateForWeekday(int year, int weekOfYear, int weekdayId)
         {

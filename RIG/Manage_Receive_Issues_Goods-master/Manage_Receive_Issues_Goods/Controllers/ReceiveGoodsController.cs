@@ -63,5 +63,14 @@ namespace Manage_Receive_Issues_Goods.Controllers
             return Json(events);
         }
 
+        [HttpGet]
+        public async Task<JsonResult> GetSuppliersForToday()
+        {
+            var suppliers = await _schedulereceivedService.GetSuppliersForTodayAsync();
+            var supplierList = suppliers.Select(s => new { supplierName = s.SupplierName }).ToList();
+            return Json(supplierList);
+        }
+
+
     }
 }

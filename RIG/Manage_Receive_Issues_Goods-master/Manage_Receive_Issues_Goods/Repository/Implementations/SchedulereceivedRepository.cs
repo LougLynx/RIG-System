@@ -73,5 +73,15 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
                 .ThenInclude(s => s.Supplier) // Bao gồm cả nhà cung cấp
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Supplier>> GetSuppliersForTodayAsync(int weekdayId)
+        {
+            return await _context.Schedulereceiveds
+                .Where(s => s.WeekdayId == weekdayId)
+                .Select(s => s.Supplier)
+                .Distinct()
+                .ToListAsync();
+        }
+
     }
 }

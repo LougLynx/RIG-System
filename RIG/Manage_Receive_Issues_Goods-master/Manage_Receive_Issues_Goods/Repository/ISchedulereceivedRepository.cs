@@ -13,5 +13,6 @@ namespace Manage_Receive_Issues_Goods.Repository
         Task UpdateAsync(Schedulereceived entity);
         Task DeleteAsync(int id);
         Task<IEnumerable<Actualreceived>> GetAllActualReceivedAsync();
+        Task<IEnumerable<Supplier>> GetSuppliersForTodayAsync(int weekdayId);
     }
 }

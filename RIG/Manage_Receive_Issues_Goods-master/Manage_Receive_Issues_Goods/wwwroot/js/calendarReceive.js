@@ -1,7 +1,7 @@
 ﻿document.addEventListener('DOMContentLoaded', function () {
     var calendarEl = document.getElementById('calendar');
 
- // PARSE SANG ĐỊNH ISO 8601
+    // PARSE SANG ĐỊNH ISO 8601
     function getFormattedNow() {
         var now = new Date();
         var year = now.getFullYear();
@@ -15,21 +15,21 @@
     //Lấy thời gian thực cho Indicator
     var now = getFormattedNow();
 
-    /*  // Function to fetch and display suppliers for today
-      function loadSuppliersForToday() {
-          fetch('/ReceiveGoods/GetSuppliersForToday')
-              .then(response => response.json())
-              .then(data => {
-                  var suppliersHTML = '';
-                  data.forEach(supplier => {
-                      suppliersHTML += `<li>${supplier.supplierName}</li>`;
-                  });
-                  document.getElementById('suppliersListContent').innerHTML = suppliersHTML;
-              });
-      }
-  */
+    //Hàm để lấy nhà cung cấp cho hôm nay
+    function loadSuppliersForToday() {
+        fetch('/ReceiveGoods/GetSuppliersForToday')
+            .then(response => response.json())
+            .then(data => {
+                var suppliersHTML = '';
+                data.forEach(supplier => {
+                    suppliersHTML += `<li>${supplier.supplierName}</li>`;
+                });
+                document.getElementById('suppliersListContent').innerHTML = suppliersHTML;
+            });
+    }
 
-// HÀM GỌI API ĐỂ LẤY CÁC STAGE CỦA SỰ KIỆN
+
+    // HÀM GỌI API ĐỂ LẤY CÁC STAGE CỦA SỰ KIỆN
     function loadEventStages(eventId) {
         //return fetch(`/api/TaskStages/${eventId}`) // Gọi API lấy giai đoạn dựa vào event ID
         return fetch(`/api/TaskStages/1`) // Gọi API lấy dữ liệu demo
@@ -53,7 +53,7 @@
             });
     }
 
-//KHỞI TẠO LỊCH
+    //KHỞI TẠO LỊCH
     var calendar = new FullCalendar.Calendar(calendarEl, {
         schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
         initialView: 'resourceTimelineDay',
@@ -63,7 +63,7 @@
         now: now,
         timeZone: 'Asia/Bangkok',
         locale: 'en-GB',
-        aspectRatio: 1.5,
+        aspectRatio: 2.0,
         headerToolbar: {
             left: 'prev,next',
             center: 'title',
@@ -88,7 +88,7 @@
             info.el.classList.remove('highlighted-event');
         },
 
-//HÀM XỬ LÝ KHI CLICK VÀO SỰ KIỆN
+        //HÀM XỬ LÝ KHI CLICK VÀO SỰ KIỆN
         eventClick: function (info) {
             var start = new Date(info.event.start);
             var end = new Date(info.event.end);
@@ -125,7 +125,7 @@
             var myModal = new bootstrap.Modal(document.getElementById('eventModal'));
             myModal.show();
         },
-//FOMAT NGÀY THÁNG
+        //FOMAT NGÀY THÁNG
         views: {
             resourceTimelineDay: {
                 titleFormat: { day: '2-digit', month: '2-digit', year: 'numeric' }
@@ -155,7 +155,8 @@
     });
 
     calendar.render();
-    /* loadSuppliersForToday(); // Load suppliers when the page loads*/
+    //Tải nahf cung cấp lên khi tải trang 
+    loadSuppliersForToday();
 });
 //HIỂN THỊ THỜI GIAN THỰC
 document.addEventListener('DOMContentLoaded', function () {
