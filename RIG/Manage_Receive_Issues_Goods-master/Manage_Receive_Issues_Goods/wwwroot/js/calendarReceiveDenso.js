@@ -1,4 +1,4 @@
-﻿/*document.addEventListener('DOMContentLoaded', function () {
+﻿document.addEventListener('DOMContentLoaded', function () {
     var calendarEl = document.getElementById('calendar');
 
     // PARSE SANG ĐỊNH ISO 8601
@@ -15,60 +15,22 @@
     //Lấy thời gian thực cho Indicator
     var now = getFormattedNow();
 
-    //Hàm để lấy nhà cung cấp cho hôm nay
-    function loadSuppliersForToday() {
-        fetch('/TLIPWarehouse/GetSuppliersForToday')
-            .then(response => response.json())
-            .then(data => {
-                var suppliersHTML = '';
-                data.forEach(supplier => {
-                    suppliersHTML += `<li>${supplier.supplierName}</li>`;
-                });
-                document.getElementById('suppliersListContent').innerHTML = suppliersHTML;
-            });
-    }
-
-
-    // HÀM GỌI API ĐỂ LẤY CÁC STAGE CỦA SỰ KIỆN
-    function loadEventStages(eventId) {
-        //return fetch(`/api/TaskStages/${eventId}`) // Gọi API lấy giai đoạn dựa vào event ID
-        return fetch(`/api/TaskStages/1`) // Gọi API lấy dữ liệu demo
-            .then(response => response.json())
-            .then(data => {
-                var stagesHTML = '';
-                data.forEach(stage => {
-                    stagesHTML += `
-                        <tr>
-                            <td>${stage.name} (${stage.startTime} - ${stage.endTime})</td>
-                            <td>${stage.status}</td>
-                            
-                            <td>
-                                <button class="btn btn-warning btn-sm">Delay</button>
-                                <button class="btn btn-success btn-sm">Done</button>
-                            </td>
-                            <td>${stage.assignedUser}</td>
-                        </tr>`;
-                });
-                document.getElementById('stagesTableBody').innerHTML = stagesHTML; // Hiển thị các giai đoạn trong modal
-            });
-    }
-
     //KHỞI TẠO LỊCH
     var calendar = new FullCalendar.Calendar(calendarEl, {
         schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
-        initialView: 'resourceTimelineDay',
-        // Mỗi slot là 30 phút
-        slotDuration: '00:30',
+        initialView: 'resourceTimeGridFourDay',
+        slotDuration: '01:00',
+        datesAboveResources: true,
         // Mỗi slot cách nhau 1 tiếng
-        slotLabelInterval: '01:00',
+        slotLabelInterval: '00:30',
         slotLabelFormat: {
             hour: '2-digit',
             minute: '2-digit',
             hour12: false // Sử dụng định dạng 24 giờ
         },
-        // Hiển thị các ô thời gian từ 6 giờ sáng hôm trước đến 6 giờ sáng hôm sau
+        // Hiển thị các ô thời gian theo ý muốn
         slotMinTime: '00:00:00',
-        slotMaxTime: '23:00:00',
+        slotMaxTime: '24:00:00',
         //Gọi Indicator
         nowIndicator: true,
         //set Indicator với thời gian thực
@@ -79,12 +41,15 @@
         headerToolbar: {
             left: 'prev,next',
             center: 'title',
-            right: 'resourceTimelineDay,resourceTimelineWeek'
+            right: 'resourceTimeGridDay,resourceTimeGridFourDay'
         },
         editable: false,
-        resourceAreaHeaderContent: 'Details/Hour',
+        allDaySlot: false,
         //Lấy API để hiển thị cột Actual và Plan
-        resources: '/api/Resources',
+        resources: [
+            { id: '1', title: 'Plan', eventColor : '#1E2B37' },
+            { id: '2', title: 'Actual', eventColor: '#3E7D3E' }
+        ],
         //Sắp xếp theo thứ tự theo order(Plan trước Actual sau)
         resourceOrder: 'order',
         events: '/TLIPWarehouse/GetPlanAndActualEvents',
@@ -124,7 +89,6 @@
             // Đưa dữ liệu sự kiện vào modal
             document.getElementById('eventDetails').innerText = `Nhà cung cấp: ${info.event.title}\nBắt đầu: ${formattedStart}\nKết thúc: ${formattedEnd}`;
 
-
             // Kiểm tra nếu sự kiện thuộc "Actual" row
             if (info.event.getResources().some(resource => resource.title === "Actual")) {
                 // Gọi API để tải các giai đoạn của sự kiện
@@ -140,16 +104,16 @@
             var myModal = new bootstrap.Modal(document.getElementById('eventModal'));
             myModal.show();
         },
-        //FOMAT NGÀY THÁNG
+        //FOMAT NGÀY THÁNG và phần view
         views: {
-            resourceTimelineDay: {
-                titleFormat: { day: '2-digit', month: '2-digit', year: 'numeric' }
-            },
-            resourceTimelineWeek: {
+                resourceTimeGridFourDay: {
+                type: 'resourceTimeGrid',
+                duration: { days: 7 },
+                buttonText: '7 days',
                 titleFormat: { day: '2-digit', month: '2-digit', year: 'numeric' }
             }
         },
-        resourceLaneClassNames: function (arg) {
+        resourceLaneContent: function (arg) {
             if (arg.resource.title === "Actual") {
                 return ['gray-background'];
             }
@@ -177,8 +141,6 @@
     });
 
     calendar.render();
-    //Tải nhà cung cấp lên khi tải trang 
-    loadSuppliersForToday();
 });
 //HIỂN THỊ THỜI GIAN THỰC
 document.addEventListener('DOMContentLoaded', function () {
@@ -193,4 +155,3 @@ document.addEventListener('DOMContentLoaded', function () {
     setInterval(updateTime, 1000);
     updateTime();
 });
-*/
