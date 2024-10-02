@@ -1,4 +1,4 @@
-﻿document.addEventListener('DOMContentLoaded', function () {
+﻿/*document.addEventListener('DOMContentLoaded', function () {
     var calendarEl = document.getElementById('calendar');
 
     // PARSE SANG ĐỊNH ISO 8601
@@ -17,7 +17,7 @@
 
     //Hàm để lấy nhà cung cấp cho hôm nay
     function loadSuppliersForToday() {
-        fetch('/ReceiveGoods/GetSuppliersForToday')
+        fetch('/TLIPWarehouse/GetSuppliersForToday')
             .then(response => response.json())
             .then(data => {
                 var suppliersHTML = '';
@@ -57,6 +57,18 @@
     var calendar = new FullCalendar.Calendar(calendarEl, {
         schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
         initialView: 'resourceTimelineDay',
+        // Mỗi slot là 30 phút
+        slotDuration: '00:30',
+        // Mỗi slot cách nhau 1 tiếng
+        slotLabelInterval: '01:00',
+        slotLabelFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false // Sử dụng định dạng 24 giờ
+        },
+        // Hiển thị các ô thời gian từ 6 giờ sáng hôm trước đến 6 giờ sáng hôm sau
+        slotMinTime: '00:00:00',
+        slotMaxTime: '23:00:00',
         //Gọi Indicator
         nowIndicator: true,
         //set Indicator với thời gian thực
@@ -75,7 +87,7 @@
         resources: '/api/Resources',
         //Sắp xếp theo thứ tự theo order(Plan trước Actual sau)
         resourceOrder: 'order',
-        events: '/ReceiveGoods/GetPlanAndActualEvents',
+        events: '/TLIPWarehouse/GetPlanAndActualEvents',
         // Không cho phép kéo sự kiện để thay đổi thời gian bắt đầu
         eventStartEditable: false,
         // Không cho phép thay đổi độ dài (thời lượng) sự kiện
@@ -86,6 +98,9 @@
         },
         eventMouseLeave: function (info) {
             info.el.classList.remove('highlighted-event');
+        },
+        resourceLabelClassNames: function (arg) {
+            return ['custom-resource-label'];
         },
 
         //HÀM XỬ LÝ KHI CLICK VÀO SỰ KIỆN
@@ -151,11 +166,18 @@
             content.classList.add('centered-event');
             content.innerHTML = arg.event.title;
             return { domNodes: [content] };
+        },
+        slotLabelContent: function (arg) {
+            return { html: `<i style="color: blue; text-decoration: none;">${arg.text}</i>` };
+        },
+        slotLabelClassNames: function (arg) {
+            return ['custom-slot-label'];
         }
+
     });
 
     calendar.render();
-    //Tải nahf cung cấp lên khi tải trang 
+    //Tải nhà cung cấp lên khi tải trang 
     loadSuppliersForToday();
 });
 //HIỂN THỊ THỜI GIAN THỰC
@@ -171,3 +193,4 @@ document.addEventListener('DOMContentLoaded', function () {
     setInterval(updateTime, 1000);
     updateTime();
 });
+*/

@@ -4,7 +4,7 @@ using Manage_Receive_Issues_Goods.Models;
 
 namespace Manage_Receive_Issues_Goods.Repository
 {
-    public interface ISchedulereceivedRepository
+    public interface ISchedulereceivedTLIPRepository
     {
         Task<IEnumerable<Schedulereceived>> GetAllAsync();
         Task<Schedulereceived> GetByIdAsync(int id);
@@ -14,5 +14,6 @@ namespace Manage_Receive_Issues_Goods.Repository
         Task DeleteAsync(int id);
         Task<IEnumerable<Actualreceived>> GetAllActualReceivedAsync();
         Task<IEnumerable<Supplier>> GetSuppliersForTodayAsync(int weekdayId);
+        Task<Schedulereceived> GetScheduleBySupplierIdAsync(int supplierId);
     }
 }

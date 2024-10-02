@@ -4,7 +4,7 @@ using Manage_Receive_Issues_Goods.Models;
 
 namespace Manage_Receive_Issues_Goods.Services
 {
-    public interface ISchedulereceivedService
+    public interface ISchedulereceivedTLIPService
     {
         Task<IEnumerable<Schedulereceived>> GetAllSchedulesAsync();
         Task<Schedulereceived> GetScheduleByIdAsync(int id);
@@ -16,5 +16,7 @@ namespace Manage_Receive_Issues_Goods.Services
         DateTime GetDateForWeekday(int year, int weekOfYear, int weekdayId);
         int GetWeekOfYear(DateTime date);
         Task<IEnumerable<Supplier>> GetSuppliersForTodayAsync();
+        Task<Schedulereceived> GetScheduleBySupplierIdAsync(int supplierId);
+        Task<bool> DelaySupplierAsync(int supplierId);
     }
 }

@@ -7,11 +7,11 @@ using Manage_Receive_Issues_Goods.Repository;
 
 namespace Manage_Receive_Issues_Goods.Repositories.Implementations
 {
-    public class SchedulereceivedRepository : ISchedulereceivedRepository
+    public class SchedulereceivedTLIPRepository : ISchedulereceivedTLIPRepository
     {
         private readonly RigContext _context;
 
-        public SchedulereceivedRepository(RigContext context)
+        public SchedulereceivedTLIPRepository(RigContext context)
         {
             _context = context;
         }
@@ -78,10 +78,15 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
         {
             return await _context.Schedulereceiveds
                 .Where(s => s.WeekdayId == weekdayId)
+                .OrderBy(s => s.DeliveryTime.Time1) // Sắp xếp theo giờ giao hàng
                 .Select(s => s.Supplier)
                 .Distinct()
                 .ToListAsync();
         }
 
+        public async Task<Schedulereceived> GetScheduleBySupplierIdAsync(int supplierId)
+        {
+            return await _context.Schedulereceiveds.FirstOrDefaultAsync(s => s.SupplierId == supplierId);
+        }
     }
 }

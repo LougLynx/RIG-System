@@ -1,0 +1,63 @@
+﻿@{
+    ViewData["Title"] = "Issued Goods Schedule (TLIP)";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/custom.css">
+</head>
+<body>
+    <div style="display: flex; gap: 10px;">
+        <a class="nav-link btn btn-dark" asp-area="" asp-controller="TLIPWarehouse" asp-action="ScheduleReceive">Received</a>
+        <a class="nav-link btn btn-dark" asp-area="" asp-controller="TLIPWarehouse" asp-action="ScheduleIssued">Issued</a>
+    </div>
+
+
+
+    <!-- Title with Real-time Clock -->
+    <i> <h1 class="center-align"><span id="currentTime"></span></h1> </i>
+
+    <!-- Calendar -->
+    <div id='calendar'></div>
+
+    <!-- Suppliers List -->
+    <div id="suppliersList">
+        <h3>Suppliers for Today</h3>
+        <ul id="suppliersListContent"></ul>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventModalLabel">Chi tiết lịch trình</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="eventDetails"></p>
+                    <table id="stagesTable" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Giai đoạn</th>
+                                <th>Trạng thái</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stagesTableBody">
+                            <!-- Giai đoạn sẽ được hiển thị ở đây -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script src="~/js/calendarIssuesTLIP.js"></script>
+    }
+</body>
+</html>

@@ -4,14 +4,15 @@ using System.Threading.Tasks;
 using Manage_Receive_Issues_Goods.Models;
 using Manage_Receive_Issues_Goods.Repositories;
 using Manage_Receive_Issues_Goods.Repository;
+using Microsoft.EntityFrameworkCore;
 
 namespace Manage_Receive_Issues_Goods.Services
 {
-    public class SchedulereceivedService : ISchedulereceivedService
+    public class SchedulereceivedTLIPService : ISchedulereceivedTLIPService
     {
-        private readonly ISchedulereceivedRepository _repository;
+        private readonly ISchedulereceivedTLIPRepository _repository;
 
-        public SchedulereceivedService(ISchedulereceivedRepository repository)
+        public SchedulereceivedTLIPService(ISchedulereceivedTLIPRepository repository)
         {
             _repository = repository;
         }
@@ -55,7 +56,8 @@ namespace Manage_Receive_Issues_Goods.Services
             int currentWeekday = (int)DateTime.Now.DayOfWeek; // Lấy thứ hiện tại (0 = Sunday, 1 = Monday, ...)
             if (currentWeekday == 0) currentWeekday = 7; // Chuyển đổi 0 (Chủ Nhật) thành 7 cho phù hợp với bảng Weekday
 
-            return await _repository.GetSuppliersForTodayAsync(currentWeekday);
+            var suppliers = await _repository.GetSuppliersForTodayAsync(currentWeekday);
+            return suppliers;
         }
 
 
@@ -88,6 +90,40 @@ namespace Manage_Receive_Issues_Goods.Services
             return culture.Calendar.GetWeekOfYear(date, System.Globalization.CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
         }
 
+        public async Task<bool> DelaySupplierAsync(int supplierId)
+        {
+            var schedule = await GetScheduleBySupplierIdAsync(supplierId);
+            if (schedule == null) return false;
+
+            var allSchedules = await GetSchedulesByWeekdayAsync(schedule.WeekdayId);
+            var otherSchedules = allSchedules.Where(s => s.SupplierId != supplierId).OrderBy(s => s.DeliveryTime.Time1).ToList();
+
+            foreach (var otherSchedule in otherSchedules)
+            {
+                if (otherSchedule.LeadTime <= schedule.LeadTime)
+                {
+                    // Swap delivery times
+                    var tempTime = schedule.DeliveryTime;
+                    schedule.DeliveryTime = otherSchedule.DeliveryTime;
+                    otherSchedule.DeliveryTime = tempTime;
+
+                    await UpdateScheduleAsync(schedule);
+                    await UpdateScheduleAsync(otherSchedule);
+                    return true;
+                }
+            }
+
+            // If no suitable schedule found, move to end of the day
+            schedule.DeliveryTime = new Time { Time1 = TimeOnly.FromDateTime(DateTime.Today.AddHours(23).AddMinutes(59)) };
+            await UpdateScheduleAsync(schedule);
+            return true;
+        }
+        public async Task<Schedulereceived> GetScheduleBySupplierIdAsync(int supplierId)
+        {
+           return await _repository.GetScheduleBySupplierIdAsync(supplierId);
+        }
 
     }
+
+
 }

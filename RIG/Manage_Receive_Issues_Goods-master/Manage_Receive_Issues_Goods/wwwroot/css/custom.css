@@ -41,3 +41,22 @@ body {
 .center-align {
     text-align: center;
 }
+
+#suppliersListContent {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Adjust the gap between blocks as needed */
+}
+
+.supplier-block {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    text-align: center;
+    min-width: 100px; /* Adjust the minimum width as needed */
+}
+
+
+
+

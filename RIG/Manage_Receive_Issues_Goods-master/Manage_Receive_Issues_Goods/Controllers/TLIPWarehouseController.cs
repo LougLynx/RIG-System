@@ -6,21 +6,21 @@ using System.Threading.Tasks;
 
 namespace Manage_Receive_Issues_Goods.Controllers
 {
-    public class ReceiveGoodsController : Controller
+    public class TLIPWarehouseController : Controller
     {
-        private readonly ISchedulereceivedService _schedulereceivedService;
+        private readonly ISchedulereceivedTLIPService _schedulereceivedService;
 
-        public ReceiveGoodsController(ISchedulereceivedService schedulereceivedService)
+        public TLIPWarehouseController(ISchedulereceivedTLIPService schedulereceivedService)
         {
             _schedulereceivedService = schedulereceivedService;
         }
 
-        public IActionResult Index()
+        public IActionResult ScheduleReceive()
         {
             return View();
         }
 
-        public IActionResult Schedule()
+        public IActionResult ScheduleIssued()
         {
             return View();
         }
@@ -71,6 +71,17 @@ namespace Manage_Receive_Issues_Goods.Controllers
             return Json(supplierList);
         }
 
+        [HttpPost]
+        [Route("api/tlipwarehouse/delaySupplier")]
+        public async Task<IActionResult> DelaySupplier([FromBody] int supplierId)
+        {
+            var result = await _schedulereceivedService.DelaySupplierAsync(supplierId);
+            if (result)
+            {
+                return Ok(new { success = true });
+            }
+            return BadRequest(new { success = false });
+        }
 
     }
 }

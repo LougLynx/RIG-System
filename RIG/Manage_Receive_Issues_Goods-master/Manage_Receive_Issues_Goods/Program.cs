@@ -16,10 +16,10 @@ builder.Services.AddDbContext<RigContext>(options =>
 });
 
 // Register repositories
-builder.Services.AddScoped<ISchedulereceivedRepository, SchedulereceivedRepository>();
+builder.Services.AddScoped<ISchedulereceivedTLIPRepository, SchedulereceivedTLIPRepository>();
 
 // Register services
-builder.Services.AddScoped<ISchedulereceivedService, SchedulereceivedService>();
+builder.Services.AddScoped<ISchedulereceivedTLIPService, SchedulereceivedTLIPService>();
 
 
 var app = builder.Build();
