@@ -1,0 +1,181 @@
+﻿@model IEnumerable<Manage_Receive_Issues_Goods.Models.Planritddetail>
+
+@{
+    ViewData["Title"] = "Change Plan";
+    var filteredModel = Model.Where(detail => detail.PlanId == 1);
+    var totalShipment = filteredModel.FirstOrDefault()?.Plan.TotalShipment ?? 0;
+    var effectiveDate = filteredModel.FirstOrDefault()?.Plan.EffectiveDate.ToShortDateString() ?? "N/A";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - My ASP.NET Application</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/css/bootstrap-timepicker.min.css" />
+</head>
+<body>
+    <div style="display: flex; gap: 10px;">
+        <a class="nav-link btn btn-dark" asp-area="" asp-controller="DensoWarehouse" asp-action="ScheduleReceive">Back</a>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#changePlanModal">Change Plan</button>
+    </div>
+    <h1>Total Shipment: @totalShipment</h1>
+    <h2>Effective Date: @effectiveDate</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Plan Detail Name</th>
+                <th>Plan Time</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var detail in filteredModel)
+            {
+                <tr>
+                    <td>@detail.PlanDetailName</td>
+                    <td>@detail.PlanTime</td>
+                    <td>
+                        <button type="button" class="btn btn-warning edit-btn" data-detail-id="@detail.PlanDetailId" data-detail-time="@detail.PlanTime" data-toggle="modal" data-target="#editPlanTimeModal">Edit</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Change Plan Modal -->
+    <div class="modal fade" id="changePlanModal" tabindex="-1" role="dialog" aria-labelledby="changePlanModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changePlanModalLabel">Change Plan</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="changePlanForm" method="post" asp-action="ChangePlan">
+                        <div class="form-group">
+                            <label for="planName">Plan Name</label>
+                            <input type="text" class="form-control" id="planName" name="planName" value="Receive Shipment" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="planType">Plan Type</label>
+                            <input type="text" class="form-control" id="planType" name="planType" value="Received" readonly />
+                        </div>
+                        <div class="form-group">
+                            <label for="totalShipment">Total Shipment</label>
+                            <input type="number" class="form-control" id="totalShipment" name="totalShipment" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="effectiveDate">Effective Date</label>
+                            <input type="date" class="form-control" id="effectiveDate" name="effectiveDate" required />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary save-plan-btn">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Edit Plan Time Modal -->
+    <div class="modal fade" id="editPlanTimeModal" tabindex="-1" role="dialog" aria-labelledby="editPlanTimeModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPlanTimeModalLabel">Edit Plan Time</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editPlanTimeForm" method="post" asp-action="UpdatePlanTime">
+                        <input type="hidden" id="detailId" name="detailId" />
+                        <div class="form-group">
+                            <label for="editPlanTime">Plan Time</label>
+                            <input type="text" class="form-control timepicker" id="editPlanTime" name="planTime" required />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary save-time-btn">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/js/bootstrap-timepicker.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.timepicker').timepicker({
+                showMeridian: false,
+                defaultTime: false
+            });
+
+            $('.edit-btn').on('click', function () {
+                var detailId = $(this).data('detail-id');
+                var detailTime = $(this).data('detail-time');
+                $('#detailId').val(detailId);
+                $('#editPlanTime').timepicker('setTime', detailTime);
+            });
+
+            $('.save-time-btn').on('click', function () {
+                var formData = $('#editPlanTimeForm').serialize();
+                $.ajax({
+                    url: '@Url.Action("UpdatePlanTime", "RITD")',
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        $('#editPlanTimeModal').modal('hide');
+                        location.reload();
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error updating time: ' + error);
+                    }
+                });
+            });
+
+            $('.save-shipment-btn').on('click', function () {
+                var formData = $('#addShipmentForm').serialize();
+                $.ajax({
+                    url: '@Url.Action("AddShipment", "RITD")',
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        $('#addShipmentModal').modal('hide');
+                        location.reload();
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error adding shipment: ' + error);
+                    }
+                });
+            });
+
+            $('.save-plan-btn').on('click', function () {
+                var formData = $('#changePlanForm').serialize();
+                $.ajax({
+                    url: '@Url.Action("ChangePlan", "RITD")',
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        $('#changePlanModal').modal('hide');
+                        location.reload();
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error changing plan: ' + error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

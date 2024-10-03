@@ -1,6 +1,11 @@
-﻿@{
-    ViewData["Title"] = "Received Goods Schedule (Denso)";
+﻿@model IEnumerable<Manage_Receive_Issues_Goods.Models.Planritddetail>
+
+@{
+    ViewData["Title"] = "RECEIVED Goods Schedule (Denso)";
+    var planDetails = Json.Serialize(Model);
+    Console.WriteLine(planDetails);
 }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,9 +18,8 @@
     <div style="display: flex; gap: 10px;">
         <a class="nav-link btn btn-dark" asp-area="" asp-controller="DensoWarehouse" asp-action="ScheduleReceive">Received</a>
         <a class="nav-link btn btn-dark" asp-area="" asp-controller="DensoWarehouse" asp-action="ScheduleIssued">Issued</a>
+        <a class="nav-link btn btn-dark" asp-area="" asp-controller="RITD" asp-action="ChangePlan">Plan</a>
     </div>
-
-
 
     <!-- Title with Real-time Clock -->
     <i> <h1 class="center-align"><span id="currentTime"></span></h1> </i>
@@ -41,8 +45,8 @@
                                 <th>Hành động</th>
                             </tr>
                         </thead>
-                        <tbody id="stagesTableBody">
-                            <!-- Giai đoạn sẽ được hiển thị ở đây -->
+                        <tbody>
+                            <!-- Table content will be dynamically generated -->
                         </tbody>
                     </table>
                 </div>
@@ -50,8 +54,9 @@
         </div>
     </div>
 
-    @section Scripts {
-        <script src="~/js/calendarReceiveDenso.js"></script>
-    }
+    @* <script>
+        var planDetails = @Html.Raw(planDetailsJson);
+    </script *@>
+    <script src="~/js/calendarReceiveDenso.js"></script>
 </body>
 </html>

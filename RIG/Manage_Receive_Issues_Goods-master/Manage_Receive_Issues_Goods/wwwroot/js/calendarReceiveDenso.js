@@ -1,6 +1,9 @@
 ﻿document.addEventListener('DOMContentLoaded', function () {
     var calendarEl = document.getElementById('calendar');
 
+    // Log the planDetails to verify data
+    console.log('Plan Details:', planDetails);
+
     // PARSE SANG ĐỊNH ISO 8601
     function getFormattedNow() {
         var now = new Date();
@@ -15,14 +18,38 @@
     //Lấy thời gian thực cho Indicator
     var now = getFormattedNow();
 
+    // Generate events for each day
+    function generateDailyEvents(planDetails) {
+        const events = [];
+        const titles = planDetails.map(detail => detail.PlanDetailName);
+        const times = planDetails.map(detail => detail.PlanTime);
+
+        for (let i = 0; i < 7; i++) { // Generate for 7 days
+            const date = new Date();
+            date.setDate(date.getDate() + i);
+            const dateString = date.toISOString().split('T')[0];
+
+            titles.forEach((title, index) => {
+                events.push({
+                    id: `${i}-${index}`,
+                    title: title,
+                    start: `${dateString}T${times[index]}`,
+                    resourceId: index % 2 === 0 ? '1' : '2'
+                });
+            });
+        }
+
+        return events;
+    }
+
     //KHỞI TẠO LỊCH
     var calendar = new FullCalendar.Calendar(calendarEl, {
         schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
         initialView: 'resourceTimeGridFourDay',
-        slotDuration: '01:00',
+        slotDuration: '00:30',
         datesAboveResources: true,
         // Mỗi slot cách nhau 1 tiếng
-        slotLabelInterval: '00:30',
+        slotLabelInterval: '01:00',
         slotLabelFormat: {
             hour: '2-digit',
             minute: '2-digit',
@@ -47,12 +74,12 @@
         allDaySlot: false,
         //Lấy API để hiển thị cột Actual và Plan
         resources: [
-            { id: '1', title: 'Plan', eventColor : '#1E2B37' },
+            { id: '1', title: 'Plan', eventColor: '#1E2B37' },
             { id: '2', title: 'Actual', eventColor: '#3E7D3E' }
         ],
         //Sắp xếp theo thứ tự theo order(Plan trước Actual sau)
-        resourceOrder: 'order',
-        events: '/TLIPWarehouse/GetPlanAndActualEvents',
+        //events: '/RITD/GetPlanAndActualEvents',
+        events: generateDailyEvents(planDetails),
         // Không cho phép kéo sự kiện để thay đổi thời gian bắt đầu
         eventStartEditable: false,
         // Không cho phép thay đổi độ dài (thời lượng) sự kiện
@@ -106,10 +133,13 @@
         },
         //FOMAT NGÀY THÁNG và phần view
         views: {
-                resourceTimeGridFourDay: {
+            resourceTimeGridFourDay: {
                 type: 'resourceTimeGrid',
                 duration: { days: 7 },
                 buttonText: '7 days',
+                titleFormat: { day: '2-digit', month: '2-digit', year: 'numeric' },
+            },
+            resourceTimeGridDay: {
                 titleFormat: { day: '2-digit', month: '2-digit', year: 'numeric' }
             }
         },

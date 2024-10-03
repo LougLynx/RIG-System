@@ -1,6 +1,9 @@
 using Manage_Receive_Issues_Goods.Models;
 using Manage_Receive_Issues_Goods.Repositories.Implementations;
 using Manage_Receive_Issues_Goods.Repository;
+using Manage_Receive_Issues_Goods.Repository.Implementations;
+using Manage_Receive_Issues_Goods.Service;
+using Manage_Receive_Issues_Goods.Service.Implementations;
 using Manage_Receive_Issues_Goods.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,9 +19,11 @@ builder.Services.AddDbContext<RigContext>(options =>
 });
 
 // Register repositories
+builder.Services.AddScoped<IScheduleRITDRepository, ScheduleRITDRepository>();
 builder.Services.AddScoped<ISchedulereceivedTLIPRepository, SchedulereceivedTLIPRepository>();
 
 // Register services
+builder.Services.AddScoped<IScheduleRITDService, ScheduleRITDService>();
 builder.Services.AddScoped<ISchedulereceivedTLIPService, SchedulereceivedTLIPService>();
 
 

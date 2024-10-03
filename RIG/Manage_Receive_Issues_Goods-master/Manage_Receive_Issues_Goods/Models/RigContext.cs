@@ -18,7 +18,15 @@ public partial class RigContext : DbContext
 
     public virtual DbSet<Actualreceived> Actualreceiveds { get; set; }
 
+    public virtual DbSet<Actualsritd> Actualsritds { get; set; }
+
+    public virtual DbSet<Planritd> Planritds { get; set; }
+
+    public virtual DbSet<Planritddetail> Planritddetails { get; set; }
+
     public virtual DbSet<Schedulereceived> Schedulereceiveds { get; set; }
+
+    public virtual DbSet<Status> Statuses { get; set; }
 
     public virtual DbSet<Supplier> Suppliers { get; set; }
 
@@ -27,21 +35,8 @@ public partial class RigContext : DbContext
     public virtual DbSet<Weekday> Weekdays { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    /*#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-            => optionsBuilder.UseMySql("server=localhost;port=3306;user=root;password=sa123;database=rig", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.36-mysql"));*/
-    {
-        var builder = new ConfigurationBuilder()
-        .SetBasePath(Directory.GetCurrentDirectory())
-        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-
-        IConfiguration configuration = builder.Build();
-
-        // Cần thêm phiên bản của MySQL
-        optionsBuilder.UseMySql(
-            configuration.GetConnectionString("DefaultConnection"),
-            ServerVersion.AutoDetect(configuration.GetConnectionString("DefaultConnection"))
-        );
-    }
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseMySql("server=localhost;port=3306;user=root;password=Pbei7955;database=rig", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.36-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -56,6 +51,29 @@ public partial class RigContext : DbContext
             entity.HasOne(d => d.Schedule).WithMany(p => p.Actualreceiveds)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("actualreceived_ibfk_1");
+        });
+
+        modelBuilder.Entity<Actualsritd>(entity =>
+        {
+            entity.HasKey(e => e.ActualId).HasName("PRIMARY");
+
+            entity.HasOne(d => d.PlanDetail).WithMany(p => p.Actualsritds)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("actualsritd_ibfk_1");
+        });
+
+        modelBuilder.Entity<Planritd>(entity =>
+        {
+            entity.HasKey(e => e.PlanId).HasName("PRIMARY");
+        });
+
+        modelBuilder.Entity<Planritddetail>(entity =>
+        {
+            entity.HasKey(e => e.PlanDetailId).HasName("PRIMARY");
+
+            entity.HasOne(d => d.Plan).WithMany(p => p.Planritddetails)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("planritddetails_ibfk_1");
         });
 
         modelBuilder.Entity<Schedulereceived>(entity =>
@@ -73,6 +91,15 @@ public partial class RigContext : DbContext
             entity.HasOne(d => d.Weekday).WithMany(p => p.Schedulereceiveds)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("schedulereceived_ibfk_3");
+        });
+
+        modelBuilder.Entity<Status>(entity =>
+        {
+            entity.HasKey(e => e.StatusId).HasName("PRIMARY");
+
+            entity.HasOne(d => d.PlanDetail).WithMany(p => p.Statuses)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("statuses_ibfk_1");
         });
 
         modelBuilder.Entity<Supplier>(entity =>
