@@ -3,8 +3,8 @@
 @{
     ViewData["Title"] = "Change Plan";
     var filteredModel = Model.Where(detail => detail.PlanId == 1);
-    var totalShipment = filteredModel.FirstOrDefault()?.Plan.TotalShipment ?? 0;
-    var effectiveDate = filteredModel.FirstOrDefault()?.Plan.EffectiveDate.ToShortDateString() ?? "N/A";
+    // var totalShipment = filteredModel.FirstOrDefault()?.Plan.TotalShipment ?? 0;
+    // var effectiveDate = filteredModel.FirstOrDefault()?.Plan.EffectiveDate.ToShortDateString() ?? "N/A";
 }
 <!DOCTYPE html>
 <html>
@@ -20,8 +20,8 @@
         <a class="nav-link btn btn-dark" asp-area="" asp-controller="DensoWarehouse" asp-action="ScheduleReceive">Back</a>
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#changePlanModal">Change Plan</button>
     </div>
-    <h1>Total Shipment: @totalShipment</h1>
-    <h2>Effective Date: @effectiveDate</h2>
+@*     <h1>Total Shipment: @totalShipment</h1>
+    <h2>Effective Date: @effectiveDate</h2> *@
     <table class="table">
         <thead>
             <tr>

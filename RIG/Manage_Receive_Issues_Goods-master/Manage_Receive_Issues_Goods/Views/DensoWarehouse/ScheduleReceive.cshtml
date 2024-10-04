@@ -1,9 +1,9 @@
-﻿@model IEnumerable<Manage_Receive_Issues_Goods.Models.Planritddetail>
+﻿   @model IEnumerable<Manage_Receive_Issues_Goods.Models.Planritddetail>
 
 @{
     ViewData["Title"] = "RECEIVED Goods Schedule (Denso)";
-    var planDetails = Json.Serialize(Model);
-    Console.WriteLine(planDetails);
+    var planDetailsJson = ViewData["PlanDetailsJson"];
+    var actualDetailsJson = ViewData["ActualDetailsJson"];
 }
 
 <!DOCTYPE html>
@@ -54,9 +54,10 @@
         </div>
     </div>
 
-    @* <script>
+    <script>
         var planDetails = @Html.Raw(planDetailsJson);
-    </script *@>
+        var actualDetails = @Html.Raw(actualDetailsJson);
+    </script>
     <script src="~/js/calendarReceiveDenso.js"></script>
 </body>
 </html>

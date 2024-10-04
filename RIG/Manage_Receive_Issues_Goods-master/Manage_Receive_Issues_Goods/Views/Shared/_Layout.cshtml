@@ -17,19 +17,17 @@
     @await RenderSectionAsync("Scripts", required: false)
     <link rel="stylesheet" href="~/css/layout.css">
 </head>
-<body onload="checkSidebarState()">
+<body onload="checkSidebarState(); highlightActiveLink();">
     <div id="mySidebar" class="sidebar">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
-        <a class="nav-link active text-light" asp-area="" asp-controller="Home" asp-action="Index">
-            <b><i>DENSO</i> <br>Receive and Issue Goods</b>
-        </a>
+        <h1 class=" text-light"><b><i>DENSO</i> <br>Manage RIG</b></h1>
+
         <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
         <a class="nav-link text-light" asp-area="" asp-controller="TLIPWarehouse" asp-action="ScheduleReceive">TLIP</a>
         <a class="nav-link text-light" asp-area="" asp-controller="DensoWarehouse" asp-action="ScheduleReceive">Denso</a>
     </div>
 
     <div id="main">
-        <button class="openbtn" onclick="openNav()">☰ </button>
+        <button class="openbtn" onclick="toggleNav()">☰ </button>
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2"><b>@ViewData["Title"]</b></h1>
         </div>
@@ -37,4 +35,3 @@
     </div>
 </body>
 </html>
-

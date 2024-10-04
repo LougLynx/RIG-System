@@ -6,11 +6,16 @@ using Manage_Receive_Issues_Goods.Service;
 using Manage_Receive_Issues_Goods.Service.Implementations;
 using Manage_Receive_Issues_Goods.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options => 
+options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<RigContext>(options =>

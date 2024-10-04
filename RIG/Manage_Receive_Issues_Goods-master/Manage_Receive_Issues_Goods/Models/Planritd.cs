@@ -23,6 +23,6 @@ public partial class Planritd
 
     public DateOnly EffectiveDate { get; set; }
 
-    [InverseProperty("Plan")]
-    public virtual ICollection<Planritddetail> Planritddetails { get; set; } = new List<Planritddetail>();
+    //[InverseProperty("Plan")]
+    //public virtual ICollection<Planritddetail> Planritddetails { get; set; } = new List<Planritddetail>();
 }

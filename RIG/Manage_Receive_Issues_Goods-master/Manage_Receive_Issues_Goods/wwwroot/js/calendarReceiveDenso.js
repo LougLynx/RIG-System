@@ -2,7 +2,7 @@
     var calendarEl = document.getElementById('calendar');
 
     // Log the planDetails to verify data
-    console.log('Plan Details:', planDetails);
+    //console.log('Plan Details:', planDetails);
 
     // PARSE SANG ĐỊNH ISO 8601
     function getFormattedNow() {
@@ -18,46 +18,90 @@
     //Lấy thời gian thực cho Indicator
     var now = getFormattedNow();
 
-    // Generate events for each day
-    function generateDailyEvents(planDetails) {
-        const events = [];
-        const titles = planDetails.map(detail => detail.PlanDetailName);
-        const times = planDetails.map(detail => detail.PlanTime);
+    console.log('actualDetails:', actualDetails);
+        //tạo sự kiện cho 7 ngày
+        function generateDailyEvents(planDetails, actualDetails) {
+            const events = [];
+            const titles = planDetails.map(detail => detail.PlanDetailName);
+            const times = planDetails.map(detail => detail.PlanTime);
+            const ids = planDetails.map(detail => detail.PlanDetailId);
 
-        for (let i = 0; i < 7; i++) { // Generate for 7 days
-            const date = new Date();
-            date.setDate(date.getDate() + i);
-            const dateString = date.toISOString().split('T')[0];
+            for (let i = 0; i < 7; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() + i);
+                const dateString = date.toISOString().split('T')[0];
+                console.log('DateString Plan:', dateString);
 
-            titles.forEach((title, index) => {
-                events.push({
-                    id: `${i}-${index}`,
-                    title: title,
-                    start: `${dateString}T${times[index]}`,
-                    resourceId: index % 2 === 0 ? '1' : '2'
+                titles.forEach((title, index) => {
+                    events.push({
+                        id: `plan-${i}-${index}`,
+                        title: 'Chuyến ' + title,
+                        start: `${dateString}T${times[index]}`,
+                        end: (() => {
+                            const startDate = new Date(`${dateString}T${times[index]}`);
+                            const endDate = new Date(startDate.getTime() + 60 * 60000);
+                            return endDate.toISOString().split('T')[0] + 'T' + endDate.toTimeString().split(' ')[0];
+                        })(),
+                        resourceId: `${ids[index] * 2 - 1}`
+                    });
                 });
+            }
+
+            actualDetails.forEach(detail => {
+                console.log('Detail:', detail); // Log the detail object
+
+                const actualDate = new Date(detail.ActualTime);
+                console.log('Actual Date:', actualDate); // Log the actual date
+
+                const year = actualDate.getFullYear();
+                const month = String(actualDate.getMonth() + 1).padStart(2, '0');
+                const day = String(actualDate.getDate()).padStart(2, '0');
+                const dateString = `${year}-${month}-${day}`;
+                console.log('DateString:', dateString);
+
+                const timeString = actualDate.toTimeString().split(' ')[0];
+                const actualTime = `${dateString}T${timeString}`;
+                console.log('Actual Time:', actualTime); // Log the formatted actual time
+
+                const startDate = new Date(actualTime);
+                const endDate = new Date(startDate.getTime() + 60 * 60000);
+                const endTime = endDate.toISOString().split('T')[0] + 'T' + endDate.toTimeString().split(' ')[0];
+                console.log('Start Time:', startDate); // Log the start time
+                console.log('End Time:', endDate); // Log the end time
+
+                events.push({
+                    id: `actual-${detail.ActualId}`,
+                    title: 'Actual ',
+                    start: actualTime,
+                    end: endTime,
+                    resourceId: `${detail.PlanDetailId * 2}`
+                });
+                console.log('Event:', events[events.length - 1]); // Log the event object
             });
+
+
+
+            return events;
         }
 
-        return events;
-    }
-
-    //KHỞI TẠO LỊCH
     var calendar = new FullCalendar.Calendar(calendarEl, {
         schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
-        initialView: 'resourceTimeGridFourDay',
-        slotDuration: '00:30',
-        datesAboveResources: true,
+        initialView: 'resourceTimelineDay',
+        // Mỗi slot là 30 phút
+        slotDuration: '01:00',
         // Mỗi slot cách nhau 1 tiếng
-        slotLabelInterval: '01:00',
+        slotLabelInterval: '00:30',
         slotLabelFormat: {
             hour: '2-digit',
             minute: '2-digit',
             hour12: false // Sử dụng định dạng 24 giờ
         },
-        // Hiển thị các ô thời gian theo ý muốn
+        // Hiển thị các ô thời gian từ 6 giờ sáng hôm trước đến 6 giờ sáng hôm sau
         slotMinTime: '00:00:00',
         slotMaxTime: '24:00:00',
+        stickyFooterScrollbar: 'auto',
+        resourceAreaWidth: '110px',
+        height: 1100,
         //Gọi Indicator
         nowIndicator: true,
         //set Indicator với thời gian thực
@@ -68,18 +112,16 @@
         headerToolbar: {
             left: 'prev,next',
             center: 'title',
-            right: 'resourceTimeGridDay,resourceTimeGridFourDay'
+            right: 'resourceTimelineDay,resourceTimelineWeek'
         },
         editable: false,
-        allDaySlot: false,
+        resourceAreaHeaderContent: 'Details/Hour',
         //Lấy API để hiển thị cột Actual và Plan
-        resources: [
-            { id: '1', title: 'Plan', eventColor: '#1E2B37' },
-            { id: '2', title: 'Actual', eventColor: '#3E7D3E' }
-        ],
+        resources: '/api/Resources',
         //Sắp xếp theo thứ tự theo order(Plan trước Actual sau)
-        //events: '/RITD/GetPlanAndActualEvents',
-        events: generateDailyEvents(planDetails),
+        resourceOrder: 'order',
+        //Sắp xếp theo thứ tự theo order(Plan trước Actual sau)
+        events: generateDailyEvents(planDetails, actualDetails),
         // Không cho phép kéo sự kiện để thay đổi thời gian bắt đầu
         eventStartEditable: false,
         // Không cho phép thay đổi độ dài (thời lượng) sự kiện
@@ -114,7 +156,7 @@
             });
 
             // Đưa dữ liệu sự kiện vào modal
-            document.getElementById('eventDetails').innerText = `Nhà cung cấp: ${info.event.title}\nBắt đầu: ${formattedStart}\nKết thúc: ${formattedEnd}`;
+            document.getElementById('eventDetails').innerText = ` ${info.event.title}\nBắt đầu: ${formattedStart}`;
 
             // Kiểm tra nếu sự kiện thuộc "Actual" row
             if (info.event.getResources().some(resource => resource.title === "Actual")) {
@@ -131,19 +173,16 @@
             var myModal = new bootstrap.Modal(document.getElementById('eventModal'));
             myModal.show();
         },
-        //FOMAT NGÀY THÁNG và phần view
+        //FOMAT NGÀY THÁNG
         views: {
-            resourceTimeGridFourDay: {
-                type: 'resourceTimeGrid',
-                duration: { days: 7 },
-                buttonText: '7 days',
-                titleFormat: { day: '2-digit', month: '2-digit', year: 'numeric' },
+            resourceTimelineDay: {
+                titleFormat: { day: '2-digit', month: '2-digit', year: 'numeric' }
             },
-            resourceTimeGridDay: {
+            resourceTimelineWeek: {
                 titleFormat: { day: '2-digit', month: '2-digit', year: 'numeric' }
             }
         },
-        resourceLaneContent: function (arg) {
+        resourceLaneClassNames: function (arg) {
             if (arg.resource.title === "Actual") {
                 return ['gray-background'];
             }
@@ -169,6 +208,7 @@
         }
 
     });
+
 
     calendar.render();
 });

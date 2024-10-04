@@ -1,25 +1,38 @@
-﻿using Manage_Receive_Issues_Goods.Services;
+﻿using Manage_Receive_Issues_Goods.Models;
+using Manage_Receive_Issues_Goods.Service;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace Manage_Receive_Issues_Goods.Controllers
 {
     public class DensoWarehouseController : Controller
     {
-        private readonly ISchedulereceivedTLIPService _schedulereceivedService;
+        private readonly IScheduleRITDService _schedulereceivedService;
 
-        public DensoWarehouseController(ISchedulereceivedTLIPService schedulereceivedService)
+        public DensoWarehouseController(IScheduleRITDService schedulereceivedService)
         {
             _schedulereceivedService = schedulereceivedService;
         }
 
-        public IActionResult ScheduleReceive()
+        public async Task<IActionResult> ScheduleReceive()
         {
-            return View();
+            var planDetails = await _schedulereceivedService.GetAllPlanDetailsAsync();
+            var actualDetails = await _schedulereceivedService.GetAllActualsAsync();
+
+            var planDetailsJson = JsonSerializer.Serialize(planDetails);
+            var actualDetailsJson = JsonSerializer.Serialize(actualDetails);
+
+            ViewData["PlanDetailsJson"] = planDetailsJson;
+            ViewData["ActualDetailsJson"] = actualDetailsJson;
+
+            return View(planDetails);
         }
+
 
         public IActionResult ScheduleIssued()
         {
             return View();
         }
+ 
     }
 }

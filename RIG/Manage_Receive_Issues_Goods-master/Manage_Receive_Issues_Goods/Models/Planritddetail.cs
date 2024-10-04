@@ -25,12 +25,12 @@ public partial class Planritddetail
     [StringLength(100)]
     public string PlanDetailName { get; set; } = null!;
 
-    [InverseProperty("PlanDetail")]
-    public virtual ICollection<Actualsritd> Actualsritds { get; set; } = new List<Actualsritd>();
+    /*[InverseProperty("PlanDetail")]
+    public virtual ICollection<Actualsritd> Actualsritds { get; set; } = new List<Actualsritd>();*/
 
-    [ForeignKey("PlanId")]
-    [InverseProperty("Planritddetails")]
-    public virtual Planritd Plan { get; set; } = null!;
+    //[ForeignKey("PlanId")]
+    //[InverseProperty("Planritddetails")]
+    //public virtual Planritd Plan { get; set; } = null!;
 
     [InverseProperty("PlanDetail")]
     public virtual ICollection<Status> Statuses { get; set; } = new List<Status>();

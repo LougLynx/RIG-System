@@ -20,7 +20,7 @@ public partial class Actualsritd
     [Column(TypeName = "datetime")]
     public DateTime ActualTime { get; set; }
 
-    [ForeignKey("PlanDetailId")]
+    /*[ForeignKey("PlanDetailId")]
     [InverseProperty("Actualsritds")]
-    public virtual Planritddetail PlanDetail { get; set; } = null!;
+    public virtual Planritddetail PlanDetail { get; set; } = null!;*/
 }

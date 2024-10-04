@@ -22,25 +22,58 @@ namespace Manage_Receive_Issues_Goods.Repository.Implementations
 
         public async Task<IEnumerable<Planritddetail>> GetAllPlanDetailsAsync()
         {
-            var planDetails = await _context.Planritddetails.ToListAsync();
-            var effectiveDate = planDetails.FirstOrDefault()?.Plan.EffectiveDate ?? DateOnly.FromDateTime(DateTime.Now);
+            // Lấy tất cả kế hoạch xếp theo EffectiveDate giảm dần
+            var plans = await _context.Planritds
+                .OrderByDescending(p => p.EffectiveDate)
+                .ToListAsync();
 
-            foreach (var detail in planDetails)
+            if (plans == null || !plans.Any())
             {
-                if (detail.PlanDate < effectiveDate)
+                return Enumerable.Empty<Planritddetail>();
+            }
+            
+            var firstPlan = plans.First();
+            var today = DateOnly.FromDateTime(DateTime.Now);
+
+            //Xét xem kế hoạch đầu tiên có EffectiveDate lớn hơn hoặc bằng ngày hiện tại không
+            if (firstPlan.EffectiveDate >= today)
+            {
+                //Nếu EffectiveDate của kế hoạch đầu tiên bằng ngày hiện tại
+                if (firstPlan.EffectiveDate == today)
                 {
-                    detail.PlanDate = effectiveDate;
+                    //Lấy luôn kế hoạch đó
+                    return await _context.Planritddetails
+                        .Where(pd => pd.PlanId == firstPlan.PlanId)
+                        .ToListAsync();
+                }
+                else
+                {
+                    //Nếu EffectiveDate của kế hoạch đầu tiên lớn hơn ngày hiện tại thì lấy kế hoạch thứ 2
+                    var secondPlan = plans.Skip(1).FirstOrDefault();
+                    if (secondPlan != null)
+                    {
+                        return await _context.Planritddetails
+                            .Where(pd => pd.PlanId == secondPlan.PlanId)
+                            .ToListAsync();
+                    }
                 }
             }
-                Console.WriteLine("Plan detail controller:" + planDetails);
-            return planDetails;
+
+            //Nếu không kế hoạch đầu tiên có EffectiveDate nhỏ ngày hiện tại thì là kế hoạch hiện tại
+            return await _context.Planritddetails
+                .Where(pd => pd.PlanId == firstPlan.PlanId)
+                .ToListAsync();
         }
+
+
 
         public async Task<IEnumerable<Actualsritd>> GetAllActualsAsync()
         {
-            return await _context.Actualsritds
+            /*return await _context.Actualsritds
                 .Include(a => a.PlanDetail)
-                .ToListAsync();
+                .ToListAsync();*/
+
+            return await _context.Actualsritds.ToListAsync();
         }
 
         public async Task<IEnumerable<Status>> GetAllStatusesAsync()
@@ -56,7 +89,7 @@ namespace Manage_Receive_Issues_Goods.Repository.Implementations
             var endOfWeek = startOfWeek.AddDays(7);
 
             return await _context.Planritddetails
-                .Include(p => p.Plan)
+                //.Include(p => p.Plan)
                 .Where(p => p.PlanDate >= startOfWeek && p.PlanDate < endOfWeek)
                 .ToListAsync();
         }

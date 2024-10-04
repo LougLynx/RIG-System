@@ -57,9 +57,9 @@ public partial class RigContext : DbContext
         {
             entity.HasKey(e => e.ActualId).HasName("PRIMARY");
 
-            entity.HasOne(d => d.PlanDetail).WithMany(p => p.Actualsritds)
+            /*entity.HasOne(d => d.PlanDetail).WithMany(p => p.Actualsritds)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("actualsritd_ibfk_1");
+                .HasConstraintName("actualsritd_ibfk_1");*/
         });
 
         modelBuilder.Entity<Planritd>(entity =>
@@ -71,9 +71,9 @@ public partial class RigContext : DbContext
         {
             entity.HasKey(e => e.PlanDetailId).HasName("PRIMARY");
 
-            entity.HasOne(d => d.Plan).WithMany(p => p.Planritddetails)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("planritddetails_ibfk_1");
+            //entity.HasOne(d => d.Plan).WithMany(p => p.Planritddetails)
+            //    .OnDelete(DeleteBehavior.ClientSetNull)
+            //    .HasConstraintName("planritddetails_ibfk_1");
         });
 
         modelBuilder.Entity<Schedulereceived>(entity =>
