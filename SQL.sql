@@ -87,20 +87,20 @@ CREATE TABLE IF NOT EXISTS `ScheduleReceived` (
 INSERT INTO `ScheduleReceived` (`SupplierID`, `DeliveryTimeID`, `WeekdayID`, `LeadTime`)
 VALUES 
 -- Supplier A, giao hàng vào Thứ Ba, lúc 08:00:00, thời gian chuẩn bị 120 phút
-(1, 9, 3, 120), 
+(1, 9, 4, 120), 
 -- Supplier B, giao hàng vào Thứ Ba, lúc 10:00:00, thời gian chuẩn bị 90 phút
-(2, 11, 3, 90);
+(2, 11, 4, 90);
 
 INSERT INTO `ScheduleReceived` (`SupplierID`, `DeliveryTimeID`, `WeekdayID`, `LeadTime`)
 VALUES 
 -- Supplier A, giao hàng vào Thứ Ba, lúc 12:00:00, thời gian chuẩn bị 90 phút
-(3, 13, 3, 90), 
+(3, 13, 4, 90), 
 -- Supplier B, giao hàng vào Thứ Ba, lúc 14:00:00, thời gian chuẩn bị 120 phút
-(6, 15, 3, 120),
+(6, 15, 4, 120),
 -- Supplier C, giao hàng vào Thứ Ba, lúc 16:00:00, thời gian chuẩn bị 125 phút
-(4, 17, 3, 90),
+(4, 17, 4, 90),
 -- Supplier D, giao hàng vào Thứ Ba, lúc 20:00:00, thời gian chuẩn bị 160 phút
-(5, 21, 3, 160);
+(5, 21, 4, 160);
 
 -- --------------------------------------------------------
 DROP TABLE IF EXISTS `ActualReceived`;
@@ -123,95 +123,81 @@ VALUES
 
 
 -- --------------------------------------------------------
--- Dumping structure for table Customer
+-- Dumping structure for table Plans
 -- --------------------------------------------------------
-DROP TABLE IF EXISTS `Customer`;
-CREATE TABLE IF NOT EXISTS `Customer` (
-  `CustomerId` int NOT NULL AUTO_INCREMENT,
-  `CustomerName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  PRIMARY KEY (`CustomerId`)
+DROP TABLE IF EXISTS `PlanRITD`;
+CREATE TABLE IF NOT EXISTS `PlanRITD` (
+    `PlanID` int NOT NULL AUTO_INCREMENT,
+    `PlanName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+    `PlanType` ENUM('Received', 'Issued') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+    `TotalShipment` int NOT NULL DEFAULT 0,
+    `EffectiveDate` date NOT NULL, -- New field to indicate when the plan should start being applied
+    PRIMARY KEY (`PlanID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- --------------------------------------------------------
--- Dumping structure for table ScheduleIssuedDenso
--- --------------------------------------------------------
-DROP TABLE IF EXISTS `ScheduleIssuedDenso`;
-CREATE TABLE IF NOT EXISTS `ScheduleIssuedDenso` (
-  `ScheduleDensoID` int NOT NULL AUTO_INCREMENT,
-  `CustomerID` int NOT NULL,
-  `StartTime` datetime NOT NULL,
-  `EndTime` datetime NOT NULL,
-  PRIMARY KEY (`ScheduleDensoID`),
-  FOREIGN KEY (`CustomerID`) REFERENCES `Customer`(`CustomerId`)
+DROP TABLE IF EXISTS `PlanRITDDetails`;
+CREATE TABLE IF NOT EXISTS `PlanRITDDetails` (
+    `PlanDetailID` int NOT NULL AUTO_INCREMENT,
+    `PlanID` int NOT NULL,
+    `PlanDate` date NOT NULL,
+    `PlanTime` time NOT NULL,
+    `PlanDetailName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+    PRIMARY KEY (`PlanDetailID`),
+    FOREIGN KEY (`PlanID`) REFERENCES `PlanRITD`(`PlanID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+
 -- --------------------------------------------------------
--- Dumping structure for table Stage
+-- Dumping structure for table Actuals
 -- --------------------------------------------------------
-DROP TABLE IF EXISTS `Stage`;
-CREATE TABLE IF NOT EXISTS `Stage` (
-  `StageId` int NOT NULL AUTO_INCREMENT,
-  `ScheduleDensoID` int NOT NULL,
-  `StageName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `StartTime` datetime NOT NULL,
-  `EndTime` datetime NOT NULL,
-  `Status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  PRIMARY KEY (`StageId`),
-  FOREIGN KEY (`ScheduleDensoID`) REFERENCES `ScheduleIssuedDenso`(`ScheduleDensoID`)
+DROP TABLE IF EXISTS `ActualsRITD`;
+CREATE TABLE IF NOT EXISTS `ActualsRITD` (
+    `ActualID` int NOT NULL AUTO_INCREMENT,
+    `PlanDetailID` int NOT NULL,
+    `ActualTime` datetime NOT NULL,
+    PRIMARY KEY (`ActualID`),
+    FOREIGN KEY (`PlanDetailID`) REFERENCES `PlanRITDDetails`(`PlanDetailID`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+-- --------------------------------------------------------
+-- Dumping structure for table Statuses
+-- --------------------------------------------------------
+DROP TABLE IF EXISTS `Statuses`;
+CREATE TABLE IF NOT EXISTS `Statuses` (
+    `StatusID` int NOT NULL AUTO_INCREMENT,
+    `PlanDetailID` int NOT NULL,
+    `Status` ENUM('Pending', 'In Transit', 'Delivered') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+    PRIMARY KEY (`StatusID`),
+    FOREIGN KEY (`PlanDetailID`) REFERENCES `PlanRITDDetails`(`PlanDetailID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- --------------------------------------------------------
--- Dumping structure for table StageDelay
--- --------------------------------------------------------
-DROP TABLE IF EXISTS `StageDelay`;
-CREATE TABLE IF NOT EXISTS `StageDelay` (
-  `DelayID` int NOT NULL AUTO_INCREMENT,
-  `StageID` int NOT NULL,
-  `OldStartTime` datetime NOT NULL,
-  `OldEndTime` datetime NOT NULL,
-  `NewStartTime` datetime NOT NULL,
-  `NewEndTime` datetime NOT NULL,
-  `DelayReason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `TimeStampDelay` datetime NOT NULL,
-  PRIMARY KEY (`DelayID`),
-  FOREIGN KEY (`StageID`) REFERENCES `Stage`(`StageId`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- Insert dữ liệu vào bảng Customer
-INSERT INTO `Customer` (`CustomerName`)
+-- Insert dữ liệu mẫu vào bảng PlanRITD
+INSERT INTO `PlanRITD` (`PlanName`, `PlanType`,`TotalShipment`,`EffectiveDate`)
 VALUES 
-('Customer A'),
-('Customer B'),
-('Customer C'),
-('Customer D'),
-('Customer E'),
-('Customer F');
+('Plan Issued', 'Issued', 3,'2024-10-03'),
+('Plan Received', 'Received', 3,'2024-10-03');
 
--- Insert dữ liệu vào bảng ScheduleIssuedDenso
-INSERT INTO `ScheduleIssuedDenso` (`CustomerID`, `StartTime`, `EndTime`)
+-- Insert dữ liệu mẫu vào bảng PlanRITDDetails
+INSERT INTO `PlanRITDDetails` (`PlanID`, `PlanDate`, `PlanTime`,`PlanDetailName`)
 VALUES 
-(1, '2023-10-01 08:00:00', '2023-10-01 10:00:00'),
-(2, '2023-10-02 09:00:00', '2023-10-02 11:00:00'),
-(3, '2023-10-03 10:00:00', '2023-10-03 12:00:00');
+(1, '2024-10-03', '08:00:00', 'Chuyến 1'),
+(1, '2024-10-03', '10:00:00', 'Chuyến 2'),
+(1, '2024-10-03', '14:00:00', 'Chuyến 3'),
+(2, '2024-10-03', '08:00:00', 'Chuyến 1'),	
+(2, '2024-10-03', '10:00:00', 'Chuyến 2'),
+(2, '2024-10-03', '14:00:00', 'Chuyến 3');
 
--- Insert dữ liệu vào bảng Stage
-INSERT INTO `Stage` (`ScheduleDensoID`, `StageName`, `StartTime`, `EndTime`, `Status`)
+-- Insert dữ liệu mẫu vào bảng ActualsRITD
+INSERT INTO `ActualsRITD` (`PlanDetailID`, `ActualTime`)
 VALUES 
-(1, 'Stage 1', '2023-10-01 08:00:00', '2023-10-01 08:30:00', 'Completed'),
-(1, 'Stage 2', '2023-10-01 08:30:00', '2023-10-01 09:00:00', 'Pending'),
-(2, 'Stage 1', '2023-10-02 09:00:00', '2023-10-02 09:30:00', 'Completed'),
-(2, 'Stage 2', '2023-10-02 09:30:00', '2023-10-02 10:00:00', 'Pending'),
-(3, 'Stage 1', '2023-10-03 10:00:00', '2023-10-03 10:30:00', 'Completed'),
-(3, 'Stage 2', '2023-10-03 10:30:00', '2023-10-03 11:00:00', 'Pending');
+(1, '2024-10-03 08:30:00'),
+(2, '2024-10-03 09:30:00');
 
--- Insert dữ liệu vào bảng StageDelay
-INSERT INTO `StageDelay` (`StageID`, `OldStartTime`, `OldEndTime`, `NewStartTime`, `NewEndTime`, `DelayReason`, `TimeStampDelay`)
+-- Insert dữ liệu mẫu vào bảng Statuses
+INSERT INTO `Statuses` (`PlanDetailID`, `Status`)
 VALUES 
-(2, '2023-10-01 08:30:00', '2023-10-01 09:00:00', '2023-10-01 09:00:00', '2023-10-01 09:30:00', 'Technical Issue', '2023-10-01 08:45:00'),
-(4, '2023-10-02 09:30:00', '2023-10-02 10:00:00', '2023-10-02 10:00:00', '2023-10-02 10:30:00', 'Resource Unavailable', '2023-10-02 09:45:00');
-
-
-
+(1, 'In Transit'),
+(2, 'Pending'),
+(3, 'Confirm');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
