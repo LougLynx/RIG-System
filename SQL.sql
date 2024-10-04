@@ -87,20 +87,20 @@ CREATE TABLE IF NOT EXISTS `ScheduleReceived` (
 INSERT INTO `ScheduleReceived` (`SupplierID`, `DeliveryTimeID`, `WeekdayID`, `LeadTime`)
 VALUES 
 -- Supplier A, giao hàng vào Thứ Ba, lúc 08:00:00, thời gian chuẩn bị 120 phút
-(1, 9, 4, 120), 
+(1, 9, 5, 120), 
 -- Supplier B, giao hàng vào Thứ Ba, lúc 10:00:00, thời gian chuẩn bị 90 phút
-(2, 11, 4, 90);
+(2, 11, 5, 90);
 
 INSERT INTO `ScheduleReceived` (`SupplierID`, `DeliveryTimeID`, `WeekdayID`, `LeadTime`)
 VALUES 
 -- Supplier A, giao hàng vào Thứ Ba, lúc 12:00:00, thời gian chuẩn bị 90 phút
-(3, 13, 4, 90), 
+(3, 13, 5, 90), 
 -- Supplier B, giao hàng vào Thứ Ba, lúc 14:00:00, thời gian chuẩn bị 120 phút
-(6, 15, 4, 120),
+(6, 15, 5, 120),
 -- Supplier C, giao hàng vào Thứ Ba, lúc 16:00:00, thời gian chuẩn bị 125 phút
-(4, 17, 4, 90),
+(4, 17, 5, 90),
 -- Supplier D, giao hàng vào Thứ Ba, lúc 20:00:00, thời gian chuẩn bị 160 phút
-(5, 21, 4, 160);
+(5, 21, 5, 160);
 
 -- --------------------------------------------------------
 DROP TABLE IF EXISTS `ActualReceived`;
@@ -174,23 +174,50 @@ CREATE TABLE IF NOT EXISTS `Statuses` (
 INSERT INTO `PlanRITD` (`PlanName`, `PlanType`,`TotalShipment`,`EffectiveDate`)
 VALUES 
 ('Plan Issued', 'Issued', 3,'2024-10-03'),
-('Plan Received', 'Received', 3,'2024-10-03');
+('Plan Received', 'Received', 3,'2024-11-05');
 
 -- Insert dữ liệu mẫu vào bảng PlanRITDDetails
 INSERT INTO `PlanRITDDetails` (`PlanID`, `PlanDate`, `PlanTime`,`PlanDetailName`)
 VALUES 
-(1, '2024-10-03', '08:00:00', 'Chuyến 1'),
-(1, '2024-10-03', '10:00:00', 'Chuyến 2'),
-(1, '2024-10-03', '14:00:00', 'Chuyến 3'),
-(2, '2024-10-03', '08:00:00', 'Chuyến 1'),	
-(2, '2024-10-03', '10:00:00', 'Chuyến 2'),
-(2, '2024-10-03', '14:00:00', 'Chuyến 3');
+(1, '2024-10-03', '00:30:00', 'Số 1'),
+(1, '2024-10-03', '02:00:00', 'Số 2'),
+(1, '2024-10-03', '03:40:00', 'Số 3'),
+(1, '2024-10-03', '04:30:00', 'Số 4'),
+(1, '2024-10-03', '06:00:00', 'Số 5'),
+(1, '2024-10-03', '07:30:00', 'Số 6'),
+(1, '2024-10-03', '08:30:00', 'Số 7'),
+(1, '2024-10-03', '10:00:00', 'Số 8'),
+(1, '2024-10-03', '11:10:00', 'Số 9'),
+(1, '2024-10-03', '12:30:00', 'Số 10'),
+(1, '2024-10-03', '13:30:00', 'Số 11'),
+(1, '2024-10-03', '14:30:00', 'Số 12'),
+(1, '2024-10-03', '15:30:00', 'Số 13'),
+(1, '2024-10-03', '17:00:00', 'Số 14'),
+(1, '2024-10-03', '18:30:00', 'Số 15'),
+(1, '2024-10-03', '19:30:00', 'Số 16'),
+(1, '2024-10-03', '20:30:00', 'Số 17'),
+(1, '2024-10-03', '21:30:00', 'Số 18'),
+(1, '2024-10-03', '22:30:00', 'Số 19'),
+(1, '2024-10-03', '23:30:00', 'Số 20'),
+
+
+
+(2, '2024-10-03', '08:00:00', 'Số 1'),	
+(2, '2024-10-03', '10:00:00', 'Số 2'),
+(2, '2024-10-03', '14:00:00', 'Số 3'),
+(2, '2024-10-03', '14:00:00', 'Số 4');
 
 -- Insert dữ liệu mẫu vào bảng ActualsRITD
 INSERT INTO `ActualsRITD` (`PlanDetailID`, `ActualTime`)
 VALUES 
-(1, '2024-10-03 08:30:00'),
-(2, '2024-10-03 09:30:00');
+(1, '2024-10-04 01:00:00'),
+(2, '2024-10-04 02:30:00'),
+(3, '2024-10-04 04:00:00'),
+(4, '2024-10-04 05:00:00'),
+(5, '2024-10-04 06:30:00'),
+(6, '2024-10-04 08:30:00'),
+(7, '2024-10-04 09:00:00'),
+(8, '2024-10-04 10:00:00');
 
 -- Insert dữ liệu mẫu vào bảng Statuses
 INSERT INTO `Statuses` (`PlanDetailID`, `Status`)
