@@ -2,9 +2,9 @@
 
 @{
     ViewData["Title"] = "Change Plan";
-    var filteredModel = Model.Where(detail => detail.PlanId == 1);
-    // var totalShipment = filteredModel.FirstOrDefault()?.Plan.TotalShipment ?? 0;
-    // var effectiveDate = filteredModel.FirstOrDefault()?.Plan.EffectiveDate.ToShortDateString() ?? "N/A";
+    var filteredModel = Model;
+     var totalShipment = filteredModel.FirstOrDefault()?.Plan.TotalShipment ?? 0;
+     var effectiveDate = filteredModel.FirstOrDefault()?.Plan.EffectiveDate.ToShortDateString() ?? "N/A";
 }
 <!DOCTYPE html>
 <html>
@@ -20,8 +20,8 @@
         <a class="nav-link btn btn-dark" asp-area="" asp-controller="DensoWarehouse" asp-action="ScheduleReceive">Back</a>
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#changePlanModal">Change Plan</button>
     </div>
-@*     <h1>Total Shipment: @totalShipment</h1>
-    <h2>Effective Date: @effectiveDate</h2> *@
+    <h1>Total Shipment: @totalShipment</h1>
+    <h2>Effective Date: @effectiveDate</h2> 
     <table class="table">
         <thead>
             <tr>
@@ -55,7 +55,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="changePlanForm" method="post" asp-action="ChangePlan">
+                    <form id="changePlanForm" method="post">
                         <div class="form-group">
                             <label for="planName">Plan Name</label>
                             <input type="text" class="form-control" id="planName" name="planName" value="Receive Shipment" required />
@@ -72,6 +72,10 @@
                             <label for="effectiveDate">Effective Date</label>
                             <input type="date" class="form-control" id="effectiveDate" name="effectiveDate" required />
                         </div>
+
+                        <!-- Dynamic Plan Details Section -->
+                        <div id="planDetailsSection"></div>
+
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -116,6 +120,55 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/js/bootstrap-timepicker.min.js"></script>
     <script>
         $(document).ready(function () {
+            // Khi người dùng nhập số Total Shipment, tạo động các Plan Detail
+            $('#totalShipment').on('input', function () {
+                const totalShipment = parseInt($(this).val());
+                let planDetailsHtml = '';
+
+                if (totalShipment > 0) {
+                    for (let i = 1; i <= totalShipment; i++) {
+                        planDetailsHtml += `
+            <div class="form-group">
+                <label for="planDetailTime_${i}">Plan Detail Số ${i}</label>
+                <input type="time" class="form-control" id="planDetailTime_${i}" name="planDetails[${i - 1}].planTime" required />
+            </div>
+        `;
+
+                    }
+                }
+
+                $('#planDetailsSection').html(planDetailsHtml); // Thêm các trường động vào form
+            });
+
+            // Save changes khi nhấn nút "Save"
+            $('.save-plan-btn').on('click', function () {
+                const formData = $('#changePlanForm').serialize();
+                console.log('Form Data Sent:', formData); // Log dữ liệu gửi lên server
+                $.ajax({
+                    url: '@Url.Action("ChangePlan", "RITD")',
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        console.log("Response from server:", response);
+                        if (response.success) {
+                            $('#changePlanModal').modal('hide');  // Ẩn modal sau khi lưu thành công
+                            location.reload();  // Tải lại trang
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log('Error saving plan:', error);
+                        alert('Error saving plan: ' + error);
+                    }
+                });
+            });
+
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
             $('.timepicker').timepicker({
                 showMeridian: false,
                 defaultTime: false
@@ -140,38 +193,6 @@
                     },
                     error: function (xhr, status, error) {
                         alert('Error updating time: ' + error);
-                    }
-                });
-            });
-
-            $('.save-shipment-btn').on('click', function () {
-                var formData = $('#addShipmentForm').serialize();
-                $.ajax({
-                    url: '@Url.Action("AddShipment", "RITD")',
-                    type: 'POST',
-                    data: formData,
-                    success: function (response) {
-                        $('#addShipmentModal').modal('hide');
-                        location.reload();
-                    },
-                    error: function (xhr, status, error) {
-                        alert('Error adding shipment: ' + error);
-                    }
-                });
-            });
-
-            $('.save-plan-btn').on('click', function () {
-                var formData = $('#changePlanForm').serialize();
-                $.ajax({
-                    url: '@Url.Action("ChangePlan", "RITD")',
-                    type: 'POST',
-                    data: formData,
-                    success: function (response) {
-                        $('#changePlanModal').modal('hide');
-                        location.reload();
-                    },
-                    error: function (xhr, status, error) {
-                        alert('Error changing plan: ' + error);
                     }
                 });
             });

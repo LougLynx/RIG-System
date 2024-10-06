@@ -66,14 +66,13 @@ namespace Manage_Receive_Issues_Goods.Repository.Implementations
         }
 
 
-
         public async Task<IEnumerable<Actualsritd>> GetAllActualsAsync()
         {
-            /*return await _context.Actualsritds
+            return await _context.Actualsritds
                 .Include(a => a.PlanDetail)
-                .ToListAsync();*/
+                .ToListAsync();
 
-            return await _context.Actualsritds.ToListAsync();
+            //return await _context.Actualsritds.ToListAsync();
         }
 
         public async Task<IEnumerable<Status>> GetAllStatusesAsync()
@@ -83,7 +82,7 @@ namespace Manage_Receive_Issues_Goods.Repository.Implementations
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Planritddetail>> GetPlanDetailsForWeekAsync()
+        /*public async Task<IEnumerable<Planritddetail>> GetPlanDetailsForWeekAsync()
         {
             var startOfWeek = DateOnly.FromDateTime(DateTime.Now.StartOfWeek(DayOfWeek.Monday));
             var endOfWeek = startOfWeek.AddDays(7);
@@ -92,7 +91,7 @@ namespace Manage_Receive_Issues_Goods.Repository.Implementations
                 //.Include(p => p.Plan)
                 .Where(p => p.PlanDate >= startOfWeek && p.PlanDate < endOfWeek)
                 .ToListAsync();
-        }
+        }*/
 
         public async Task<Planritddetail> GetPlanDetailByIdAsync(int detailId)
         {
@@ -116,7 +115,51 @@ namespace Manage_Receive_Issues_Goods.Repository.Implementations
                 })
                 .ToListAsync();
         }
+
+        public async Task AddActualAsync(Actualsritd actual)
+        {
+            _context.Actualsritds.Add(actual);
+            await _context.SaveChangesAsync();
+        }
+
+		public async Task DeleteActualAsync(int actualId)
+		{
+			var actual = await _context.Actualsritds.FindAsync(actualId);
+			if (actual != null)
+			{
+				_context.Actualsritds.Remove(actual);
+				await _context.SaveChangesAsync();
+			}
+		}
+
+        public async Task AddPlanAsync(Planritd plan)
+        {
+            _context.Planritds.Add(plan);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AddPlanDetailAsync(Planritddetail planDetail)
+        {
+            _context.Planritddetails.Add(planDetail);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<int> GetPlanIdByDetailsAsync(string planName, string planType, DateOnly effectiveDate)
+        {
+            var plan = await _context.Planritds
+                .FirstOrDefaultAsync(p => p.PlanName == planName && p.PlanType == planType && p.EffectiveDate == effectiveDate);
+
+            if (plan != null)
+            {
+                return plan.PlanId;
+            }
+
+            return 0;  
+        }
+
+
     }
+
 
     public static class DateTimeExtensions
     {

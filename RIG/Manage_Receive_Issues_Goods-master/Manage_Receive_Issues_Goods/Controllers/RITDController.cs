@@ -17,12 +17,81 @@ namespace Manage_Receive_Issues_Goods.Controllers
         {
             _scheduleService = scheduleService;
         }
-
         public async Task<IActionResult> ChangePlan()
         {
-            var planDetails = await _scheduleService.GetPlanDetailsForWeekAsync();
+            var planDetails = await _scheduleService.GetAllPlanDetailsAsync();
             return View(planDetails);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePlan(string planName, string planType, int totalShipment, string effectiveDate, List<PlanDetailInputModel> planDetails)
+        {
+            try
+            {
+
+                // Log dữ liệu planDetails để kiểm tra
+                Console.WriteLine("Plan Details Received:");
+                foreach (var detail in planDetails)
+                {
+                    Console.WriteLine($"Plan Detail - Time: {detail.PlanTime}");
+                }
+
+                // Kiểm tra nếu chuỗi effectiveDate bị null hoặc rỗng
+                if (string.IsNullOrEmpty(effectiveDate))
+                {
+                    return Json(new { success = false, message = "EffectiveDate cannot be null or empty." });
+                }
+                // Chuyển đổi effectiveDate từ string sang DateOnly
+                DateOnly effectiveDateOnly = DateOnly.Parse(effectiveDate);
+
+                // Lưu thông tin Plan vào bảng PlanRITD
+                var newPlan = new Planritd
+                {
+                    PlanName = planName,
+                    PlanType = planType,
+                    TotalShipment = totalShipment,
+                    EffectiveDate = effectiveDateOnly
+                };
+                Console.WriteLine(newPlan);
+
+                await _scheduleService.AddPlanAsync(newPlan);  // Lưu kế hoạch vào bảng PlanRITD
+
+                // Lấy PlanID của kế hoạch vừa tạo
+                var planId = await _scheduleService.GetPlanIdByDetailsAsync(planName, planType, effectiveDateOnly);
+                Console.WriteLine(planId);
+
+
+                if (planId == 0)
+                {
+                    Console.WriteLine("Không có PlanID");
+                    return Json(new { success = false, message = "Không tìm thấy Plan mới tạo." });
+                }
+                // Lưu các PlanDetail vào bảng PlanRITDDetails
+                foreach (var detail in planDetails)
+                {
+                    // Kiểm tra nếu planTime bị null hoặc rỗng
+                    if (string.IsNullOrEmpty(detail.PlanTime))
+                    {
+                        return Json(new { success = false, message = "PlanTime cannot be null or empty." });
+                    }
+                    var newDetail = new Planritddetail
+                    {
+                        PlanId = planId,
+                        PlanTime = TimeOnly.Parse(detail.PlanTime),  // Chuyển đổi PlanTime từ string sang TimeOnly
+                        PlanDetailName = $"Số {planDetails.IndexOf(detail) + 1}"  // Đặt tên cho các PlanDetail
+                    };
+                    await _scheduleService.AddPlanDetailAsync(newDetail);  // Lưu từng PlanDetail
+                }
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+
 
         [HttpPost]
         public async Task<IActionResult> UpdatePlanTime(int detailId, string planTime)
@@ -44,7 +113,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
         }
 
 
-        [HttpGet]
+        /*[HttpGet]
         public async Task<JsonResult> GetPlanAndActualEvents(DateTime start, DateTime end)
         {
             var plans = await _scheduleService.GetAllPlansAsync();
@@ -75,6 +144,6 @@ namespace Manage_Receive_Issues_Goods.Controllers
             }).Where(e => e.start != null).ToList();
 
             return Json(events);
-        }
+        }*/
     }
 }
