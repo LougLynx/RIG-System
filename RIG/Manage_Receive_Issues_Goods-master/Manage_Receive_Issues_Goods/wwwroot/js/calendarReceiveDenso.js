@@ -1,6 +1,7 @@
 ﻿document.addEventListener('DOMContentLoaded', function () {
     var calendarEl = document.getElementById('calendar');
 
+   
     // Lấy thời gian thực cho Indicator
     function getFormattedNow() {
         var now = new Date();
@@ -17,19 +18,26 @@
 
     // Tạo sự kiện dựa trên dữ liệu được truyền từ Razor View
     function generateDailyEvents(planDetails) {
-        const events = [];
+        console.log("Plan Detail:", planDetails);
 
+        const events = [];
+        const today = new Date();
+        const todayString = today.toISOString().split('T')[0];
+
+        console.log("Today String:", todayString);
+        console.log("Today :", today);
         console.log("Plan Details Received:", planDetails);
 
         planDetails.forEach(detail => {
             // Log detail for each PlanDetail
             console.log("Processing Plan Detail:", detail);
 
-            // Tạo sự kiện cho các kế hoạch (PlanDetails)
-            const date = new Date();
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
+            // Determine the date to display based on ActualTime if it exists, otherwise use today for current date
+            const actualTime = detail.Actuals && detail.Actuals.length > 0 ? new Date(detail.Actuals[0].ActualTime) : null;
+            const displayDate = actualTime ? actualTime : today;
+            const year = displayDate.getFullYear();
+            const month = String(displayDate.getMonth() + 1).padStart(2, '0');
+            const day = String(displayDate.getDate()).padStart(2, '0');
             const dateString = `${year}-${month}-${day}`;
             const start = `${dateString}T${detail.PlanTime}`;
 
@@ -56,10 +64,9 @@
 
             if (detail.Actuals && detail.Actuals.length > 0) {
                 console.log(`Actuals Found for Plan Detail ID: ${detail.PlanDetailId}`);
-
+                console.log("Detail Actual:", detail.Actuals);
                 // Lấy chỉ Actual đầu tiên
                 const actual = detail.Actuals[0];
-                console.log("Processing First Actual:", actual);
 
                 const actualDate = new Date(actual.ActualTime);
 
@@ -95,6 +102,9 @@
         console.log("All Events Generated:", events);
         return events;
     }
+
+
+
 
     function confirmActual(planDetailId) {
         var now = new Date();
@@ -200,6 +210,8 @@
                         var eventModal = bootstrap.Modal.getInstance(eventModalElement);
                         eventModal.hide();
 
+                        // Reload lại trang
+                        location.reload();
                     } else {
                         alert('Error deleting actual.');
                     }

@@ -15,7 +15,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
 			_schedulereceivedService = schedulereceivedService;
 		}
 
-		public async Task<IActionResult> ScheduleReceive()
+        /*public async Task<IActionResult> ScheduleReceive()
 		{
 			var planDetails = await _schedulereceivedService.GetAllPlanDetailsAsync();
 			var actualDetails = await _schedulereceivedService.GetAllActualsAsync();
@@ -39,9 +39,25 @@ namespace Manage_Receive_Issues_Goods.Controllers
 			ViewData["PlanDetailsJson"] = planDetailsJson;
 
 			return View(planDetailsDto);
-		}
+		}*/
+        /*public async Task<IActionResult> ScheduleReceive()
+        {
+            var planDetails = await _schedulereceivedService.GetPlanAndActualDetailsAsync();
 
-		[HttpPost]
+            // Chuyển đổi thành JSON và truyền vào ViewData
+            var planDetailsJson = JsonSerializer.Serialize(planDetails);
+            ViewData["PlanDetailsJson"] = planDetailsJson;
+
+            return View(planDetails);
+        }*/
+        public async Task<IActionResult> ScheduleReceive()
+        {
+            var planDetails = await _schedulereceivedService.GetPlanDetailsForDisplayAsync();
+            ViewData["PlanDetailsJson"] = JsonSerializer.Serialize(planDetails);
+            return View(planDetails);
+        }
+
+        [HttpPost]
 		public async Task<IActionResult> AddActual([FromBody] ActualDetailDTO actualDetailDto)
 		{
 			if (actualDetailDto == null || actualDetailDto.PlanDetailId <= 0)
@@ -93,8 +109,14 @@ namespace Manage_Receive_Issues_Goods.Controllers
 			}
 		}
 
+        [HttpDelete]
+        public async Task<IActionResult> DeleteOldActuals()
+        {
+            await _schedulereceivedService.DeleteOldActualsAsync();
+            return NoContent();
+        }
 
-		public IActionResult ScheduleIssued()
+        public IActionResult ScheduleIssued()
 		{
 			return View();
 		}

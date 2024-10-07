@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Manage_Receive_Issues_Goods.DTO;
 using Manage_Receive_Issues_Goods.Models;
 
 namespace Manage_Receive_Issues_Goods.Service
@@ -19,5 +20,8 @@ namespace Manage_Receive_Issues_Goods.Service
         Task AddPlanAsync(Planritd plan);
         Task AddPlanDetailAsync(Planritddetail planDetail);
         Task<int> GetPlanIdByDetailsAsync(string planName, string planType, DateOnly effectiveDate);
+        Task DeleteOldActualsAsync();
+        Task<IEnumerable<PlanDetailDTO>> GetPlanAndActualDetailsAsync();
+        Task<IEnumerable<PlanDetailDTO>> GetPlanDetailsForDisplayAsync();
     }
 }

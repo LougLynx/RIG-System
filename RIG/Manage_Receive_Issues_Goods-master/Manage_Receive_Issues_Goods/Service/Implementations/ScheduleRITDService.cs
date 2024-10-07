@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Manage_Receive_Issues_Goods.DTO;
 using Manage_Receive_Issues_Goods.Models;
 using Manage_Receive_Issues_Goods.Repository;
 using Microsoft.EntityFrameworkCore;
@@ -59,10 +60,10 @@ namespace Manage_Receive_Issues_Goods.Service.Implementations
             await _scheduleRepository.AddActualAsync(actual);
         }
 
-		public async Task DeleteActualAsync(int actualId)
-		{
-			await _scheduleRepository.DeleteActualAsync(actualId);
-		}
+        public async Task DeleteActualAsync(int actualId)
+        {
+            await _scheduleRepository.DeleteActualAsync(actualId);
+        }
         public async Task AddPlanAsync(Planritd plan)
         {
             await _scheduleRepository.AddPlanAsync(plan);
@@ -76,5 +77,40 @@ namespace Manage_Receive_Issues_Goods.Service.Implementations
         {
             return await _scheduleRepository.GetPlanIdByDetailsAsync(planName, planType, effectiveDate);
         }
+
+        public async Task DeleteOldActualsAsync()
+        {
+            await _scheduleRepository.DeleteOldActualsAsync();
+        }
+        public async Task<IEnumerable<PlanDetailDTO>> GetPlanAndActualDetailsAsync()
+        {
+            return await _scheduleRepository.GetPlanAndActualDetailsAsync();
+        }
+
+        public async Task<IEnumerable<PlanDetailDTO>> GetPlanDetailsForDisplayAsync()
+        {
+            var currentPlan = await _scheduleRepository.GetCurrentPlanAsync();
+            var nextPlan = await _scheduleRepository.GetNextPlanAsync();
+
+            var startDate = currentPlan?.EffectiveDate ?? DateOnly.FromDateTime(DateTime.Today);
+            var endDate = nextPlan?.EffectiveDate.AddDays(-1) ?? DateOnly.FromDateTime(DateTime.Today);
+
+            var planDetails = await _scheduleRepository.GetPlanDetailsBetweenDatesAsync(startDate, endDate);
+            return planDetails.Select(pd => new PlanDetailDTO
+            {
+                PlanDetailId = pd.PlanDetailId,
+                PlanTime = pd.PlanTime,
+                PlanDetailName = pd.PlanDetailName,
+                Actuals = pd.Actualsritds.Select(a => new ActualDetailDTO
+                {
+                    ActualId = a.ActualId,
+                    PlanDetailId = a.PlanDetailId,
+                    ActualTime = a.ActualTime
+                }).ToList()
+            });
+        }
+
+        
+
     }
 }
