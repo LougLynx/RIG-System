@@ -82,35 +82,44 @@ namespace Manage_Receive_Issues_Goods.Service.Implementations
         {
             await _scheduleRepository.DeleteOldActualsAsync();
         }
+       
         public async Task<IEnumerable<PlanDetailDTO>> GetPlanAndActualDetailsAsync()
         {
             return await _scheduleRepository.GetPlanAndActualDetailsAsync();
         }
 
-        public async Task<IEnumerable<PlanDetailDTO>> GetPlanDetailsForDisplayAsync()
-        {
-            var currentPlan = await _scheduleRepository.GetCurrentPlanAsync();
-            var nextPlan = await _scheduleRepository.GetNextPlanAsync();
+		public async Task<(Planritd currentPlan, Planritd? nextPlan)> GetCurrentAndNextPlanAsync()
+		{
+			var currentPlan = await _scheduleRepository.GetCurrentPlanAsync();
+			var nextPlan = await _scheduleRepository.GetNextPlanAsync();
 
-            var startDate = currentPlan?.EffectiveDate ?? DateOnly.FromDateTime(DateTime.Today);
-            var endDate = nextPlan?.EffectiveDate.AddDays(-1) ?? DateOnly.FromDateTime(DateTime.Today);
+			// Nếu không có kế hoạch kế tiếp, gán nextPlan là null để frontend biết cần lặp vô hạn.
+			return (currentPlan, nextPlan);
+		}
 
-            var planDetails = await _scheduleRepository.GetPlanDetailsBetweenDatesAsync(startDate, endDate);
-            return planDetails.Select(pd => new PlanDetailDTO
-            {
-                PlanDetailId = pd.PlanDetailId,
-                PlanTime = pd.PlanTime,
-                PlanDetailName = pd.PlanDetailName,
-                Actuals = pd.Actualsritds.Select(a => new ActualDetailDTO
-                {
-                    ActualId = a.ActualId,
-                    PlanDetailId = a.PlanDetailId,
-                    ActualTime = a.ActualTime
-                }).ToList()
-            });
-        }
+		public async Task<IEnumerable<PlanDetailDTO>> GetPlanDetailsForDisplayAsync()
+		{
+			var (currentPlan, nextPlan) = await GetCurrentAndNextPlanAsync();
 
-        
+			var startDate = currentPlan?.EffectiveDate ?? DateOnly.FromDateTime(DateTime.Today);
+			var endDate = nextPlan?.EffectiveDate.AddDays(-1) ?? DateOnly.FromDateTime(DateTime.Today).AddYears(100); // Nếu không có kế hoạch tiếp theo, lặp lại trong 100 năm
 
-    }
+			var planDetails = await _scheduleRepository.GetPlanDetailsBetweenDatesAsync(startDate, endDate);
+			return planDetails.Select(pd => new PlanDetailDTO
+			{
+				PlanDetailId = pd.PlanDetailId,
+				PlanTime = pd.PlanTime,
+				PlanDetailName = pd.PlanDetailName,
+				Actuals = pd.Actualsritds.Select(a => new ActualDetailDTO
+				{
+					ActualId = a.ActualId,
+					PlanDetailId = a.PlanDetailId,
+					ActualTime = a.ActualTime
+				}).ToList()
+			});
+		}
+
+
+
+	}
 }

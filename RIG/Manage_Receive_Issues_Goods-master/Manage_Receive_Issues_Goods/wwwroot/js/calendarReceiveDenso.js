@@ -1,7 +1,7 @@
 ﻿document.addEventListener('DOMContentLoaded', function () {
     var calendarEl = document.getElementById('calendar');
 
-   
+
     // Lấy thời gian thực cho Indicator
     function getFormattedNow() {
         var now = new Date();
@@ -17,85 +17,90 @@
     var now = getFormattedNow();
 
     // Tạo sự kiện dựa trên dữ liệu được truyền từ Razor View
-    function generateDailyEvents(planDetails) {
-        console.log("Plan Detail:", planDetails);
-
+    function generateDailyEvents(planDetails, currentPlanEffectiveDate, nextPlanEffectiveDate) {
         const events = [];
         const today = new Date();
-        const todayString = today.toISOString().split('T')[0];
-
-        console.log("Today String:", todayString);
-        console.log("Today :", today);
-        console.log("Plan Details Received:", planDetails);
+        const todayString = today.toISOString().split('T')[0]; // Ngày hôm nay ở định dạng YYYY-MM-DD
+        const currentPlanStartDate = new Date(currentPlanEffectiveDate);
+        const nextPlanStartDate = nextPlanEffectiveDate ? new Date(nextPlanEffectiveDate) : null;
 
         planDetails.forEach(detail => {
-            // Log detail for each PlanDetail
-            console.log("Processing Plan Detail:", detail);
-
-            // Determine the date to display based on ActualTime if it exists, otherwise use today for current date
-            const actualTime = detail.Actuals && detail.Actuals.length > 0 ? new Date(detail.Actuals[0].ActualTime) : null;
-            const displayDate = actualTime ? actualTime : today;
-            const year = displayDate.getFullYear();
-            const month = String(displayDate.getMonth() + 1).padStart(2, '0');
-            const day = String(displayDate.getDate()).padStart(2, '0');
-            const dateString = `${year}-${month}-${day}`;
-            const start = `${dateString}T${detail.PlanTime}`;
-
-            // Calculate the end time manually without using the Date object to avoid timezone issues
-            const [hours, minutes] = detail.PlanTime.split(':').map(Number); // Extract hours and minutes from PlanTime 
-            const endHours = hours + 1; // Add 1 hour for the event duration
-
-            // Construct end time in the same format as start time, adjusting only hours (and wrap around if necessary)
-            const end = `${dateString}T${String(endHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
-
-            console.log(`Generated Plan Event - ID: plan-${detail.PlanDetailId}, Start: ${start}, End: ${end}`);
-
-            events.push({
-                id: `plan-${detail.PlanDetailId}`,
-                title: `Plan ${detail.PlanDetailName}`,
-                start: start,
-                end: end,
-                resourceId: `${detail.PlanDetailId * 2 - 1}`,
-                extendedProps: {
-                    hasActual: detail.Actuals && detail.Actuals.length > 0,
-                    planDetailId: detail.PlanDetailId
-                }
-            });
-
+            // Hiển thị các sự kiện dựa trên ActualTime cho các PlanDetail trong quá khứ
             if (detail.Actuals && detail.Actuals.length > 0) {
-                console.log(`Actuals Found for Plan Detail ID: ${detail.PlanDetailId}`);
-                console.log("Detail Actual:", detail.Actuals);
-                // Lấy chỉ Actual đầu tiên
-                const actual = detail.Actuals[0];
+                detail.Actuals.forEach(actual => {
+                    const actualDate = new Date(actual.ActualTime);
+                    const actualYear = actualDate.getFullYear();
+                    const actualMonth = String(actualDate.getMonth() + 1).padStart(2, '0');
+                    const actualDay = String(actualDate.getDate()).padStart(2, '0');
+                    const actualDateString = `${actualYear}-${actualMonth}-${actualDay}`;
 
-                const actualDate = new Date(actual.ActualTime);
+                    // Kiểm tra xem ngày của Actual có trùng với hôm nay hay không
+                    if (actualDateString !== todayString) {
+                        // Hiển thị sự kiện PlanDetail dựa trên ActualTime nếu không phải ngày hôm nay
+                        const planStartTime = `${actualDateString}T${detail.PlanTime}`;
+                        const [hours, minutes] = detail.PlanTime.split(':').map(Number);
+                        const planEndTime = `${actualDateString}T${String(hours + 1).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
 
-                const actualYear = actualDate.getFullYear();
-                const actualMonth = String(actualDate.getMonth() + 1).padStart(2, '0');
-                const actualDay = String(actualDate.getDate()).padStart(2, '0');
-                const actualDateString = `${actualYear}-${actualMonth}-${actualDay}`;
+                        events.push({
+                            id: `plan-${detail.PlanDetailId}-actual-${actualDateString}`,
+                            title: `Plan ${detail.PlanDetailName}`,
+                            start: planStartTime,
+                            end: planEndTime,
+                            resourceId: `${detail.PlanDetailId * 2 - 1}`,
+                            extendedProps: {
+                                hasActual: true,
+                                planDetailId: detail.PlanDetailId
+                            }
+                        });
+                    }
 
-                const actualTimeString = actualDate.toTimeString().split(' ')[0];
-                const actualStartTime = `${actualDateString}T${actualTimeString}`;
+                    // Hiển thị sự kiện Actual dựa trên ActualTime
+                    const actualStartTime = `${actualDateString}T${actualDate.toTimeString().split(' ')[0]}`;
+                    const actualEndDate = new Date(actualDate.getTime() + 60 * 60000); // Thêm 1 giờ cho thời gian kết thúc
+                    const actualEndTime = `${actualEndDate.getFullYear()}-${String(actualEndDate.getMonth() + 1).padStart(2, '0')}-${String(actualEndDate.getDate()).padStart(2, '0')}T${actualEndDate.toTimeString().split(' ')[0]}`;
 
-                console.log("Actual Time Start:", actualStartTime);
-
-                const actualStartDate = new Date(actualStartTime);
-                const actualEndDate = new Date(actualStartDate.getTime() + 60 * 60000);
-                const actualEndTime = `${actualEndDate.getFullYear()}-${String(actualEndDate.getMonth() + 1).padStart(2, '0')}-${String(actualEndDate.getDate()).padStart(2, '0')}T${actualEndDate.toTimeString().split(' ')[0]}`;
-
-                console.log("Actual Time End:", actualEndTime);
-
-                events.push({
-                    id: `actual-${actual.ActualId}`,
-                    title: `Actual ${detail.PlanDetailName}`,
-                    start: actualStartTime,
-                    end: actualEndTime,
-                    resourceId: `${detail.PlanDetailId * 2}`,
-                    extendedProps: { hasActual: true }
+                    events.push({
+                        id: `actual-${actual.ActualId}`,
+                        title: `Actual ${detail.PlanDetailName}`,
+                        start: actualStartTime,
+                        end: actualEndTime,
+                        resourceId: `${detail.PlanDetailId * 2}`,
+                        extendedProps: { hasActual: true }
+                    });
                 });
-            } else {
-                console.log(`No Actuals Found for Plan Detail ID: ${detail.PlanDetailId}`);
+            }
+
+            // Hiển thị các PlanDetail từ hiện tại đến trước ngày của kế hoạch tiếp theo
+            if (!nextPlanStartDate || today < nextPlanStartDate) {
+                let startDate = new Date(Math.max(today.getTime(), currentPlanStartDate.getTime()));
+                const endDate = nextPlanStartDate || new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+
+                while (startDate < endDate) {
+                    const year = startDate.getFullYear();
+                    const month = String(startDate.getMonth() + 1).padStart(2, '0');
+                    const day = String(startDate.getDate()).padStart(2, '0');
+                    const dateString = `${year}-${month}-${day}`;
+                    const start = `${dateString}T${detail.PlanTime}`;
+
+                    const [hours, minutes] = detail.PlanTime.split(':').map(Number);
+                    const endHours = hours + 1;
+                    const end = `${dateString}T${String(endHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+
+                    events.push({
+                        id: `plan-${detail.PlanDetailId}-${dateString}`,
+                        title: `Plan ${detail.PlanDetailName}`,
+                        start: start,
+                        end: end,
+                        resourceId: `${detail.PlanDetailId * 2 - 1}`,
+                        extendedProps: {
+                            hasActual: false,
+                            planDetailId: detail.PlanDetailId
+                        }
+                    });
+
+                    // Tăng ngày để lặp lại sự kiện
+                    startDate.setDate(startDate.getDate() + 1);
+                }
             }
         });
 
@@ -135,7 +140,7 @@
                         id: `actual-${planDetailId}`,
                         title: `Actual for Plan ${planDetailId}`,
                         start: formattedNow,
-                        end: new Date(new Date(formattedNow).getTime() + 60 * 60000),
+                        end: new Date(new Date(formattedNow).getTime() + 60 * 60000).toISOString(),
                         resourceId: `${planDetailId * 2}`,
                         extendedProps: { hasActual: true }
                     };
@@ -143,22 +148,26 @@
                     // Thêm sự kiện actual vào lịch
                     calendar.addEvent(actualEvent);
 
+                    // Cập nhật extendedProps của sự kiện PlanDetail để đánh dấu đã có Actual
+                    const todayString = formattedNow.split('T')[0];
+                    var planEvent = calendar.getEventById(`plan-${planDetailId}-${todayString}`);
+                    if (planEvent) {
+                        planEvent.setExtendedProp('hasActual', true); // Cập nhật prop để xác nhận đã có Actual
+                        console.log('Updated PlanDetail with hasActual:', planEvent);
+                    } else {
+                        console.log('PlanDetail event not found for update.');
+                    }
+
                     // Ẩn nút Confirm sau khi xác nhận
                     var confirmButton = document.getElementById('confirmButton');
                     if (confirmButton) {
-                        confirmButton.style.display = 'none'; // Ẩn nút Confirm
-                    }
-
-                    // Cập nhật extendedProps của sự kiện hiện tại để đánh dấu đã có Actual
-                    var event = calendar.getEventById(`plan-${planDetailId}`);
-                    if (event) {
-                        event.setExtendedProp('hasActual', true); // Cập nhật prop để xác nhận đã có Actual
+                        confirmButton.style.display = 'none';
                     }
 
                     // Đóng modal chi tiết hiện tại
                     var detailModal = document.getElementById('eventModal');
-                    var bootstrapModal = bootstrap.Modal.getInstance(detailModal); // Lấy instance của modal hiện tại
-                    bootstrapModal.hide(); // Đóng modal chi tiết
+                    var bootstrapModal = bootstrap.Modal.getInstance(detailModal);
+                    bootstrapModal.hide();
 
                     // Hiển thị modal thành công với tích xanh
                     var successModal = new bootstrap.Modal(document.getElementById('successModal'));
@@ -170,6 +179,7 @@
             })
             .catch(error => console.error('Error:', error));
     }
+
 
     let deleteActualId = null; // Biến lưu trữ ID của Actual cần xóa
 
@@ -252,46 +262,54 @@
         resourceAreaHeaderContent: 'Details/Hour',
         resources: '/api/Resources',
         resourceOrder: 'order',
-        events: generateDailyEvents(planDetails),
+        events: generateDailyEvents(planDetails, currentPlanEffectiveDate, nextPlanEffectiveDate),
         eventClick: function (info) {
-            var start = new Date(info.event.start);
-            var end = new Date(info.event.end);
+            // Lấy ngày hôm nay ở định dạng YYYY-MM-DD
+            const today = new Date();
+            const todayString = today.toISOString().split('T')[0];
 
-            var formattedStart = start.toLocaleString('vi-VN', {
-                timeZone: 'UTC',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+            // Lấy ngày từ thời gian bắt đầu của sự kiện được click
+            const eventDate = new Date(info.event.start).toISOString().split('T')[0];
+            console.log("Infor Start:", eventDate);
+            // Lấy các thông tin cần thiết từ sự kiện
+            const hasActual = info.event.extendedProps.hasActual;
+            console.log("Has Actual:", hasActual);
+            const planDetailId = info.event.extendedProps.planDetailId;
 
-            document.getElementById('eventDetails').innerHTML = `${info.event.title}<br><i><strong>Nhận lúc: ${formattedStart}</strong></i>`;
+            // Hiển thị chi tiết sự kiện trong modal
+            document.getElementById('eventDetails').innerHTML = `${info.event.title}<br><i><strong>Nhận lúc: ${new Date(info.event.start).toLocaleString('vi-VN', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}</strong></i>`;
 
-            var confirmButton = document.getElementById('confirmButton');
-            var deleteButton = document.getElementById('deleteButton');
-
+            // Điều chỉnh nút Confirm dựa trên điều kiện
+            const confirmButton = document.getElementById('confirmButton');
             if (confirmButton) {
-                if (!info.event.extendedProps.hasActual) {
+                // Chỉ hiển thị nút Confirm nếu sự kiện thuộc về ngày hôm nay và chưa có Actual
+                if (eventDate === todayString && !hasActual) {
                     confirmButton.style.display = 'block';
                     confirmButton.onclick = function () {
-                        console.log("Plan Detail ID:", info.event.extendedProps.planDetailId );
-                         confirmActual(info.event.extendedProps.planDetailId);
+                        confirmActual(planDetailId);
                     };
                 } else {
                     confirmButton.style.display = 'none';
                 }
             }
 
-            if (info.event.id.startsWith('actual')) {
-                deleteButton.style.display = 'block';
-                deleteButton.onclick = function () {
-                    confirmDelete(info.event.id.split('-')[1]);
-                };
-            } else {
-                deleteButton.style.display = 'none';
+            // Điều chỉnh nút Delete nếu sự kiện là Actual
+            const deleteButton = document.getElementById('deleteButton');
+            if (deleteButton) {
+                if (info.event.id.startsWith('actual')) {
+                    deleteButton.style.display = 'block';
+                    deleteButton.onclick = function () {
+                        confirmDelete(info.event.id.split('-')[1]);
+                    };
+                } else {
+                    deleteButton.style.display = 'none';
+                }
             }
-             
-            var modalElement = document.getElementById('eventModal');
+
+            // Hiển thị modal chi tiết sự kiện
+            const modalElement = document.getElementById('eventModal');
             if (modalElement) {
-                var myModal = new bootstrap.Modal(modalElement);
+                const myModal = new bootstrap.Modal(modalElement);
                 myModal.show();
             }
         },

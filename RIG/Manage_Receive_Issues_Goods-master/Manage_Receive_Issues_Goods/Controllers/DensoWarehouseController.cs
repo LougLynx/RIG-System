@@ -15,7 +15,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
 			_schedulereceivedService = schedulereceivedService;
 		}
 
-        /*public async Task<IActionResult> ScheduleReceive()
+		/*public async Task<IActionResult> ScheduleReceive()
 		{
 			var planDetails = await _schedulereceivedService.GetAllPlanDetailsAsync();
 			var actualDetails = await _schedulereceivedService.GetAllActualsAsync();
@@ -40,7 +40,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
 
 			return View(planDetailsDto);
 		}*/
-        /*public async Task<IActionResult> ScheduleReceive()
+		/*public async Task<IActionResult> ScheduleReceive()
         {
             var planDetails = await _schedulereceivedService.GetPlanAndActualDetailsAsync();
 
@@ -50,14 +50,21 @@ namespace Manage_Receive_Issues_Goods.Controllers
 
             return View(planDetails);
         }*/
-        public async Task<IActionResult> ScheduleReceive()
-        {
-            var planDetails = await _schedulereceivedService.GetPlanDetailsForDisplayAsync();
-            ViewData["PlanDetailsJson"] = JsonSerializer.Serialize(planDetails);
-            return View(planDetails);
-        }
+		public async Task<IActionResult> ScheduleReceive()
+		{
+			var planDetails = await _schedulereceivedService.GetPlanDetailsForDisplayAsync();
+			var (currentPlan, nextPlan) = await _schedulereceivedService.GetCurrentAndNextPlanAsync();
 
-        [HttpPost]
+			ViewData["PlanDetailsJson"] = JsonSerializer.Serialize(planDetails);
+			ViewData["CurrentPlanEffectiveDate"] = currentPlan?.EffectiveDate.ToString("yyyy-MM-dd");
+			ViewData["NextPlanEffectiveDate"] = nextPlan?.EffectiveDate.ToString("yyyy-MM-dd") ?? string.Empty; // Trả về chuỗi rỗng nếu không có nextPlan
+
+			return View(planDetails);
+		}
+
+
+
+		[HttpPost]
 		public async Task<IActionResult> AddActual([FromBody] ActualDetailDTO actualDetailDto)
 		{
 			if (actualDetailDto == null || actualDetailDto.PlanDetailId <= 0)

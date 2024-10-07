@@ -23,5 +23,6 @@ namespace Manage_Receive_Issues_Goods.Service
         Task DeleteOldActualsAsync();
         Task<IEnumerable<PlanDetailDTO>> GetPlanAndActualDetailsAsync();
         Task<IEnumerable<PlanDetailDTO>> GetPlanDetailsForDisplayAsync();
+        Task<(Planritd currentPlan, Planritd nextPlan)> GetCurrentAndNextPlanAsync();
     }
 }
