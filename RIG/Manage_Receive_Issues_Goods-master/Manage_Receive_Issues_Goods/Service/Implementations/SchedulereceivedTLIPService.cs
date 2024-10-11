@@ -123,7 +123,14 @@ namespace Manage_Receive_Issues_Goods.Services
            return await _repository.GetScheduleBySupplierIdAsync(supplierId);
         }
 
+        public async Task<IEnumerable<AsnInformation>> GetAsnInformationAsync(DateTime inputDate)
+        {
+            return await _repository.GetAsnInformationAsync(inputDate);
+        }
+
+        public async Task<IEnumerable<AsnDetailData>> GetAsnDetailAsync(string asnNumber, string doNumber, string invoice)
+        {
+            return await _repository.GetAsnDetailAsync(asnNumber, doNumber, invoice);
+        }
     }
-
-
 }

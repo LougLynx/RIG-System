@@ -1,6 +1,7 @@
 ﻿using Manage_Receive_Issues_Goods.DTO;
 using Manage_Receive_Issues_Goods.Models;
 using Manage_Receive_Issues_Goods.Service;
+using Manage_Receive_Issues_Goods.Service.Implementations;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -14,54 +15,51 @@ namespace Manage_Receive_Issues_Goods.Controllers
 		{
 			_schedulereceivedService = schedulereceivedService;
 		}
-
-		/*public async Task<IActionResult> ScheduleReceive()
-		{
-			var planDetails = await _schedulereceivedService.GetAllPlanDetailsAsync();
-			var actualDetails = await _schedulereceivedService.GetAllActualsAsync();
-
-			// Ánh xạ từ thực thể sang DTO
-			var planDetailsDto = planDetails.Select(plan => new PlanDetailDTO
-			{
-				PlanDetailId = plan.PlanDetailId,
-				PlanDetailName = plan.PlanDetailName,
-				PlanTime = plan.PlanTime,
-				Actuals = actualDetails.Where(a => a.PlanDetailId == plan.PlanDetailId)
-									   .Select(a => new ActualDetailDTO
-									   {
-										   ActualId = a.ActualId,
-										   ActualTime = a.ActualTime
-									   }).ToList()
-			}).ToList();
-
-			// Chuyển đổi thành JSON và truyền vào ViewData
-			var planDetailsJson = JsonSerializer.Serialize(planDetailsDto);
-			ViewData["PlanDetailsJson"] = planDetailsJson;
-
-			return View(planDetailsDto);
-		}*/
-		/*public async Task<IActionResult> ScheduleReceive()
-        {
-            var planDetails = await _schedulereceivedService.GetPlanAndActualDetailsAsync();
-
-            // Chuyển đổi thành JSON và truyền vào ViewData
-            var planDetailsJson = JsonSerializer.Serialize(planDetails);
-            ViewData["PlanDetailsJson"] = planDetailsJson;
-
-            return View(planDetails);
-        }*/
 		public async Task<IActionResult> ScheduleReceive()
 		{
 			var planDetails = await _schedulereceivedService.GetPlanDetailsForDisplayAsync();
 			var (currentPlan, nextPlan) = await _schedulereceivedService.GetCurrentAndNextPlanAsync();
+            var pastPlanDetails = await _schedulereceivedService.GetPastPlanDetailsAsync();
 
-			ViewData["PlanDetailsJson"] = JsonSerializer.Serialize(planDetails);
+            ViewData["PlanDetailsJson"] = JsonSerializer.Serialize(planDetails);
 			ViewData["CurrentPlanEffectiveDate"] = currentPlan?.EffectiveDate.ToString("yyyy-MM-dd");
 			ViewData["NextPlanEffectiveDate"] = nextPlan?.EffectiveDate.ToString("yyyy-MM-dd") ?? string.Empty; // Trả về chuỗi rỗng nếu không có nextPlan
-
-			return View(planDetails);
+            ViewData["PastPlanDetailsJson"] = JsonSerializer.Serialize(pastPlanDetails);
+            return View(planDetails);
 		}
 
+		[HttpGet]
+		public async Task<IActionResult> GetUpdatedEvents()
+		{
+			var planDetails = await _schedulereceivedService.GetPlanDetailsForDisplayAsync();
+			var (currentPlan, nextPlan) = await _schedulereceivedService.GetCurrentAndNextPlanAsync();
+			var pastPlanDetails = await _schedulereceivedService.GetPastPlanDetailsAsync();
+
+			// Filter actuals for the current day
+			var today = DateTime.Today;
+			var filteredPlanDetails = planDetails.Select(detail => new PlanDetailDTO
+			{
+				PlanDetailId = detail.PlanDetailId,
+				PlanTime = detail.PlanTime,
+				PlanDetailName = detail.PlanDetailName,
+				Actuals = detail.Actuals?.Where(actual => actual.ActualTime.Date == today).ToList()
+			}).ToList();
+
+			var result = new
+			{
+				planDetails = filteredPlanDetails,
+				currentPlanEffectiveDate = currentPlan?.EffectiveDate.ToString("yyyy-MM-dd"),
+				nextPlanEffectiveDate = nextPlan?.EffectiveDate.ToString("yyyy-MM-dd") ?? string.Empty,
+				pastPlanDetails
+			};
+
+			var options = new JsonSerializerOptions
+			{
+				PropertyNamingPolicy = null // Use null to preserve original property names (PascalCase)
+			};
+
+			return new JsonResult(result, options);
+		}
 
 
 		[HttpPost]
@@ -116,12 +114,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
 			}
 		}
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteOldActuals()
-        {
-            await _schedulereceivedService.DeleteOldActualsAsync();
-            return NoContent();
-        }
+      
 
         public IActionResult ScheduleIssued()
 		{

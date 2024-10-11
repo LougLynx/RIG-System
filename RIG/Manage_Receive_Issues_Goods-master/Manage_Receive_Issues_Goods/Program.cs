@@ -1,3 +1,5 @@
+using Manage_Receive_Issues_Goods.Controllers;
+using Manage_Receive_Issues_Goods.Hubs;
 using Manage_Receive_Issues_Goods.Models;
 using Manage_Receive_Issues_Goods.Repositories.Implementations;
 using Manage_Receive_Issues_Goods.Repository;
@@ -10,9 +12,15 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSignalR();
+//builder.Services.AddHttpClient();
+builder.Services.AddHttpClient<TLIPWarehouseController>();
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddControllers().AddJsonOptions(options =>
+options.JsonSerializerOptions.PropertyNamingPolicy = null);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<RigContext>(options =>
@@ -41,13 +49,11 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthorization();
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapHub<UpdateReceiveDensoHub>("/updateReceiveDensoHub");
 
 app.Run();

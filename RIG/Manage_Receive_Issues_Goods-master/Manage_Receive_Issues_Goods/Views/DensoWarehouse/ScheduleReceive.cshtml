@@ -4,6 +4,7 @@
 @{
 	ViewData["Title"] = "RECEIVED Goods Schedule (Denso)";
 	var planDetailsJson = ViewData["PlanDetailsJson"];
+	var pastPlanDetailsJson = ViewData["PastPlanDetailsJson"];
 	var currentPlanEffectiveDate = ViewData["CurrentPlanEffectiveDate"];
 	var nextPlanEffectiveDate = ViewData["NextPlanEffectiveDate"];
 }
@@ -86,7 +87,8 @@
 		var planDetails = @Html.Raw(planDetailsJson);
 		var currentPlanEffectiveDate = '@currentPlanEffectiveDate';
 		var nextPlanEffectiveDate = '@nextPlanEffectiveDate';
+		var pastPlanDetails = @Html.Raw(pastPlanDetailsJson);
 	</script>
-	<script src="~/js/calendarReceiveDenso.js"></script>
+	<script src="~/js/denso/calendarReceiveDenso.js"></script>
 </body>
 </html>

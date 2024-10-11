@@ -7,22 +7,19 @@ namespace Manage_Receive_Issues_Goods.Service
 {
     public interface IScheduleRITDService
     {
-        Task<IEnumerable<Planritd>> GetAllPlansAsync();
         Task<IEnumerable<Planritddetail>> GetAllPlanDetailsAsync();
-        Task<IEnumerable<Actualsritd>> GetAllActualsAsync();
         Task<IEnumerable<Status>> GetAllStatusesAsync();
-        /*Task<IEnumerable<Planritddetail>> GetPlanDetailsForWeekAsync();*/
         Task<Planritddetail> GetPlanDetailByIdAsync(int detailId);
         Task UpdatePlanDetailAsync(Planritddetail detail);
-        Task<IEnumerable<Planritddetail>> GetAllPlanDetailsWithoutDateAsync();
         Task AddActualAsync(Actualsritd actual);
         Task DeleteActualAsync(int actualId);
         Task AddPlanAsync(Planritd plan);
         Task AddPlanDetailAsync(Planritddetail planDetail);
         Task<int> GetPlanIdByDetailsAsync(string planName, string planType, DateOnly effectiveDate);
-        Task DeleteOldActualsAsync();
-        Task<IEnumerable<PlanDetailDTO>> GetPlanAndActualDetailsAsync();
         Task<IEnumerable<PlanDetailDTO>> GetPlanDetailsForDisplayAsync();
         Task<(Planritd currentPlan, Planritd nextPlan)> GetCurrentAndNextPlanAsync();
+        Task<IEnumerable<PlanDTO>> GetFuturePlansAsync();
+        Task<IEnumerable<Planritddetail>> GetPlanDetails(int planId);
+        Task<IEnumerable<PlanDetailDTO>> GetPastPlanDetailsAsync();
     }
 }

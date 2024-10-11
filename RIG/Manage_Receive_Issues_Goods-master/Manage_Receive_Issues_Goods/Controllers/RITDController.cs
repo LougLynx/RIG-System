@@ -2,6 +2,7 @@
 using Manage_Receive_Issues_Goods.Service;
 using Manage_Receive_Issues_Goods.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -99,7 +100,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
             var detail = await _scheduleService.GetPlanDetailByIdAsync(detailId);
             if (detail != null)
             {
-                detail.PlanTime = TimeOnly.Parse(planTime); 
+                detail.PlanTime = TimeOnly.Parse(planTime);
                 await _scheduleService.UpdatePlanDetailAsync(detail);
                 return Json(new { success = true });
             }
@@ -112,38 +113,27 @@ namespace Manage_Receive_Issues_Goods.Controllers
             return View(planDetails);
         }
 
-
-        /*[HttpGet]
-        public async Task<JsonResult> GetPlanAndActualEvents(DateTime start, DateTime end)
+        [HttpGet]
+        public async Task<IActionResult> GetFuturePlans()
         {
-            var plans = await _scheduleService.GetAllPlansAsync();
-            var planDetails = await _scheduleService.GetAllPlanDetailsAsync();
-            var actuals = await _scheduleService.GetAllActualsAsync();
-            var statuses = await _scheduleService.GetAllStatusesAsync();
+            var futurePlans = await _scheduleService.GetFuturePlansAsync();
+            Console.WriteLine(futurePlans);
+            return Json(futurePlans);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetPlanDetails(int planId)
+        {
+            var planDetails = await _scheduleService.GetPlanDetails(planId);
 
-            var events = planDetails.SelectMany(p =>
-            {
-                var actual = actuals.FirstOrDefault(a => a.PlanDetailId == p.PlanDetailId);
-                var status = statuses.FirstOrDefault(s => s.PlanDetailId == p.PlanDetailId);
-                var planDateTime = p.PlanDate.ToDateTime(p.PlanTime);
-                return new[]
+            var result = planDetails
+                .Select(d => new
                 {
-                        new {
-                            resourceId = "1",
-                            title = $"{p.PlanDetailName} - {status?.Status1}",
-                            start = planDateTime.ToString("yyyy-MM-ddTHH:mm:ss"),
-                            end = planDateTime.AddMinutes(60).ToString("yyyy-MM-ddTHH:mm:ss") 
-                        },
-                        new {
-                            resourceId = "2",
-                            title = $"{p.PlanDetailName} - Actual",
-                            start = actual?.ActualTime.ToString("yyyy-MM-ddTHH:mm:ss"),
-                            end = actual?.ActualTime.AddMinutes(60).ToString("yyyy-MM-ddTHH:mm:ss") 
-                        }
-                };
-            }).Where(e => e.start != null).ToList();
+                    d.PlanDetailName,
+                    d.PlanTime
+                })
+                .ToList();
 
-            return Json(events);
-        }*/
+            return Json(result);
+        }
     }
 }

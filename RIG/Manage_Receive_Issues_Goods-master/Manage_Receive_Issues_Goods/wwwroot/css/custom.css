@@ -13,7 +13,7 @@ body {
 }
 
     .nav-link:hover {
-        color: #ffcccc !important;
+        color: #ba1414 !important;
     }
 
 .main-content {
@@ -23,8 +23,12 @@ body {
 .footer {
     text-align: center;
 }
+
 .gray-background {
     background-color: lightgray;
+}
+.white-background {
+    background-color: whitesmoke;
 }
 
 .highlighted-event {
@@ -56,7 +60,3 @@ body {
     text-align: center;
     min-width: 100px; /* Adjust the minimum width as needed */
 }
-
-
-
-

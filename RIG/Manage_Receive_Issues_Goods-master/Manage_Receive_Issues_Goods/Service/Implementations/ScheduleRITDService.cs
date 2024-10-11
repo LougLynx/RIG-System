@@ -16,19 +16,10 @@ namespace Manage_Receive_Issues_Goods.Service.Implementations
         {
             _scheduleRepository = scheduleRepository;
         }
-        public async Task<IEnumerable<Actualsritd>> GetAllActualsAsync()
-        {
-            return await _scheduleRepository.GetAllActualsAsync();
-        }
 
         public async Task<IEnumerable<Planritddetail>> GetAllPlanDetailsAsync()
         {
             return await _scheduleRepository.GetAllPlanDetailsAsync();
-        }
-
-        public async Task<IEnumerable<Planritd>> GetAllPlansAsync()
-        {
-            return await _scheduleRepository.GetAllPlansAsync();
         }
 
         public async Task<IEnumerable<Status>> GetAllStatusesAsync()
@@ -36,10 +27,11 @@ namespace Manage_Receive_Issues_Goods.Service.Implementations
             return await _scheduleRepository.GetAllStatusesAsync();
         }
 
-        /*public async Task<IEnumerable<Planritddetail>> GetPlanDetailsForWeekAsync()
+
+        public async Task<IEnumerable<Planritddetail>> GetPlanDetails(int planId)
         {
-            return await _scheduleRepository.GetPlanDetailsForWeekAsync();
-        }*/
+            return await _scheduleRepository.GetPlanDetails(planId);
+        }
 
         public async Task<Planritddetail> GetPlanDetailByIdAsync(int detailId)
         {
@@ -50,11 +42,6 @@ namespace Manage_Receive_Issues_Goods.Service.Implementations
         {
             await _scheduleRepository.UpdatePlanDetailAsync(detail);
         }
-        public async Task<IEnumerable<Planritddetail>> GetAllPlanDetailsWithoutDateAsync()
-        {
-            return await _scheduleRepository.GetAllPlanDetailsWithoutDateAsync();
-        }
-
         public async Task AddActualAsync(Actualsritd actual)
         {
             await _scheduleRepository.AddActualAsync(actual);
@@ -76,16 +63,6 @@ namespace Manage_Receive_Issues_Goods.Service.Implementations
         public async Task<int> GetPlanIdByDetailsAsync(string planName, string planType, DateOnly effectiveDate)
         {
             return await _scheduleRepository.GetPlanIdByDetailsAsync(planName, planType, effectiveDate);
-        }
-
-        public async Task DeleteOldActualsAsync()
-        {
-            await _scheduleRepository.DeleteOldActualsAsync();
-        }
-       
-        public async Task<IEnumerable<PlanDetailDTO>> GetPlanAndActualDetailsAsync()
-        {
-            return await _scheduleRepository.GetPlanAndActualDetailsAsync();
         }
 
 		public async Task<(Planritd currentPlan, Planritd? nextPlan)> GetCurrentAndNextPlanAsync()
@@ -119,7 +96,37 @@ namespace Manage_Receive_Issues_Goods.Service.Implementations
 			});
 		}
 
-
-
-	}
+        public async Task<IEnumerable<PlanDTO>> GetFuturePlansAsync()
+        {
+            var futurePlans = await _scheduleRepository.GetFuturePlansAsync();
+            return futurePlans.Select(plan => new PlanDTO
+            {
+                PlanId = plan.PlanId,
+                EffectiveDate = plan.EffectiveDate,
+                TotalShipment = plan.TotalShipment,
+                PlanDetails = plan.Planritddetails.Select(detail => new PlanDetailDTO
+                {
+                    PlanDetailId = detail.PlanDetailId,
+                    PlanDetailName = detail.PlanDetailName,
+                    PlanTime = detail.PlanTime
+                }).ToList()
+            }).ToList();
+        }
+        public async Task<IEnumerable<PlanDetailDTO>> GetPastPlanDetailsAsync()
+        {
+			var pastPlanDetails = await _scheduleRepository.GetPastPlanDetailsAsync();
+			return pastPlanDetails.Select(pd => new PlanDetailDTO
+			{
+				PlanDetailId = pd.PlanDetailId,
+				PlanTime = pd.PlanTime,
+				PlanDetailName = pd.PlanDetailName,
+				Actuals = pd.Actualsritds.Select(a => new ActualDetailDTO
+				{
+					ActualId = a.ActualId,
+					PlanDetailId = a.PlanDetailId,
+					ActualTime = a.ActualTime
+				}).ToList()
+			}).ToList();
+		}
+    }
 }

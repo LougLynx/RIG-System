@@ -4,7 +4,7 @@
     ViewData["Title"] = "Change Plan";
     var filteredModel = Model;
      var totalShipment = filteredModel.FirstOrDefault()?.Plan.TotalShipment ?? 0;
-     var effectiveDate = filteredModel.FirstOrDefault()?.Plan.EffectiveDate.ToShortDateString() ?? "N/A";
+    var effectiveDate = filteredModel.FirstOrDefault()?.Plan.EffectiveDate.ToString("dd/MM/yyyy") ?? "N/A";
 }
 <!DOCTYPE html>
 <html>
@@ -14,15 +14,22 @@
     <title>@ViewData["Title"] - My ASP.NET Application</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/css/bootstrap-timepicker.min.css" />
+    <style>
+        .custom-table {
+            background-color: #FDFDFD;
+        }
+    </style>
 </head>
 <body>
     <div style="display: flex; gap: 10px;">
         <a class="nav-link btn btn-dark" asp-area="" asp-controller="DensoWarehouse" asp-action="ScheduleReceive">Back</a>
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#changePlanModal">Change Plan</button>
+        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#viewPlanFutureModal">View Plan Future</button>
+
     </div>
     <h1>Total Shipment: @totalShipment</h1>
     <h2>Effective Date: @effectiveDate</h2> 
-    <table class="table">
+    <table class="table custom-table">
         <thead>
             <tr>
                 <th>Plan Detail Name</th>
@@ -86,6 +93,62 @@
         </div>
     </div>
 
+    <!--  View Plan Future Modal -->
+    <div class="modal fade" id="viewPlanFutureModal" tabindex="-1" role="dialog" aria-labelledby="viewPlanFutureModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewPlanFutureModalLabel">Future Plans</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Plan ID</th>
+                                <th>Effective Date</th>
+                                <th>Total Shipment</th>
+                            </tr>
+                        </thead>
+                        <tbody id="futurePlansTableBody">
+                            <!-- Future plans will be populated here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plan Details Modal -->
+    <div class="modal fade" id="planDetailsModal" tabindex="-1" role="dialog" aria-labelledby="planDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="planDetailsModalLabel">Plan Details</h5>
+                   
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Plan Detail Name</th>
+                                <th>Plan Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="planDetailsTableBody">
+                            <!-- Plan details will be populated here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+               
+            </div>
+        </div>
+    </div>
 
     <!-- Edit Plan Time Modal -->
     <div class="modal fade" id="editPlanTimeModal" tabindex="-1" role="dialog" aria-labelledby="editPlanTimeModalLabel" aria-hidden="true">
@@ -118,85 +181,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/js/bootstrap-timepicker.min.js"></script>
+    <script src="~/js/changePlanRITD.js"></script>
     <script>
-        $(document).ready(function () {
-            // Khi người dùng nhập số Total Shipment, tạo động các Plan Detail
-            $('#totalShipment').on('input', function () {
-                const totalShipment = parseInt($(this).val());
-                let planDetailsHtml = '';
-
-                if (totalShipment > 0) {
-                    for (let i = 1; i <= totalShipment; i++) {
-                        planDetailsHtml += `
-            <div class="form-group">
-                <label for="planDetailTime_${i}">Plan Detail Số ${i}</label>
-                <input type="time" class="form-control" id="planDetailTime_${i}" name="planDetails[${i - 1}].planTime" required />
-            </div>
-        `;
-
-                    }
-                }
-
-                $('#planDetailsSection').html(planDetailsHtml); // Thêm các trường động vào form
-            });
-
-            // Save changes khi nhấn nút "Save"
-            $('.save-plan-btn').on('click', function () {
-                const formData = $('#changePlanForm').serialize();
-                console.log('Form Data Sent:', formData); // Log dữ liệu gửi lên server
-                $.ajax({
-                    url: '@Url.Action("ChangePlan", "RITD")',
-                    type: 'POST',
-                    data: formData,
-                    success: function (response) {
-                        console.log("Response from server:", response);
-                        if (response.success) {
-                            $('#changePlanModal').modal('hide');  // Ẩn modal sau khi lưu thành công
-                            location.reload();  // Tải lại trang
-                        } else {
-                            alert('Error: ' + response.message);
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.log('Error saving plan:', error);
-                        alert('Error saving plan: ' + error);
-                    }
-                });
-            });
-
+        document.addEventListener('DOMContentLoaded', function () {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById('effectiveDate').setAttribute('min', today);
         });
     </script>
-
-    <script>
-        $(document).ready(function () {
-            $('.timepicker').timepicker({
-                showMeridian: false,
-                defaultTime: false
-            });
-
-            $('.edit-btn').on('click', function () {
-                var detailId = $(this).data('detail-id');
-                var detailTime = $(this).data('detail-time');
-                $('#detailId').val(detailId);
-                $('#editPlanTime').timepicker('setTime', detailTime);
-            });
-
-            $('.save-time-btn').on('click', function () {
-                var formData = $('#editPlanTimeForm').serialize();
-                $.ajax({
-                    url: '@Url.Action("UpdatePlanTime", "RITD")',
-                    type: 'POST',
-                    data: formData,
-                    success: function (response) {
-                        $('#editPlanTimeModal').modal('hide');
-                        location.reload();
-                    },
-                    error: function (xhr, status, error) {
-                        alert('Error updating time: ' + error);
-                    }
-                });
-            });
-        });
-    </script>
+    
+    
 </body>
 </html>

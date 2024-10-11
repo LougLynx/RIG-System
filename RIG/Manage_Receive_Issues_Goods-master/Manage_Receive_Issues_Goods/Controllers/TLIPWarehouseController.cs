@@ -1,7 +1,11 @@
-﻿using Manage_Receive_Issues_Goods.Models;
+﻿using Manage_Receive_Issues_Goods.Hubs;
+using Manage_Receive_Issues_Goods.Models;
 using Manage_Receive_Issues_Goods.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Linq;
+using System.Net.Http.Headers;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Manage_Receive_Issues_Goods.Controllers
@@ -82,6 +86,24 @@ namespace Manage_Receive_Issues_Goods.Controllers
             }
             return BadRequest(new { success = false });
         }
+
+        [HttpGet]
+        [Route("api/tlipwarehouse/getAsnInformation")]
+        public async Task<IActionResult> GetAsnInformation(DateTime inputDate)
+        {
+            var asnInformation = await _schedulereceivedService.GetAsnInformationAsync(inputDate);
+            return Json(asnInformation);
+        }
+
+        [HttpGet]
+        [Route("api/tlipwarehouse/getAsnDetail")]
+        public async Task<IActionResult> GetAsnDetail(string asnNumber, string doNumber, string invoice)
+        {
+            var asnDetail = await _schedulereceivedService.GetAsnDetailAsync(asnNumber, doNumber, invoice);
+            return Json(asnDetail);
+        }
+
+
 
     }
 }

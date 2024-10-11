@@ -15,5 +15,7 @@ namespace Manage_Receive_Issues_Goods.Repository
         Task<IEnumerable<Actualreceived>> GetAllActualReceivedAsync();
         Task<IEnumerable<Supplier>> GetSuppliersForTodayAsync(int weekdayId);
         Task<Schedulereceived> GetScheduleBySupplierIdAsync(int supplierId);
+        Task<IEnumerable<AsnInformation>> GetAsnInformationAsync(DateTime inputDate);
+        Task<IEnumerable<AsnDetailData>> GetAsnDetailAsync(string asnNumber, string doNumber, string invoice);
     }
 }

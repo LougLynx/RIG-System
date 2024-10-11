@@ -18,5 +18,8 @@ namespace Manage_Receive_Issues_Goods.Services
         Task<IEnumerable<Supplier>> GetSuppliersForTodayAsync();
         Task<Schedulereceived> GetScheduleBySupplierIdAsync(int supplierId);
         Task<bool> DelaySupplierAsync(int supplierId);
+        Task<IEnumerable<AsnInformation>> GetAsnInformationAsync(DateTime inputDate);
+        Task<IEnumerable<AsnDetailData>> GetAsnDetailAsync(string asnNumber, string doNumber, string invoice);
+
     }
 }
