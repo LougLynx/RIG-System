@@ -1,8 +1,10 @@
 ﻿using Manage_Receive_Issues_Goods.DTO;
+using Manage_Receive_Issues_Goods.Hubs;
 using Manage_Receive_Issues_Goods.Models;
 using Manage_Receive_Issues_Goods.Service;
 using Manage_Receive_Issues_Goods.Service.Implementations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Text.Json;
 
 namespace Manage_Receive_Issues_Goods.Controllers
@@ -10,10 +12,12 @@ namespace Manage_Receive_Issues_Goods.Controllers
 	public class DensoWarehouseController : Controller
 	{
 		private readonly IScheduleRITDService _schedulereceivedService;
+		private readonly IHubContext<UpdateReceiveDensoHub> _hubContext;
 
-		public DensoWarehouseController(IScheduleRITDService schedulereceivedService)
+		public DensoWarehouseController(IScheduleRITDService schedulereceivedService, IHubContext<UpdateReceiveDensoHub> hubContext)
 		{
 			_schedulereceivedService = schedulereceivedService;
+			_hubContext = hubContext;
 		}
 		public async Task<IActionResult> ScheduleReceive()
 		{
@@ -72,7 +76,6 @@ namespace Manage_Receive_Issues_Goods.Controllers
 
 			try
 			{
-				// Kiểm tra và chuyển đổi ActualTime nếu cần thiết
 				if (actualDetailDto.ActualTime == DateTime.MinValue)
 				{
 					return Json(new { success = false, message = "Invalid ActualTime" });
@@ -86,6 +89,9 @@ namespace Manage_Receive_Issues_Goods.Controllers
 
 				// Lưu actual vào database
 				await _schedulereceivedService.AddActualAsync(newActual);
+
+				// Gửi cập nhật thông qua SignalR
+				await _hubContext.Clients.All.SendAsync("ReceiveUpdate", "New actual added"); 
 
 				return Json(new { success = true });
 			}
@@ -106,6 +112,10 @@ namespace Manage_Receive_Issues_Goods.Controllers
 			try
 			{
 				await _schedulereceivedService.DeleteActualAsync(id);
+
+				// Gửi cập nhật thông qua SignalR
+				await _hubContext.Clients.All.SendAsync("ReceiveUpdate", "Actual deleted"); 
+
 				return Json(new { success = true });
 			}
 			catch (Exception ex)
@@ -114,9 +124,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
 			}
 		}
 
-      
-
-        public IActionResult ScheduleIssued()
+		public IActionResult ScheduleIssued()
 		{
 			return View();
 		}

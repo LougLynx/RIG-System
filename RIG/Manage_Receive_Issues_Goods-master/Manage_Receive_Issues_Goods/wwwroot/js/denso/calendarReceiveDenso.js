@@ -1,12 +1,90 @@
 ﻿
 document.addEventListener('DOMContentLoaded', function () {
+
     var calendarEl = document.getElementById('calendar');
+    var fullscreenBtn = document.getElementById('fullscreenBtn');
     var notificationDismissed = false;
+
 
     console.log("Plandetail  nè:", planDetails);
     console.log("Past Plandetail  nè:", pastPlanDetails);
     console.log("Current effectivedate  nè:", currentPlanEffectiveDate);
 
+    // Tạo kết nối SignalR với Hub
+    var connection = new signalR.HubConnectionBuilder().withUrl("/updateReceiveDensoHub").build();
+
+    connection.start().then(function () {
+        console.log("SignalR connected.");
+    }).catch(function (err) {
+        return console.error(err.toString());
+    });
+
+    // Lắng nghe sự kiện cập nhật
+    connection.on("ReceiveUpdate", function (message) {
+        console.log("Received SignalR update:", message);
+        fetchUpdatedEvents(); 
+    });
+
+    /**
+    * Function to refresh calendar events
+    */
+    function fetchUpdatedEvents() {
+        fetch('/DensoWarehouse/GetUpdatedEvents')
+            .then(response => response.json())
+            .then(data => { 
+                console.log('Plan details:', data.planDetails);
+                console.log('Current EffectiveDate:', data.currentPlanEffectiveDate);
+                console.log('Next EffectiveDate:', data.nextPlanEffectiveDate);
+                console.log('PastPlanDetails:', data.pastPlanDetails);
+
+                // Tạo danh sách các sự kiện mới
+                const today = new Date().toISOString().split('T')[0];
+                console.log("Today:", today);
+                const newEvents = [];
+                let resourceIdCounterSequence = 2;
+
+                data.planDetails.forEach(detail => {
+                    if (detail.Actuals && detail.Actuals.length > 0) {
+                        detail.Actuals.forEach(actual => {
+                            const actualDate = new Date(actual.ActualTime);
+                            const actualDateString = actualDate.toISOString().split('T')[0];
+
+                            if (actualDateString === today) {
+                                const actualStartTime = `${actualDateString}T${actualDate.toTimeString().split(' ')[0]}`;
+                                const actualEndDate = new Date(actualDate.getTime() + 60 * 60000); // Thêm 1 giờ cho thời gian kết thúc
+                                const actualEndTime = `${actualEndDate.toISOString().split('T')[0]}T${actualEndDate.toTimeString().split(' ')[0]}`;
+
+                                // Tạo sự kiện mới cho Actual
+                                const newEvent = {
+                                    id: `actual-${actual.ActualId}`,
+                                    title: `Chuyến ${detail.PlanDetailName}`,
+                                    start: actualStartTime,
+                                    end: actualEndTime,
+                                    resourceId: resourceIdCounterSequence,
+                                    extendedProps: { hasActual: true }
+                                };
+                                newEvents.push(newEvent);
+
+                                const existingEvent = calendar.getEventById(newEvent.id);
+                                if (existingEvent) {
+                                    console.log("Existing event:", existingEvent );
+                                    existingEvent.remove(); 
+                                }
+                            }            
+                        });
+                    }
+                    resourceIdCounterSequence += 2;
+                });
+
+                // Thêm tất cả các sự kiện mới vào calendar
+                newEvents.forEach(newEvent => {
+                    calendar.addEvent(newEvent);
+                });
+                location.reload();
+                console.log('Updated events fetched and added:', data);
+            })
+            .catch(error => console.error('Error fetching updated events:', error));
+    }
 
     /**
      * Lấy thời gian thực cho Indicator
@@ -33,69 +111,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const day = String(date.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
     }
-
-
-    /**
-  * Function to refresh calendar events
-  */
-  /*  function fetchUpdatedEvents() {
-        fetch('/DensoWarehouse/GetUpdatedEvents')
-            .then(response => response.json())
-            .then(data => {
-                console.log('Plan details:', data.planDetails);
-                console.log('Current EffectiveDate:', data.currentPlanEffectiveDate);
-                console.log('Next EffectiveDate:', data.nextPlanEffectiveDate);
-                console.log('PastPlanDetails:', data.pastPlanDetails);
-
-                // Filter actuals for the current day
-                const today = new Date().toISOString().split('T')[0];
-                const newEvents = [];
-                let resourceIdCounterSequence = 2;
-
-                data.planDetails.forEach(detail => {
-                    if (detail.Actuals && detail.Actuals.length > 0) {
-                        detail.Actuals.forEach(actual => {
-                            const actualDate = new Date(actual.ActualTime);
-                            const actualDateString = actualDate.toISOString().split('T')[0];
-
-                            if (actualDateString === today) {
-                                const actualStartTime = `${actualDateString}T${actualDate.toTimeString().split(' ')[0]}`;
-                                const actualEndDate = new Date(actualDate.getTime() + 60 * 60000); // Add 1 hour for end time
-                                const actualEndTime = `${actualEndDate.toISOString().split('T')[0]}T${actualEndDate.toTimeString().split(' ')[0]}`;
-
-                                newEvents.push({
-                                    id: `actual-${actual.ActualId}`,
-                                    title: `Chuyến ${detail.PlanDetailName}`,
-                                    start: actualStartTime,
-                                    end: actualEndTime,
-                                    resourceId: resourceIdCounterSequence,
-                                    extendedProps: { hasActual: true }
-                                });
-                            }
-                        });
-                    }
-                    resourceIdCounterSequence += 2;
-                });
-
-                // Add new events to the calendar
-                newEvents.forEach(newEvent => {
-                    const existingEvent = calendar.getEventById(newEvent.id);
-
-                    console.log('Existing event:', existingEvent);
-                    if (existingEvent) {
-                        console.log('Existing event found:', existingEvent.id);
-                        existingEvent.remove();
-                        console.log('Existing event removed:', existingEvent.id);
-                    } else {
-                        console.log('No existing event found for:', newEvent.id);
-                    }
-                    calendar.addEvent(newEvent);
-                });
-                console.log('Updated events fetched:', data);
-            })
-            .catch(error => console.error('Error fetching updated events:', error));
-    }
-    setInterval(fetchUpdatedEvents, 2000);*/
 
     /**
     * Tạo sự kiện hàng ngày dựa trên kế hoạch quá khứ, hiện tại và kế hoạch tiếp theo
@@ -215,14 +230,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         const actualEndDate = new Date(actualDate.getTime() + 60 * 60000); // Thêm 1 giờ cho thời gian kết thúc
                         const actualEndTime = `${actualEndDate.getFullYear()}-${String(actualEndDate.getMonth() + 1).padStart(2, '0')}-${String(actualEndDate.getDate()).padStart(2, '0')}T${actualEndDate.toTimeString().split(' ')[0]}`;
 
-                         events.push({
-                             id: `actual-${actual.ActualId}`,
-                             title: `Chuyến ${detail.PlanDetailName}`,
-                             start: actualStartTime,
-                             end: actualEndTime,
-                             resourceId: resourceIdCounter + 1,
-                             extendedProps: { hasActual: true }
-                         });
+                        events.push({
+                            id: `actual-${actual.ActualId}`,
+                            title: `Chuyến ${detail.PlanDetailName}`,
+                            start: actualStartTime,
+                            end: actualEndTime,
+                            resourceId: resourceIdCounter + 1,
+                            extendedProps: { hasActual: true }
+                        });
 
                         // Cập nhật sự kiện PlanDetail để hasActual thành true
                         const planEvent = events.find(event => event.id === `plan-${detail.PlanDetailId}-${todayString}`);
@@ -247,10 +262,11 @@ document.addEventListener('DOMContentLoaded', function () {
     function checkForLateShipments(planDetails) {
         const now = new Date();
         const todayString = now.toISOString().split('T')[0]; // Ngày hôm nay ở định dạng YYYY-MM-DD
+
         planDetails.forEach(detail => {
             const planTimeParts = detail.PlanTime.split(':');
             const planDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), planTimeParts[0], planTimeParts[1]);
-            const fifteenMinutesAfterPlanTime = new Date(planDate.getTime() + 15 * 60000);
+            const fifteenMinutesAfterPlanTime = new Date(planDate.getTime() + 15 * 60000); // Thêm 15 phút
 
             // Kiểm tra nếu PlanTime là hôm nay và hiện tại đã quá 15 phút so với PlanTime
             if (now.toISOString().split('T')[0] === formatDateToLocalString(planDate) && now > fifteenMinutesAfterPlanTime) {
@@ -260,11 +276,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     const actualDateString = formatDateToLocalString(actualDate);
                     return actualDateString === todayString;
                 });
-                // Kiểm tra nếu thông báo chưa bị tắt và chưa có Actual cho hôm nay
+
+                // Nếu không có Actual cho hôm nay, đánh dấu chuyến hàng bị muộn
                 if (!hasActualForToday && !notificationDismissed) {
                     const event = calendar.getEventById(`plan-${detail.PlanDetailId}-${todayString}`);
                     if (event) {
+                        // Đặt isLate để cập nhật icon cảnh báo
                         event.setExtendedProp('isLate', true);
+                        console.log(`Shipment ${detail.PlanDetailName} is late!`);
                     }
                     toastr.warning("Please check if the shipment is late if not please confirm status", null, {
                         timeOut: 5000,
@@ -281,10 +300,11 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
     //Lặp lại thông báo mỗi 10 giây cho đên skhi được confirm
     var notificationInterval = setInterval(() => {
         checkForLateShipments(planDetails);
-    }, 10000);
+    }, 5000);
 
 
     /**
@@ -321,27 +341,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.log("Plan Event:", planEvent);
 
                     if (planEvent) {
-                        const resourceId = planEvent.extendedProps.resourceId;
-
-                        const actualEvent = {
-                            id: `actual-${planDetailId}`,
-                            title: `Chuyến ${planDetailName}`,
-                            start: formattedNow,
-                            end: new Date(new Date(formattedNow).getTime() + 60 * 60000).toISOString(),
-                            resourceId: resourceId + 1,
-                            extendedProps: { hasActual: true }
-                        };
-
-                        calendar.addEvent(actualEvent);
-
-                      /*  // Remove the event after 5 seconds
-                        setTimeout(() => {
-                            const eventToRemove = calendar.getEventById(actualEvent.id);
-                            if (eventToRemove) {
-                                eventToRemove.remove();
-                            }
-                        }, 2000);*/
-
                         planEvent.setExtendedProp('hasActual', true);
                         planEvent.setExtendedProp('isLate', false);
                         console.log('Updated PlanDetail with hasActual:', planEvent);
@@ -360,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Hiển thị modal thông báo thành công
                     var successModal = new bootstrap.Modal(document.getElementById('successModal'));
                     successModal.show();
-                    // setInterval(refreshCalendarEvents, 5000);
+                   location.reload();
                 } else {
                     console.log('Error from server:', data);
                     alert('Error confirming actual.');
@@ -480,8 +479,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const eventDate = new Date(info.event.start).toISOString().split('T')[0];
             console.log("Infor Start:", eventDate);
             // Lấy các thông tin cần thiết từ sự kiện
-            const hasActual = info.event.extendedProps.hasActual;
-            console.log("Has Actual:", hasActual);
+            const hasActual = info.event.extendedProps.hasActual;                   
+            console.log("Has Actual:", hasActual);  
             const planDetailId = info.event.extendedProps.planDetailId;
             const planDetailName = info.event.extendedProps.planDetailName;
 
@@ -501,7 +500,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     confirmButton.style.display = 'none';
                 }
             }
-
+                                                    
             // Điều chỉnh nút Delete nếu sự kiện là Actual
             const deleteButton = document.getElementById('deleteButton');
             if (deleteButton) {
@@ -554,6 +553,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     calendar.render();
 });
+
+
 
 // HIỂN THỊ THỜI GIAN THỰC
 document.addEventListener('DOMContentLoaded', function () {
