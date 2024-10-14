@@ -1,3 +1,4 @@
+using Manage_Receive_Issues_Goods.Data;
 using Manage_Receive_Issues_Goods.Controllers;
 using Manage_Receive_Issues_Goods.Hubs;
 using Manage_Receive_Issues_Goods.Models;
@@ -23,11 +24,20 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddControllers().AddJsonOptions(options =>
 options.JsonSerializerOptions.PropertyNamingPolicy = null);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
 builder.Services.AddDbContext<RigContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-});
+    options.SignIn.RequireConfirmedAccount = true;
+})
+    .AddRoles<IdentityRole>() 
+    .AddEntityFrameworkStores<RigContext>();
+
 
 // Register repositories
 builder.Services.AddScoped<IScheduleReceivedDensoRepository, ScheduleReceivedDensoRepository>();
@@ -41,7 +51,11 @@ builder.Services.AddScoped<ISchedulereceivedTLIPService, SchedulereceivedTLIPSer
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    app.UseMigrationsEndPoint();
+}
+else
 {
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
@@ -51,10 +65,14 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapHub<UpdateReceiveDensoHub>("/updateReceiveDensoHub");
+app.MapRazorPages();
+
 
 app.Run();

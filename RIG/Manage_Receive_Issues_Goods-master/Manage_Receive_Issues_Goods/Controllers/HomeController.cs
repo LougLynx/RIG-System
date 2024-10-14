@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using Manage_Receive_Issues_Goods.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Manage_Receive_Issues_Goods.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

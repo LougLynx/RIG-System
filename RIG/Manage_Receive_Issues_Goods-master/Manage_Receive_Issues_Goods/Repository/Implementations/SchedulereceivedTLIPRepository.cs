@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Manage_Receive_Issues_Goods.Repository;
 using System.Text.Json;
+using Manage_Receive_Issues_Goods.Data;
 
 namespace Manage_Receive_Issues_Goods.Repositories.Implementations
 {
