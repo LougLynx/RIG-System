@@ -3,13 +3,15 @@ using Manage_Receive_Issues_Goods.Hubs;
 using Manage_Receive_Issues_Goods.Models;
 using Manage_Receive_Issues_Goods.Service;
 using Manage_Receive_Issues_Goods.Service.Implementations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Text.Json;
 
 namespace Manage_Receive_Issues_Goods.Controllers
 {
-	public class DensoWarehouseController : Controller
+    [Authorize]
+    public class DensoWarehouseController : Controller
 	{
 		private readonly IScheduleReceivedDensoService _schedulereceivedService;
 		private readonly IHubContext<UpdateReceiveDensoHub> _hubContext;

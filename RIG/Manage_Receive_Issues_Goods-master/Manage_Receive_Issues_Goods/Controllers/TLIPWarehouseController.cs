@@ -1,6 +1,7 @@
 ﻿using Manage_Receive_Issues_Goods.Hubs;
 using Manage_Receive_Issues_Goods.Models;
 using Manage_Receive_Issues_Goods.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Linq;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Manage_Receive_Issues_Goods.Controllers
 {
+    [Authorize]
     public class TLIPWarehouseController : Controller
     {
         private readonly ISchedulereceivedTLIPService _schedulereceivedService;
