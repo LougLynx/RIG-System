@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Manage_Receive_Issues_Goods.Service.Implementations
 {
-    public class ScheduleRITDService : IScheduleRITDService
+    public class ScheduleReceivedDensoService : IScheduleReceivedDensoService
     {
-        private readonly IScheduleRITDRepository _scheduleRepository;
+        private readonly IScheduleReceivedDensoRepository _scheduleRepository;
 
-        public ScheduleRITDService(IScheduleRITDRepository scheduleRepository)
+        public ScheduleReceivedDensoService(IScheduleReceivedDensoRepository scheduleRepository)
         {
             _scheduleRepository = scheduleRepository;
         }
@@ -21,12 +21,6 @@ namespace Manage_Receive_Issues_Goods.Service.Implementations
         {
             return await _scheduleRepository.GetAllPlanDetailsAsync();
         }
-
-        public async Task<IEnumerable<Status>> GetAllStatusesAsync()
-        {
-            return await _scheduleRepository.GetAllStatusesAsync();
-        }
-
 
         public async Task<IEnumerable<Planritddetail>> GetPlanDetails(int planId)
         {
@@ -42,7 +36,7 @@ namespace Manage_Receive_Issues_Goods.Service.Implementations
         {
             await _scheduleRepository.UpdatePlanDetailAsync(detail);
         }
-        public async Task AddActualAsync(Actualsritd actual)
+        public async Task AddActualAsync(Actualsreceivedenso actual)
         {
             await _scheduleRepository.AddActualAsync(actual);
         }
@@ -87,7 +81,7 @@ namespace Manage_Receive_Issues_Goods.Service.Implementations
 				PlanDetailId = pd.PlanDetailId,
 				PlanTime = pd.PlanTime,
 				PlanDetailName = pd.PlanDetailName,
-				Actuals = pd.Actualsritds.Select(a => new ActualDetailDTO
+				Actuals = pd.Actualsreceivedensos.Select(a => new ActualDetailDTO
 				{
 					ActualId = a.ActualId,
 					PlanDetailId = a.PlanDetailId,
@@ -120,7 +114,7 @@ namespace Manage_Receive_Issues_Goods.Service.Implementations
 				PlanDetailId = pd.PlanDetailId,
 				PlanTime = pd.PlanTime,
 				PlanDetailName = pd.PlanDetailName,
-				Actuals = pd.Actualsritds.Select(a => new ActualDetailDTO
+				Actuals = pd.Actualsreceivedensos.Select(a => new ActualDetailDTO
 				{
 					ActualId = a.ActualId,
 					PlanDetailId = a.PlanDetailId,

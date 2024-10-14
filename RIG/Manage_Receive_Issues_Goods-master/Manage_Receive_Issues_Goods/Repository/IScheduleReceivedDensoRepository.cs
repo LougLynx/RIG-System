@@ -5,14 +5,13 @@ using Manage_Receive_Issues_Goods.Models;
 
 namespace Manage_Receive_Issues_Goods.Repository
 {
-    public interface IScheduleRITDRepository
+    public interface IScheduleReceivedDensoRepository
     {
-        Task<IEnumerable<Status>> GetAllStatusesAsync();
         Task<IEnumerable<Planritddetail>> GetPlanDetails(int planId);
         Task<IEnumerable<Planritddetail>> GetAllPlanDetailsAsync();
         Task<Planritddetail> GetPlanDetailByIdAsync(int detailId);
         Task UpdatePlanDetailAsync(Planritddetail detail);
-        Task AddActualAsync(Actualsritd actual);
+        Task AddActualAsync(Actualsreceivedenso actual);
         Task DeleteActualAsync(int actualId);
         Task AddPlanAsync(Planritd plan);
         Task AddPlanDetailAsync(Planritddetail planDetail);

@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Manage_Receive_Issues_Goods.Repository.Implementations
 {
-    public class ScheduleRITDRepository : IScheduleRITDRepository
+    public class ScheduleReceivedDensoRepository : IScheduleReceivedDensoRepository
     {
         private readonly RigContext _context;
 
-        public ScheduleRITDRepository(RigContext context)
+        public ScheduleReceivedDensoRepository(RigContext context)
         {
             _context = context;
         }
@@ -46,14 +46,7 @@ namespace Manage_Receive_Issues_Goods.Repository.Implementations
 
             return Enumerable.Empty<Planritddetail>();
         }
-
-     
-        public async Task<IEnumerable<Status>> GetAllStatusesAsync()
-        {
-            return await _context.Statuses
-                .Include(s => s.PlanDetail)
-                .ToListAsync();
-        }
+    
         public async Task<IEnumerable<Planritddetail>> GetPlanDetails(int planId)
         {
             var planDetails = await _context.Planritddetails
@@ -74,18 +67,18 @@ namespace Manage_Receive_Issues_Goods.Repository.Implementations
             await _context.SaveChangesAsync();
         }
     
-        public async Task AddActualAsync(Actualsritd actual)
+        public async Task AddActualAsync(Actualsreceivedenso actual)
         {
-            _context.Actualsritds.Add(actual);
+            _context.Actualsreceivedensos.Add(actual);
             await _context.SaveChangesAsync();
         }
 
 		public async Task DeleteActualAsync(int actualId)
 		{
-			var actual = await _context.Actualsritds.FindAsync(actualId);
+			var actual = await _context.Actualsreceivedensos.FindAsync(actualId);
 			if (actual != null)
 			{
-				_context.Actualsritds.Remove(actual);
+				_context.Actualsreceivedensos.Remove(actual);
 				await _context.SaveChangesAsync();
 			}
 		}
@@ -136,7 +129,7 @@ namespace Manage_Receive_Issues_Goods.Repository.Implementations
         public async Task<IEnumerable<Planritddetail>> GetPlanDetailsBetweenDatesAsync(DateOnly startDate, DateOnly endDate)
         {
             return await _context.Planritddetails
-                .Include(pd => pd.Actualsritds)
+                .Include(pd => pd.Actualsreceivedensos)
                 .Where(pd => pd.Plan.EffectiveDate >= startDate && pd.Plan.EffectiveDate < endDate)
                 .ToListAsync();
         }
@@ -151,7 +144,7 @@ namespace Manage_Receive_Issues_Goods.Repository.Implementations
         {
             var today = DateOnly.FromDateTime(DateTime.Now);
             return await _context.Planritddetails
-                .Include(p => p.Actualsritds)
+                .Include(p => p.Actualsreceivedensos)
                 .Where(p => p.Plan.EffectiveDate < today)
                 .ToListAsync();
         }

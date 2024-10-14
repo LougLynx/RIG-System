@@ -2,7 +2,6 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     var calendarEl = document.getElementById('calendar');
-    var fullscreenBtn = document.getElementById('fullscreenBtn');
     var notificationDismissed = false;
 
 
@@ -25,6 +24,11 @@ document.addEventListener('DOMContentLoaded', function () {
         fetchUpdatedEvents(); 
     });
 
+    // Lắng nghe sự kiện xóa
+    connection.on("EventDeleted", function (eventId) {
+        console.log("Event deleted:", eventId);
+        location.reload(); // Reload the page
+    });
     /**
     * Function to refresh calendar events
     */
@@ -80,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 newEvents.forEach(newEvent => {
                     calendar.addEvent(newEvent);
                 });
-                location.reload();
+                //location.reload();
                 console.log('Updated events fetched and added:', data);
             })
             .catch(error => console.error('Error fetching updated events:', error));
@@ -229,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         const actualStartTime = `${todayString}T${actualDate.toTimeString().split(' ')[0]}`;
                         const actualEndDate = new Date(actualDate.getTime() + 60 * 60000); // Thêm 1 giờ cho thời gian kết thúc
                         const actualEndTime = `${actualEndDate.getFullYear()}-${String(actualEndDate.getMonth() + 1).padStart(2, '0')}-${String(actualEndDate.getDate()).padStart(2, '0')}T${actualEndDate.toTimeString().split(' ')[0]}`;
-
+/*
                         events.push({
                             id: `actual-${actual.ActualId}`,
                             title: `Chuyến ${detail.PlanDetailName}`,
@@ -237,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             end: actualEndTime,
                             resourceId: resourceIdCounter + 1,
                             extendedProps: { hasActual: true }
-                        });
+                        });*/
 
                         // Cập nhật sự kiện PlanDetail để hasActual thành true
                         const planEvent = events.find(event => event.id === `plan-${detail.PlanDetailId}-${todayString}`);
@@ -253,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log("All Events Generated:", events);
         return events;
     }
-
+    fetchUpdatedEvents();
 
 
     /**
@@ -359,7 +363,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Hiển thị modal thông báo thành công
                     var successModal = new bootstrap.Modal(document.getElementById('successModal'));
                     successModal.show();
-                   location.reload();
+                  // location.reload();
                 } else {
                     console.log('Error from server:', data);
                     alert('Error confirming actual.');
@@ -396,7 +400,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(data => {
                     if (data.success) {
                         console.log('Actual deleted successfully.');
-
+                        connection.invoke("EventDeleted", deleteActualId).catch(function (err) {
+                            return console.error(err.toString());
+                        });
                         // Xóa sự kiện khỏi lịch
                         calendar.getEventById(`actual-${deleteActualId}`).remove();
 
@@ -410,6 +416,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         var eventModal = bootstrap.Modal.getInstance(eventModalElement);
                         eventModal.hide();
 
+                        
                         // Reload lại trang
                         location.reload();
                     } else {

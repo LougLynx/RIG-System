@@ -30,11 +30,11 @@ builder.Services.AddDbContext<RigContext>(options =>
 });
 
 // Register repositories
-builder.Services.AddScoped<IScheduleRITDRepository, ScheduleRITDRepository>();
+builder.Services.AddScoped<IScheduleReceivedDensoRepository, ScheduleReceivedDensoRepository>();
 builder.Services.AddScoped<ISchedulereceivedTLIPRepository, SchedulereceivedTLIPRepository>();
 
 // Register services
-builder.Services.AddScoped<IScheduleRITDService, ScheduleRITDService>();
+builder.Services.AddScoped<IScheduleReceivedDensoService, ScheduleReceivedDensoService>();
 builder.Services.AddScoped<ISchedulereceivedTLIPService, SchedulereceivedTLIPService>();
 
 

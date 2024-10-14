@@ -5,13 +5,12 @@ using Manage_Receive_Issues_Goods.Models;
 
 namespace Manage_Receive_Issues_Goods.Service
 {
-    public interface IScheduleRITDService
+    public interface IScheduleReceivedDensoService
     {
         Task<IEnumerable<Planritddetail>> GetAllPlanDetailsAsync();
-        Task<IEnumerable<Status>> GetAllStatusesAsync();
         Task<Planritddetail> GetPlanDetailByIdAsync(int detailId);
         Task UpdatePlanDetailAsync(Planritddetail detail);
-        Task AddActualAsync(Actualsritd actual);
+        Task AddActualAsync(Actualsreceivedenso actual);
         Task DeleteActualAsync(int actualId);
         Task AddPlanAsync(Planritd plan);
         Task AddPlanDetailAsync(Planritddetail planDetail);

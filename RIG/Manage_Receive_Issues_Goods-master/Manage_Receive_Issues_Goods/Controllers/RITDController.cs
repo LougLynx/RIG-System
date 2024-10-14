@@ -12,9 +12,9 @@ namespace Manage_Receive_Issues_Goods.Controllers
 {
     public class RITDController : Controller
     {
-        private readonly IScheduleRITDService _scheduleService;
+        private readonly IScheduleReceivedDensoService _scheduleService;
 
-        public RITDController(IScheduleRITDService scheduleService)
+        public RITDController(IScheduleReceivedDensoService scheduleService)
         {
             _scheduleService = scheduleService;
         }

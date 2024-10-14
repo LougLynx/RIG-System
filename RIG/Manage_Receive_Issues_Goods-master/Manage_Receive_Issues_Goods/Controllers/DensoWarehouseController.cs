@@ -11,10 +11,10 @@ namespace Manage_Receive_Issues_Goods.Controllers
 {
 	public class DensoWarehouseController : Controller
 	{
-		private readonly IScheduleRITDService _schedulereceivedService;
+		private readonly IScheduleReceivedDensoService _schedulereceivedService;
 		private readonly IHubContext<UpdateReceiveDensoHub> _hubContext;
 
-		public DensoWarehouseController(IScheduleRITDService schedulereceivedService, IHubContext<UpdateReceiveDensoHub> hubContext)
+		public DensoWarehouseController(IScheduleReceivedDensoService schedulereceivedService, IHubContext<UpdateReceiveDensoHub> hubContext)
 		{
 			_schedulereceivedService = schedulereceivedService;
 			_hubContext = hubContext;
@@ -81,8 +81,8 @@ namespace Manage_Receive_Issues_Goods.Controllers
 					return Json(new { success = false, message = "Invalid ActualTime" });
 				}
 
-				var newActual = new Actualsritd
-				{
+				var newActual = new Actualsreceivedenso
+                {
 					PlanDetailId = actualDetailDto.PlanDetailId,
 					ActualTime = actualDetailDto.ActualTime
 				};
