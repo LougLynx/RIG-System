@@ -72,6 +72,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapHub<UpdateReceiveDensoHub>("/updateReceiveDensoHub");
+app.MapHub<UpdateReceiveTLIPHub>("/updateReceiveTLIPHub");
 app.MapRazorPages();
 
 

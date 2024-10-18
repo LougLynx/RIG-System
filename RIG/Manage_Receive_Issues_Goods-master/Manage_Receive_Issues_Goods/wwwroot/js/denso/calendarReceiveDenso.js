@@ -29,8 +29,9 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log("Event deleted:", eventId);
         location.reload(); // Reload the page
     });
+
     /**
-    * Function to refresh calendar events
+    * Function to update actual events
     */
     function fetchUpdatedEvents() {
         fetch('/DensoWarehouse/GetUpdatedEvents')
@@ -55,6 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                             if (actualDateString === today) {
                                 const actualStartTime = `${actualDateString}T${actualDate.toTimeString().split(' ')[0]}`;
+                                console.log("actualStartTime nè nè: ",actualStartTime);
                                 const actualEndDate = new Date(actualDate.getTime() + 60 * 60000); // Thêm 1 giờ cho thời gian kết thúc
                                 const actualEndTime = `${actualEndDate.toISOString().split('T')[0]}T${actualEndDate.toTimeString().split(' ')[0]}`;
 
@@ -260,55 +262,7 @@ document.addEventListener('DOMContentLoaded', function () {
     fetchUpdatedEvents();
 
 
-    /**
-     * Kiểm tra xem chuyến hàng có bị muộn không (Plandetail chưa được confirm)
-     */
-    function checkForLateShipments(planDetails) {
-        const now = new Date();
-        const todayString = now.toISOString().split('T')[0]; // Ngày hôm nay ở định dạng YYYY-MM-DD
-
-        planDetails.forEach(detail => {
-            const planTimeParts = detail.PlanTime.split(':');
-            const planDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), planTimeParts[0], planTimeParts[1]);
-            const fifteenMinutesAfterPlanTime = new Date(planDate.getTime() + 15 * 60000); // Thêm 15 phút
-
-            // Kiểm tra nếu PlanTime là hôm nay và hiện tại đã quá 15 phút so với PlanTime
-            if (now.toISOString().split('T')[0] === formatDateToLocalString(planDate) && now > fifteenMinutesAfterPlanTime) {
-                // Kiểm tra nếu không có Actual cho hôm nay
-                const hasActualForToday = detail.Actuals && detail.Actuals.some(actual => {
-                    const actualDate = new Date(actual.ActualTime);
-                    const actualDateString = formatDateToLocalString(actualDate);
-                    return actualDateString === todayString;
-                });
-
-                // Nếu không có Actual cho hôm nay, đánh dấu chuyến hàng bị muộn
-                if (!hasActualForToday && !notificationDismissed) {
-                    const event = calendar.getEventById(`plan-${detail.PlanDetailId}-${todayString}`);
-                    if (event) {
-                        // Đặt isLate để cập nhật icon cảnh báo
-                        event.setExtendedProp('isLate', true);
-                        console.log(`Shipment ${detail.PlanDetailName} is late!`);
-                    }
-                    toastr.warning("Please check if the shipment is late if not please confirm status", null, {
-                        timeOut: 5000,
-                        extendedTimeOut: 0,
-                        closeButton: true,
-                        progressBar: true,
-                        positionClass: 'toast-top-center',
-                        onHidden: function () {
-                            notificationDismissed = true;
-                            clearInterval(notificationInterval);
-                        }
-                    });
-                }
-            }
-        });
-    }
-
-    //Lặp lại thông báo mỗi 10 giây cho đên skhi được confirm
-    var notificationInterval = setInterval(() => {
-        checkForLateShipments(planDetails);
-    }, 5000);
+  
 
 
     /**
@@ -426,6 +380,57 @@ document.addEventListener('DOMContentLoaded', function () {
                 .catch(error => console.error('Error:', error));
         }
     });
+
+
+    /**
+   * Kiểm tra xem chuyến hàng có bị muộn không (Plandetail chưa được confirm)
+   */
+    function checkForLateShipments(planDetails) {
+        const now = new Date();
+        const todayString = now.toISOString().split('T')[0]; // Ngày hôm nay ở định dạng YYYY-MM-DD
+
+        planDetails.forEach(detail => {
+            const planTimeParts = detail.PlanTime.split(':');
+            const planDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), planTimeParts[0], planTimeParts[1]);
+            const fifteenMinutesAfterPlanTime = new Date(planDate.getTime() + 15 * 60000); // Thêm 15 phút
+
+            // Kiểm tra nếu PlanTime là hôm nay và hiện tại đã quá 15 phút so với PlanTime
+            if (now.toISOString().split('T')[0] === formatDateToLocalString(planDate) && now > fifteenMinutesAfterPlanTime) {
+                // Kiểm tra nếu không có Actual cho hôm nay
+                const hasActualForToday = detail.Actuals && detail.Actuals.some(actual => {
+                    const actualDate = new Date(actual.ActualTime);
+                    const actualDateString = formatDateToLocalString(actualDate);
+                    return actualDateString === todayString;
+                });
+
+                // Nếu không có Actual cho hôm nay, đánh dấu chuyến hàng bị muộn
+                if (!hasActualForToday && !notificationDismissed) {
+                    const event = calendar.getEventById(`plan-${detail.PlanDetailId}-${todayString}`);
+                    if (event) {
+                        // Đặt isLate để cập nhật icon cảnh báo
+                        event.setExtendedProp('isLate', true);
+                        console.log(`Shipment ${detail.PlanDetailName} is late!`);
+                    }
+                    toastr.warning("Please check if the shipment is late if not please confirm status", null, {
+                        timeOut: 10000,
+                        extendedTimeOut: 0,
+                        closeButton: true,
+                        progressBar: true,
+                        positionClass: 'toast-top-center',
+                        onHidden: function () {
+                            notificationDismissed = true;
+                            clearInterval(notificationInterval);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    //Lặp lại thông báo mỗi 10 giây cho đên skhi được confirm
+    var notificationInterval = setInterval(() => {
+        checkForLateShipments(planDetails);
+    }, 10000);
 
     /**
      * Render icon cảnh báo nếu đến muộn

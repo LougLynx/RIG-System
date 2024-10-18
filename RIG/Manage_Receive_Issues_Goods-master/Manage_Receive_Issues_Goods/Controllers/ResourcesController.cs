@@ -13,7 +13,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
         {
             var resources = new List<dynamic>();
 
-            for (int i = 1; i <= 40; i++)
+            for (int i = 1; i <= 100; i++)
             {
                 resources.Add(new
                 {

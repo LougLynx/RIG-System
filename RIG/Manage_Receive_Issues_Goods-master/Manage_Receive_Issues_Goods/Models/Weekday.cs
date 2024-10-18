@@ -17,5 +17,5 @@ public partial class Weekday
     public string DayName { get; set; } = null!;
 
     [InverseProperty("Weekday")]
-    public virtual ICollection<Schedulereceived> Schedulereceiveds { get; set; } = new List<Schedulereceived>();
+    public virtual ICollection<Plandetailreceivedtlip> Plandetailreceivedtlips { get; set; } = new List<Plandetailreceivedtlip>();
 }

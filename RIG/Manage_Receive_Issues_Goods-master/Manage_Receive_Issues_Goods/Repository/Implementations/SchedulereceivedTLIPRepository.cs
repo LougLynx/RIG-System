@@ -21,43 +21,43 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
             _httpClient = httpClient;
         }
 
-        public async Task<IEnumerable<Schedulereceived>> GetAllAsync()
+        public async Task<IEnumerable<Plandetailreceivedtlip>> GetAllAsync()
         {
-            return await _context.Schedulereceiveds
-                .Include(s => s.Supplier)
+            return await _context.Plandetailreceivedtlips
+                .Include(s => s.SupplierCode)
                 .Include(s => s.DeliveryTime)
                 .Include(s => s.Weekday)
                 .ToListAsync();
         }
 
-        public async Task<Schedulereceived> GetByIdAsync(int id)
+        public async Task<Plandetailreceivedtlip> GetByIdAsync(int id)
         {
-            return await _context.Schedulereceiveds
-                .Include(s => s.Supplier)
+            return await _context.Plandetailreceivedtlips
+                .Include(s => s.SupplierCode)
                 .Include(s => s.DeliveryTime)
                 .Include(s => s.Weekday)
-                .FirstOrDefaultAsync(s => s.ScheduleId == id);
+                .FirstOrDefaultAsync(s => s.PlanDetailId == id);
         }
 
-        public async Task<IEnumerable<Schedulereceived>> GetSchedulesByWeekdayAsync(int weekdayId)
+        public async Task<IEnumerable<Plandetailreceivedtlip>> GetSchedulesByWeekdayAsync(int weekdayId)
         {
-            return await _context.Schedulereceiveds
-                .Include(s => s.Supplier)
+            return await _context.Plandetailreceivedtlips
+                .Include(s => s.SupplierCode)
                 .Include(s => s.DeliveryTime)
                 .Include(s => s.Weekday)
                 .Where(s => s.WeekdayId == weekdayId)
                 .ToListAsync();
         }
 
-        public async Task AddAsync(Schedulereceived entity)
+        public async Task AddAsync(Plandetailreceivedtlip entity)
         {
-            await _context.Schedulereceiveds.AddAsync(entity);
+            await _context.Plandetailreceivedtlips.AddAsync(entity);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(Schedulereceived entity)
+        public async Task UpdateAsync(Plandetailreceivedtlip entity)
         {
-            _context.Schedulereceiveds.Update(entity);
+            _context.Plandetailreceivedtlips.Update(entity);
             await _context.SaveChangesAsync();
         }
 
@@ -66,32 +66,31 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
             var entity = await GetByIdAsync(id);
             if (entity != null)
             {
-                _context.Schedulereceiveds.Remove(entity);
+                _context.Plandetailreceivedtlips.Remove(entity);
                 await _context.SaveChangesAsync();
             }
         }
 
-        public async Task<IEnumerable<Actualreceived>> GetAllActualReceivedAsync()
+        public async Task<IEnumerable<Actualreceivedtlip>> GetAllActualReceivedAsync()
         {
-            return await _context.Actualreceiveds
-                .Include(ar => ar.Schedule) // Bao gồm thông tin lịch trình liên quan
-                .ThenInclude(s => s.Supplier) // Bao gồm cả nhà cung cấp
-                .ToListAsync();
+            return await _context.Actualreceivedtlips
+                                 .Include(ar => ar.SupplierCodeNavigation) 
+                                 .ToListAsync();
         }
 
         public async Task<IEnumerable<Supplier>> GetSuppliersForTodayAsync(int weekdayId)
         {
-            return await _context.Schedulereceiveds
+            return (IEnumerable<Supplier>)await _context.Plandetailreceivedtlips
                 .Where(s => s.WeekdayId == weekdayId)
-                .OrderBy(s => s.DeliveryTime.Time1) // Sắp xếp theo giờ giao hàng
-                .Select(s => s.Supplier)
+                .OrderBy(s => s.DeliveryTime) 
+                .Select(s => s.SupplierCode)
                 .Distinct()
                 .ToListAsync();
         }
 
-        public async Task<Schedulereceived> GetScheduleBySupplierIdAsync(int supplierId)
+        public async Task<Plandetailreceivedtlip> GetScheduleBySupplierIdAsync(string supplierCode)
         {
-            return await _context.Schedulereceiveds.FirstOrDefaultAsync(s => s.SupplierId == supplierId);
+            return await _context.Plandetailreceivedtlips.FirstOrDefaultAsync(s => s.SupplierCode == supplierCode);
         }
 
         public async Task<IEnumerable<AsnInformation>> GetAsnInformationAsync(DateTime inputDate)
@@ -148,6 +147,31 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
                 }).ToList();
             }
             return new List<AsnDetailData>();
+        }
+
+        public async Task AddActualReceivedAsync(Actualreceivedtlip actualReceived)
+        {
+            _context.Actualreceivedtlips.Add(actualReceived);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateActualDetailTLIPAsync(string partNo, int actualReceivedId, int quantityRemain)
+        {
+            var actualDetail = await _context.Actualdetailtlips
+                .FirstOrDefaultAsync(ad => ad.PartNo == partNo && ad.ActualReceivedId == actualReceivedId);
+
+            if (actualDetail != null)
+            {
+                actualDetail.QuantityRemain = quantityRemain;
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<IEnumerable<Actualdetailtlip>> GetActualDetailsByReceivedIdAsync(int actualReceivedId)
+        {
+            return await _context.Actualdetailtlips
+                                 .Where(ad => ad.ActualReceivedId == actualReceivedId)
+                                 .ToListAsync();
         }
 
     }

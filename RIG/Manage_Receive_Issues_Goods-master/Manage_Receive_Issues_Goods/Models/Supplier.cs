@@ -10,12 +10,17 @@ namespace Manage_Receive_Issues_Goods.Models;
 public partial class Supplier
 {
     [Key]
-    [Column("SupplierID")]
-    public int SupplierId { get; set; }
+    [StringLength(100)]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
+    public string SupplierCode { get; set; } = null!;
 
     [StringLength(100)]
-    public string SupplierName { get; set; } = null!;
+    public string? SupplierName { get; set; }
 
-    [InverseProperty("Supplier")]
-    public virtual ICollection<Schedulereceived> Schedulereceiveds { get; set; } = new List<Schedulereceived>();
+    [InverseProperty("SupplierCodeNavigation")]
+    public virtual ICollection<Actualreceivedtlip> Actualreceivedtlips { get; set; } = new List<Actualreceivedtlip>();
+
+    [InverseProperty("SupplierCodeNavigation")]
+    public virtual ICollection<Plandetailreceivedtlip> Plandetailreceivedtlips { get; set; } = new List<Plandetailreceivedtlip>();
 }

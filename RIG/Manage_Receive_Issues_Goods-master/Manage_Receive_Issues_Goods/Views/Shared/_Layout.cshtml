@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<IdentityUser> SignInManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <!-- Existing links and scripts -->
@@ -24,9 +28,26 @@
     <div id="mySidebar" class="sidebar">
         <h1 class=" text-light"><b><i>DENSO</i> <br>Manage RIG</b></h1>
 
-        <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-        <a class="nav-link text-light" asp-area="" asp-controller="TLIPWarehouse" asp-action="ScheduleReceive">TLIP</a>
-        <a class="nav-link text-light" asp-area="" asp-controller="DensoWarehouse" asp-action="ScheduleReceive">Denso</a>
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <h4 class="text-light text-center"><b>@User.Identity.Name</b></h4>
+
+        }
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+            <a class="nav-link text-light" asp-area="" asp-controller="TLIPWarehouse" asp-action="ScheduleReceive">TLIP</a>
+            <a class="nav-link text-light" asp-area="" asp-controller="DensoWarehouse" asp-action="ScheduleReceive">Denso</a>
+
+            <form method="post" asp-controller="Account" asp-action="Logout">
+                <button type="submit" style="width:auto" class="nav-link btn btn-link py-0">
+                    Logout
+                </button>
+            </form>
+
+        }
+
+
     </div>
 
     <div id="main">
