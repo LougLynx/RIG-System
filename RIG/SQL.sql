@@ -16,8 +16,8 @@
 			
 	-- Dumping database structure for receive_issues_goods
 	-- --------------------------------------------------------
-	 -- DROP DATABASE IF EXISTS `rig`;
-	 -- CREATE DATABASE IF NOT EXISTS `rig` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+	  -- DROP DATABASE IF EXISTS `rig`;
+	  -- CREATE DATABASE IF NOT EXISTS `rig` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 	USE `rig`;
 
 	-- --------------------------------------------------------
