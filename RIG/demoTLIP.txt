@@ -12,7 +12,7 @@
         "etaDate": "2024-10-18T00:00:00",
         "etaDateString": "2024-10-18",
         "receiveStatus": true,
-        "isCompleted": true
+        "isCompleted": false
       },
       {
         "asnNumber": "M4927K1M01G05",

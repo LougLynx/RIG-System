@@ -23,5 +23,10 @@ namespace Manage_Receive_Issues_Goods.Services
         Task AddActualReceivedAsync(Actualreceivedtlip actualReceived);
         Task UpdateActualDetailTLIPAsync(string partNo, int actualReceivedId, int quantityRemain);
         Task<IEnumerable<Actualdetailtlip>> GetActualDetailsByReceivedIdAsync(int actualReceivedId);
+		Task<Actualreceivedtlip> GetActualReceivedWithSupplierAsync(int actualReceivedId);
+		Task<Actualreceivedtlip> GetActualReceivedEntryAsync(string supplierCode, DateTime actualDeliveryTime);
+		Task AddActualDetailAsync(Actualdetailtlip actualDetail);
+        Task UpdateActualReceivedAsync(Actualreceivedtlip actualReceived);
+
     }
 }

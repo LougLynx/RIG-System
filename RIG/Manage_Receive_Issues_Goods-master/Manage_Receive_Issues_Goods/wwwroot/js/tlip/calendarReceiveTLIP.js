@@ -7,11 +7,12 @@
     notificationConnection.start().then(function () {
         console.log("SignalR connected.");
     }).catch(function (err) {
-        return console.error(err.toString());
+        console.error("Failed to connect SignalR: ", err.toString());
     });
 
+
     notificationConnection.on("UpdateCalendar", function (actualReceived) {
-        console.log("Received update:", actualReceived);
+        /*console.log("Received update:", actualReceived);
         const start = new Date(actualReceived.actualDeliveryTime);
         const end = new Date(start);
 
@@ -23,17 +24,72 @@
 
         const formattedStart = formatDateTime(start);
         const formattedEnd = formatDateTime(end);
-        calendar.addEvent({
-            title: actualReceived.supplierName,
-            start: formattedStart,
-            end: formattedEnd,
-            resourceId: 2,
-            extendedProps: {
-                actualReceivedId: actualReceived.actualReceivedId
-            }
-        });
+        let existingEvent = calendar.getEventById(actualReceived.actualReceivedId);
+        if (!existingEvent) {
+            calendar.addEvent({
+                id: actualReceived.actualReceivedId,  
+                title: actualReceived.supplierName,
+                start: formattedStart,
+                end: formattedEnd,
+                resourceId: 2,
+                extendedProps: {
+                    actualReceivedId: actualReceived.actualReceivedId,
+                    supplierCode: actualReceived.supplierCode
+                }
+            });
+        }*/
+
+        console.log("Received update via SignalR:", actualReceived);
+        updateCalendarEvent(actualReceived);
+
     });
 
+    function updateCalendarEvent(actualReceived) {
+        const start = new Date(actualReceived.actualDeliveryTime);
+        const end = new Date(start);
+
+        if (actualReceived.actualLeadTime) {
+            end.setMinutes(end.getMinutes() + actualReceived.actualLeadTime);
+        } else {
+            end.setHours(end.getHours() + 1);
+        }
+
+        const formattedStart = formatDateTime(start);
+        const formattedEnd = formatDateTime(end);
+
+        let existingEvent = calendar.getEventById(actualReceived.actualReceivedId);
+        if (!existingEvent) {   
+            calendar.addEvent({
+                id: actualReceived.actualReceivedId,
+                title: actualReceived.supplierName,
+                start: formattedStart,
+                end: formattedEnd,
+                resourceId: 2,
+                extendedProps: {
+                    actualReceivedId: actualReceived.actualReceivedId,
+                    supplierCode: actualReceived.supplierCode
+                }
+            });
+        } else {
+            existingEvent.setStart(formattedStart);
+            existingEvent.setEnd(formattedEnd);
+        }
+    }
+
+    // Periodically update event end time if completion percentage is less than 100%
+    setInterval(function () {
+        // Fetch the latest data to update events
+        getActualReceived().then(data => {
+            data.forEach(actualReceived => {
+                // Only update if completion percentage is less than 100%
+                if (actualReceived.completionPercentage < 100) {
+                    updateCalendarEvent(actualReceived);
+                }
+            });
+        }).catch(error => {
+            console.error("Error fetching actual received data:", error);
+        });
+    }, 5000); // Every 5 seconds
 
     function formatDateToLocalString(date) {
         const year = date.getFullYear();
@@ -83,6 +139,25 @@
             .then(response => response.json());
     }
 
+    function updateEventEndInDatabase(actualReceivedId, end) {
+        fetch(`/TLIPWarehouse/UpdateActualLeadTime`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                actualReceivedId: actualReceivedId,
+                actualDeliveryTime: end // Truyền thời gian kết thúc, API sẽ tính toán ActualLeadTime
+            })
+        }).then(response => {
+            if (!response.ok) {
+                console.error('Failed to update ActualLeadTime:', response.statusText);
+            }
+        }).catch(function (err) {
+            console.error('Error updating ActualLeadTime:', err.toString());
+        });
+    }
+
 
   
 
@@ -119,7 +194,7 @@
         editable: false,
         resourceAreaHeaderContent: 'Details/Hour',
         //Lấy API để hiển thị cột Actual và Plan
-        resources: '/api/Resources',
+        resources: '/api/ResourcesReceivedTLIP',
         //Sắp xếp theo thứ tự theo order(Plan trước Actual sau)
         resourceOrder: 'order',
         events: function (fetchInfo, successCallback, failureCallback) {
@@ -128,36 +203,58 @@
                     console.log("data:", data);
                     const events = [];
                     let resourceIdCounter = 2;
+
                     data.forEach(actualReceived => {
                         console.log("actualReceived:", actualReceived);
-                        const start = new Date(actualReceived.ActualDeliveryTime);
-                        const end = new Date(start);
 
-                        if (actualReceived.ActualLeadTime) {
-                            end.setMinutes(end.getMinutes() + actualReceived.ActualLeadTime);
-                        } else {
+                        const start = new Date(actualReceived.ActualDeliveryTime);
+                        let end = new Date(start);
+
+                        const completedItems = actualReceived.ActualDetails.filter(detail => detail.QuantityRemain === 0).length;
+                        const totalItems = actualReceived.ActualDetails.length;
+                        const completionPercentage = (completedItems / totalItems) * 100;
+
+                        let eventColor = completionPercentage === 100 ? '#32AB25' : '#C7B44F';
+
+                        // Nếu phần trăm hoàn thành là 0, set thời gian kết thúc mặc định +1 tiếng
+                        if (completionPercentage === 0) {
                             end.setHours(end.getHours() + 1);
+                        } else {
+                            // Nếu phần trăm không phải 0, set thời gian kết thúc là thời gian hiện tại
+                            end = new Date();
                         }
 
                         const formattedStart = formatDateTime(start);
-                        console.log("formattedStart:", formattedStart);
                         const formattedEnd = formatDateTime(end);
-                        console.log("formattedEnd:", formattedEnd);
+
                         events.push({
+                            id: actualReceived.ActualReceivedId,
                             title: actualReceived.SupplierName,
                             start: formattedStart,
                             end: formattedEnd,
                             resourceId: resourceIdCounter,
+                            backgroundColor: eventColor,  // Đặt màu sắc cho sự kiện
                             extendedProps: {
-                                actualReceivedId: actualReceived.ActualReceivedId
+                                actualReceivedId: actualReceived.ActualReceivedId,
+                                supplierCode: actualReceived.SupplierCode,
+                                completionPercentage: completionPercentage
                             }
                         });
+
+                        // Sau khi cập nhật thời gian kết thúc (end), cập nhật vào database
+                        if (completionPercentage !== 0) {
+                            const formattedEnd = formatDateTime(new Date());  // Thời gian kết thúc là thời gian hiện tại
+                            updateEventEndInDatabase(actualReceived.ActualReceivedId, formattedEnd);
+                        }
+
                         resourceIdCounter += 2;
                     });
+
                     successCallback(events);
                 })
                 .catch(error => failureCallback(error));
-        },
+        }
+,
         // Không cho phép kéo sự kiện để thay đổi thời gian bắt đầu
         eventStartEditable: false,
         // Không cho phép thay đổi độ dài (thời lượng) sự kiện
@@ -176,7 +273,39 @@
         //HÀM XỬ LÝ KHI CLICK VÀO SỰ KIỆN
         eventClick: function (info) {
             const actualReceivedId = info.event.extendedProps.actualReceivedId;
+            const supplierCode = info.event.extendedProps.supplierCode;
+            const supplierName = info.event.title; 
+            const start = info.event.start; 
+            const end = info.event.end; 
+
+            const formattedStart = new Date(start).toLocaleString('vi-VN', {
+                timeZone: 'UTC',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const formattedEnd = new Date(end).toLocaleString('vi-VN', {
+                timeZone: 'UTC',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const eventDetails = `
+        <strong>Nhà cung cấp:</strong> ${supplierName} - ${supplierCode}<br>
+        <i><strong>Nhận lúc:</strong></i> ${formattedStart}<br>
+        <i><strong>Kết thúc lúc:</strong></i> ${formattedEnd}
+    `;
+            document.getElementById('eventDetails').innerHTML = eventDetails;
+
+            // Gán actualReceivedId vào modal để sử dụng khi cần
+            document.getElementById('eventModal').setAttribute('data-actual', actualReceivedId);
+
+            // Lấy chi tiết giai đoạn cho actualReceivedId và hiển thị chúng
             fetchAndPopulateStagesTable(actualReceivedId);
+
+            // Mở modal
+            var eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+            eventModal.show();
         },
         //FOMAT NGÀY THÁNG
         views: {
@@ -215,7 +344,8 @@
     });
 
     function getAsnDetail(asnNumber, doNumber, invoice) {
-        return fetch(`/TLIPWarehouse/GetAsnDetail?asnNumber=${asnNumber}&doNumber=${doNumber}&invoice=${invoice}`)
+       // return fetch(`/TLIPWarehouse/GetAsnDetail?asnNumber=${asnNumber}&doNumber=${doNumber}&invoice=${invoice}`)
+        return fetch(`/TLIPWarehouse/ParseAsnDetailFromFile?asnNumber=${asnNumber}&doNumber=${doNumber}&invoice=${invoice}`)
             .then(response => response.json());
     }
     function getActualReceivedEntry(supplierCode, actualDeliveryTime) {
@@ -226,6 +356,7 @@
     var previousData = [];
     function fetchData() {
         console.log('fetchData called at', new Date().toLocaleTimeString());
+
         //fetch('/TLIPWarehouse/GetAsnInformation')
         fetch('/TLIPWarehouse/ParseAsnInformationFromFile')
             .then(response => {
@@ -250,6 +381,7 @@
                         (item.Invoice && item.Invoice === newItem.Invoice)
                     );
                     console.log('previousItem:', previousItem);
+
                     if (previousItem && !previousItem.ReceiveStatus && newItem.ReceiveStatus) {
                         var actualReceived = {
                             ActualDeliveryTime: formatDateTime(now),
@@ -259,6 +391,7 @@
                             Invoice: newItem.Invoice
                         };
                         console.log('Posting data:', actualReceived);
+
                         fetch('/TLIPWarehouse/AddActualReceived', {
                             method: 'POST',
                             headers: {
@@ -271,57 +404,57 @@
                                 return fetch(`/TLIPWarehouse/GetActualReceivedEntry?supplierCode=${actualReceived.SupplierCode}&actualDeliveryTime=${actualReceived.ActualDeliveryTime}`);
                             })
                             .then(response => response.json())
-                            .then(actualReceivedEntry => {
+                            .then(async actualReceivedEntry => {
                                 console.log('Retrieved actualReceivedEntry:', actualReceivedEntry);
-                                const updateData = { ...actualReceivedEntry };
+
+                                // Fetch ASN details and update stages table
+                                const asnDetails = await getAsnDetail(
+                                    /*actualReceivedEntry.AsnNumber ? actualReceivedEntry.AsnNumber : '',
+                                    actualReceivedEntry.DoNumber ? actualReceivedEntry.DoNumber : '',   `
+                                    actualReceivedEntry.Invoice ? actualReceivedEntry.Invoice : ''*/
+                                    actualReceivedEntry.AsnNumber ? actualReceivedEntry.AsnNumber : null,
+                                    actualReceivedEntry.DoNumber ? actualReceivedEntry.DoNumber : null,
+                                    actualReceivedEntry.Invoice ? actualReceivedEntry.Invoice : null
+                                );
+                                console.log('ASN Details:', asnDetails);
+
+                                asnDetails.forEach(asnDetail => {
+                                    const actualDetail = {
+                                        ActualReceivedId: actualReceivedEntry.ActualReceivedId,
+                                        PartNo: asnDetail.PartNo,
+                                        Quantity: asnDetail.Quantity,
+                                        QuantityRemain: asnDetail.QuantityRemain
+                                    };
+                                    console.log('Posting ActualDetailTLIP:', actualDetail);
+
+                                    fetch('/TLIPWarehouse/AddActualDetail', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify(actualDetail)
+                                    }).then(response => {
+                                        if (!response.ok) {
+                                            console.error('Failed to post ActualDetailTLIP:', response.statusText);
+                                        }
+                                    }).catch(function (err) {
+                                        console.error('Error posting ActualDetailTLIP:', err.toString());
+                                    });
+                                });
+
+                                // Ensure stages table is populated before invoking UpdateCalendar
+                                //await populateStagesTable(asnDetails);
+
+                                // Now invoke the update after stages table is updated
+                              /*  const updateData = { ...actualReceivedEntry };
                                 console.log('Update data:', updateData);
                                 notificationConnection.invoke("UpdateCalendar", updateData)
                                     .catch(function (err) {
                                         return console.error(err.toString());
-                                    });
-
-                                return getAsnDetail(
-                                    actualReceivedEntry.AsnNumber ? actualReceivedEntry.AsnNumber : '',
-                                    actualReceivedEntry.DoNumber ? actualReceivedEntry.DoNumber : '',
-                                    actualReceivedEntry.Invoice ? actualReceivedEntry.Invoice : ''
-                                )
-                                    .then (asnDetails => {
-                                        console.log('ASN Details:', asnDetails);
-
-                                        asnDetails.forEach(asnDetail => {
-                                            const actualDetail = {
-                                                ActualReceivedId: actualReceivedEntry.ActualReceivedId,
-                                                PartNo: asnDetail.PartNo,
-                                                Quantity: asnDetail.Quantity,
-                                                QuantityRemain: asnDetail.QuantityRemain
-                                            };
-                                            console.log('Posting ActualDetailTLIP:', actualDetail);
-                                            
-
-                                            fetch('/TLIPWarehouse/AddActualDetail', {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json'
-                                                },
-                                                body: JSON.stringify(actualDetail)
-                                            }).then(response => {
-                                                if (!response.ok) {
-                                                    console.error('Failed to post ActualDetailTLIP:', response.statusText);
-                                                }
-                                            }).catch(function (err) {
-                                                console.error('Error posting ActualDetailTLIP:', err.toString());
-                                            });
-                                            
-                                        });
-                                        // Update the stages table
-                                        populateStagesTable(asnDetails);
-                                    })
-                                    .then(result => {
-                                        console.log('ActualDetailTLIP successfully added:', result);
-                                    })
-                                    .catch(error => {
-                                        console.error('Error adding ActualDetailTLIP:', error);
-                                    });
+                                    });*/
+                            })
+                            .catch(error => {
+                                console.error('Error adding ActualDetailTLIP:', error);
                             });
                     }
                 });
@@ -329,6 +462,7 @@
             })
             .catch(error => console.error('Error fetching data:', error));
     }
+
     setInterval(fetchData, 5000);
 
 
@@ -359,9 +493,10 @@
                                     }).catch(function (err) {
                                         console.error('Error updating ActualDetailTLIP:', err.toString());
                                     });
-                                    populateStagesTable(asnDetail);
                                 }
                             });
+                            populateStagesTable(asnDetails);
+
                             // Update previousData with the latest data
                             previousDataDetail = asnDetails;
                         });
@@ -376,20 +511,48 @@
     setInterval(fetchDataDetail, 5000);
 
 
-     function populateStagesTable(asnDetail) {
+    function populateStagesTable(asnDetails) {
         const stagesTableBody = document.getElementById('stagesTableBody');
-        stagesTableBody.innerHTML = ''; // Clear existing rows
+        stagesTableBody.innerHTML = '';
 
-        asnDetail.forEach(detail => {
+        let totalItems = asnDetails.length;
+        let completedItems = 0;
+
+        asnDetails.forEach(detail => {
             const row = document.createElement('tr');
+            const isDone = detail.QuantityRemain === 0;
+            if (isDone) {
+                completedItems++;
+            }
             row.innerHTML = `
-                <td>${detail.PartNo}</td>
-                <td>${detail.Quantity}</td>
-                <td>${detail.QuantityRemain !== 0 ? 'Pending...' : 'Done'}</td>
-            `;
+        <td>${detail.PartNo}</td>
+        <td>${detail.Quantity}</td>
+        <td>${isDone ? 'Done' : 'Pending...'}</td>
+    `;
             stagesTableBody.appendChild(row);
         });
+
+        // Tính toán phần trăm hoàn thành
+        let completionPercentage = (completedItems / totalItems) * 100;
+
+        // Cập nhật giao diện để hiển thị phần trăm hoàn thành
+        const completionElement = document.getElementById('completionPercentage');
+        let color = completionPercentage < 100 ? '#C7B44F' : '#32AB25'; 
+
+        if (completionElement) {
+            completionElement.textContent = `Đã hoàn thành được: ${completionPercentage.toFixed(2)}%`;
+            completionElement.style.color = color; // Cập nhật màu sắc
+        } else {
+            // Nếu phần tử hiển thị chưa tồn tại, tạo mới
+            const newCompletionElement = document.createElement('div');
+            newCompletionElement.id = 'completionPercentage';
+            newCompletionElement.textContent = `Đã hoàn thành được: ${completionPercentage.toFixed(2)}%`;
+            newCompletionElement.style.color = color; 
+            document.body.appendChild(newCompletionElement); 
+        }
     }
+
+
 
     function fetchAndPopulateStagesTable(actualReceivedId) {
         fetch(`/TLIPWarehouse/GetActualDetailsByReceivedId?actualReceivedId=${actualReceivedId}`)
@@ -397,8 +560,8 @@
             .then(data => {
                 console.log('Actual details:', data);
                 populateStagesTable(data);
-                var eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
-                eventModal.show();
+                /*var eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+                eventModal.show();*/
             })
             .catch(error => console.error('Error fetching actual details:', error));
     }

@@ -75,6 +75,7 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
         {
             return await _context.Actualreceivedtlips
                                  .Include(ar => ar.SupplierCodeNavigation) 
+                                 .Include(ar => ar.Actualdetailtlips) 
                                  .ToListAsync();
         }
 
@@ -172,6 +173,35 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
             return await _context.Actualdetailtlips
                                  .Where(ad => ad.ActualReceivedId == actualReceivedId)
                                  .ToListAsync();
+        }
+
+		public async Task<Actualreceivedtlip> GetActualReceivedWithSupplierAsync(int actualReceivedId)
+		{
+			return await _context.Actualreceivedtlips
+				.Include(a => a.SupplierCodeNavigation)
+				.FirstOrDefaultAsync(a => a.ActualReceivedId == actualReceivedId);
+		}
+
+		public async Task<Actualreceivedtlip> GetActualReceivedEntryAsync(string supplierCode, DateTime actualDeliveryTime)
+		{
+			return await _context.Actualreceivedtlips
+				.Include(a => a.SupplierCodeNavigation)
+				.Include(a => a.Actualdetailtlips)
+				.Where(a => a.SupplierCode == supplierCode && a.ActualDeliveryTime == actualDeliveryTime)
+				.OrderByDescending(a => a.ActualReceivedId)
+				.FirstOrDefaultAsync();
+		}
+
+		public async Task AddActualDetailAsync(Actualdetailtlip actualDetail)
+		{
+			_context.Actualdetailtlips.Add(actualDetail);
+			await _context.SaveChangesAsync();
+		}
+
+        public async Task UpdateActualReceivedAsync(Actualreceivedtlip actualReceived)
+        {
+            _context.Actualreceivedtlips.Update(actualReceived);
+            await _context.SaveChangesAsync();
         }
 
     }

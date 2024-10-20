@@ -6,7 +6,8 @@
         public DateTime ActualDeliveryTime { get; set; }
         public TimeOnly? ActualLeadTime { get; set; }
         public string SupplierCode { get; set; }
-        public string? DoNumber { get; set; }
+		public string? AsnNumber { get; set; }
+		public string? DoNumber { get; set; }
         public string? Invoice { get; set; }
         public string SupplierName { get; set; }
         public List<ActualDetailTLIPDTO> ActualDetails { get; set; }

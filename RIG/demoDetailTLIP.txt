@@ -9,7 +9,7 @@
         "doNumber": "41018003",
         "invoice": null,
         "quantiy": 35000,
-        "quantityRemain": 0
+        "quantityRemain": 35000
       },
       {
         "partNo": "VN079649-0220",
@@ -17,7 +17,7 @@
         "doNumber": "41018003",
         "invoice": null,
         "quantiy": 50000,
-        "quantityRemain": 0
+        "quantityRemain": 50000
       },
       {
         "partNo": "VN079649-0240",
@@ -25,7 +25,7 @@
         "doNumber": "41018003",
         "invoice": null,
         "quantiy": 50000,
-        "quantityRemain": 0
+        "quantityRemain": 50000
       },
       {
         "partNo": "VN079649-0250",
@@ -33,7 +33,7 @@
         "doNumber": "41018003",
         "invoice": null,
         "quantiy": 50000,
-        "quantityRemain": 0
+        "quantityRemain": 50000
       },
       {
         "partNo": "VN192373-3010",
@@ -41,7 +41,7 @@
         "doNumber": "41018003",
         "invoice": null,
         "quantiy": 2000,
-        "quantityRemain": 0
+        "quantityRemain": 2000
       },
       {
         "partNo": "VN230461-0010",
@@ -49,7 +49,7 @@
         "doNumber": "41018003",
         "invoice": null,
         "quantiy": 170000,
-        "quantityRemain": 0
+        "quantityRemain": 170000
       },
       {
         "partNo": "VN230461-0020",
@@ -57,7 +57,7 @@
         "doNumber": "41018003",
         "invoice": null,
         "quantiy": 170000,
-        "quantityRemain": 0
+        "quantityRemain": 170000
       },
       {
         "partNo": "VN230461-0030",
@@ -65,7 +65,7 @@
         "doNumber": "41018003",
         "invoice": null,
         "quantiy": 170000,
-        "quantityRemain": 0
+        "quantityRemain": 170000
       },
       {
         "partNo": "VN230461-0040",
@@ -73,7 +73,7 @@
         "doNumber": "41018003",
         "invoice": null,
         "quantiy": 180000,
-        "quantityRemain": 0
+        "quantityRemain": 180000
       },
       {
         "partNo": "VN949140-7960",
@@ -81,7 +81,7 @@
         "doNumber": "41018003",
         "invoice": null,
         "quantiy": 8000,
-        "quantityRemain": 0
+        "quantityRemain": 8000
       },
       {
         "partNo": "VN949140-8740",
@@ -89,7 +89,7 @@
         "doNumber": "41018003",
         "invoice": null,
         "quantiy": 96000,
-        "quantityRemain": 0
+        "quantityRemain": 96000
       },
       {
         "partNo": "VN949150-3310",
@@ -97,7 +97,7 @@
         "doNumber": "41018003",
         "invoice": null,
         "quantiy": 64000,
-        "quantityRemain": 0
+        "quantityRemain": 64000
       }
     ],
     "id": 5340,

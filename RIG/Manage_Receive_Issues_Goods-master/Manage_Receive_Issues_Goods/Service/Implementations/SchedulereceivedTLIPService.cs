@@ -145,5 +145,25 @@ namespace Manage_Receive_Issues_Goods.Services
         {
             return await _repository.GetActualDetailsByReceivedIdAsync(actualReceivedId);
         }
+		public async Task<Actualreceivedtlip> GetActualReceivedWithSupplierAsync(int actualReceivedId)
+		{
+			return await _repository.GetActualReceivedWithSupplierAsync(actualReceivedId);
+		}
+
+		public async Task<Actualreceivedtlip> GetActualReceivedEntryAsync(string supplierCode, DateTime actualDeliveryTime)
+		{
+			return await _repository.GetActualReceivedEntryAsync(supplierCode, actualDeliveryTime);
+		}
+
+		public async Task AddActualDetailAsync(Actualdetailtlip actualDetail)
+		{
+			await _repository.AddActualDetailAsync(actualDetail);
+		}
+
+        public async Task UpdateActualReceivedAsync(Actualreceivedtlip actualReceived)
+        {
+            await _repository.UpdateActualReceivedAsync(actualReceived);
+        }
     }
+    
 }
