@@ -6,12 +6,13 @@ namespace Manage_Receive_Issues_Goods.Services
 {
     public interface ISchedulereceivedTLIPService
     {
-        Task<IEnumerable<Plandetailreceivedtlip>> GetAllSchedulesAsync();
-        Task<Plandetailreceivedtlip> GetScheduleByIdAsync(int id);
+        Task<IEnumerable<Planreceivetlip>> GetAllPlanAsync();
+        Task<IEnumerable<Plandetailreceivedtlip>> GetAllPlanDetailAsync();
+        Task<Plandetailreceivedtlip> GetPlanDetailByIdAsync(int id);
         Task<IEnumerable<Plandetailreceivedtlip>> GetSchedulesByWeekdayAsync(int weekdayId);
-        Task AddScheduleAsync(Plandetailreceivedtlip schedule);
+        /*Task AddScheduleAsync(Plandetailreceivedtlip schedule);
         Task UpdateScheduleAsync(Plandetailreceivedtlip schedule);
-        Task DeleteScheduleAsync(int id);
+        Task DeleteScheduleAsync(int id);*/
         Task<IEnumerable<Actualreceivedtlip>> GetAllActualReceivedAsync();
         DateTime GetDateForWeekday(int year, int weekOfYear, int weekdayId);
         int GetWeekOfYear(DateTime date);
@@ -24,9 +25,13 @@ namespace Manage_Receive_Issues_Goods.Services
         Task UpdateActualDetailTLIPAsync(string partNo, int actualReceivedId, int quantityRemain);
         Task<IEnumerable<Actualdetailtlip>> GetActualDetailsByReceivedIdAsync(int actualReceivedId);
 		Task<Actualreceivedtlip> GetActualReceivedWithSupplierAsync(int actualReceivedId);
-		Task<Actualreceivedtlip> GetActualReceivedEntryAsync(string supplierCode, DateTime actualDeliveryTime);
-		Task AddActualDetailAsync(Actualdetailtlip actualDetail);
+        Task<Actualreceivedtlip> GetActualReceivedEntryAsync(string supplierCode, DateTime actualDeliveryTime, string asnNumber);
+        Task AddActualDetailAsync(Actualdetailtlip actualDetail);
         Task UpdateActualReceivedAsync(Actualreceivedtlip actualReceived);
-
+        Task<IEnumerable<Actualreceivedtlip>> GetAllActualReceivedLast7DaysAsync();
+        Task<IEnumerable<Actualreceivedtlip>> GetAllActualReceivedAsyncById(int actualReceivedId);
+        Task<IEnumerable<Plandetailreceivedtlip>> GetAllPlanDetailByPlanIdAsync(int planId);
+        Task<IEnumerable<Plandetailreceivedtlip>> GetAllCurrentPlanDetailsAsync();
+        Task<IEnumerable<Supplier>> GetSuppliersByWeekdayAsync(int weekdayId);
     }
 }

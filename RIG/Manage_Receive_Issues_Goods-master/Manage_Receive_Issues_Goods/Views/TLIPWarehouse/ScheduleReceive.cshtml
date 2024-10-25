@@ -29,38 +29,95 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true" data-actual="">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="eventModalLabel">Chi tiết chuyến hàng</h5> 
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p id="eventDetails"></p>
-                    <h5 class="modal-title" id="completionPercentage"></h5>
-                    <table id="stagesTable" class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Mã sản phẩm</th>
-                                <th>Số lượng</th>
-                                <th>Trạng thái</th>
-                            </tr>
-                        </thead>
-                        <tbody id="stagesTableBody">
-                            <!-- Giai đoạn sẽ được hiển thị ở đây -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-warning" id="delayButton">Delay</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div id="modalsContainer"></div>
 
     @section Scripts {
         <script src="~/js/tlip/calendarReceiveTLIP.js"></script>
+           <script>
+    $(document).ready(function () {
+        // Fetch actual received data
+        $.getJSON('@Url.Action("GetActualReceived", "TLIPWarehouse")', function (data) {
+            var modalsContainer = $('#modalsContainer');
+            data.forEach(function (actualReceived) {
+                var modalId = 'eventModal-' + actualReceived.ActualReceivedId;
+                var modalHtml = `
+                    <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true" data-actual="">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="eventModalLabel">Chi tiết chuyến hàng</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p id="eventDetails-${actualReceived.ActualReceivedId}"></p>
+                                    <h5 class="modal-title" id="completionPercentage-${actualReceived.ActualReceivedId}"></h5>
+                                    <table id="stagesTable-${actualReceived.ActualReceivedId}" class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Mã sản phẩm</th>
+                                                <th>Số lượng</th>
+                                                <th>Trạng thái</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="stagesTableBody-${actualReceived.ActualReceivedId}">
+                                            <!-- Giai đoạn sẽ được hiển thị ở đây -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                             
+                            </div>
+                        </div>
+                    </div>`;
+                modalsContainer.append(modalHtml);
+            });
+        });
+
+        // Fetch current plan details with dates
+        $.getJSON('@Url.Action("GetCurrentPlanDetailsWithDates", "TLIPWarehouse")', function (data) {
+            var modalsContainer = $('#modalsContainer');
+            data.forEach(function (planDetail) {
+                var modalId = 'planModal-' + planDetail.PlanDetailId;
+
+                // Calculate end time
+                var deliveryTimeParts = planDetail.DeliveryTime.split(':');
+                var leadTimeParts = planDetail.LeadTime.split(':');
+                var start = new Date(planDetail.SpecificDate);
+                start.setHours(parseInt(deliveryTimeParts[0], 10));
+                start.setMinutes(parseInt(deliveryTimeParts[1], 10));
+                start.setSeconds(parseInt(deliveryTimeParts[2], 10));
+
+                var end = new Date(start);
+                end.setHours(end.getHours() + parseInt(leadTimeParts[0], 10));
+                end.setMinutes(end.getMinutes() + parseInt(leadTimeParts[1], 10));
+                end.setSeconds(end.getSeconds() + parseInt(leadTimeParts[2], 10));
+
+                var formattedStart = start.toLocaleTimeString();
+                var formattedEnd = end.toLocaleTimeString();
+
+                var modalHtml = `
+                    <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="planModalLabel" aria-hidden="true" data-plan="">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="planModalLabel">Chi tiết kế hoạch</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                        <p id="planDetails-${planDetail.PlanDetailId}"><strong>Nhà cung cấp:</strong> ${planDetail.SupplierName}<br><strong>Nhận lúc: </strong>${formattedStart}<br><strong>Kết thúc lúc: </strong>${formattedEnd}</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-warning" id="delayButton-${planDetail.PlanDetailId}">Delay</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                modalsContainer.append(modalHtml);
+            });
+        });
+    });
+</script>
+
+
     }
 </body>
 </html>

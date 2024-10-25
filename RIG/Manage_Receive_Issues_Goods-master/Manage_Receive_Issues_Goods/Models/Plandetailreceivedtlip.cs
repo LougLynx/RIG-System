@@ -33,6 +33,13 @@ public partial class Plandetailreceivedtlip
     [Column(TypeName = "time")]
     public TimeOnly LeadTime { get; set; }
 
+    [Column(TypeName = "enum('Weekly','Monthly','Bi-Monthly')")]
+    public string PlanType { get; set; } = null!;
+
+    public int? WeekOfMonth { get; set; }
+
+    public int? OccurrencesPerMonth { get; set; }
+
     [ForeignKey("PlanId")]
     [InverseProperty("Plandetailreceivedtlips")]
     public virtual Planreceivetlip Plan { get; set; } = null!;

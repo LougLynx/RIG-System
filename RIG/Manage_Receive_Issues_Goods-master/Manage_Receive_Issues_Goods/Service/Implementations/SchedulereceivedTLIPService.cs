@@ -17,35 +17,45 @@ namespace Manage_Receive_Issues_Goods.Services
             _repository = repository;
         }
 
-        public async Task<IEnumerable<Plandetailreceivedtlip>> GetAllSchedulesAsync()
+        public async Task<IEnumerable<Planreceivetlip>> GetAllPlanAsync()
         {
-            return await _repository.GetAllAsync();
+            return await _repository.GetAllPlanAsync();
+        }
+        public async Task<IEnumerable<Plandetailreceivedtlip>> GetAllPlanDetailAsync()
+        {
+            return await _repository.GetAllPlanDetailAsync();
         }
 
-        public async Task<Plandetailreceivedtlip> GetScheduleByIdAsync(int id)
+        public async Task<IEnumerable<Plandetailreceivedtlip>> GetAllPlanDetailByPlanIdAsync(int planId)
         {
-            return await _repository.GetByIdAsync(id);
+            return await _repository.GetAllPlanDetailByPlanIdAsync(planId); 
         }
 
-        public async Task<IEnumerable<Plandetailreceivedtlip>> GetSchedulesByWeekdayAsync(int weekdayId)
+        public async Task<Plandetailreceivedtlip> GetPlanDetailByIdAsync(int id)
+        {
+            return await _repository.GetPlanDetailByIdAsync(id);
+        }
+
+        
+            public async Task<IEnumerable<Plandetailreceivedtlip>> GetSchedulesByWeekdayAsync(int weekdayId)
         {
             return await _repository.GetSchedulesByWeekdayAsync(weekdayId);
         }
 
-        public async Task AddScheduleAsync(Plandetailreceivedtlip schedule)
+      /*  public async Task AddScheduleAsync(Plandetailreceivedtlip schedule)
         {
             await _repository.AddAsync(schedule);
-        }
+        }*/
 
-        public async Task UpdateScheduleAsync(Plandetailreceivedtlip schedule)
+      /*  public async Task UpdateScheduleAsync(Plandetailreceivedtlip schedule)
         {
             await _repository.UpdateAsync(schedule);
-        }
+        }*/
 
-        public async Task DeleteScheduleAsync(int id)
+       /* public async Task DeleteScheduleAsync(int id)
         {
             await _repository.DeleteAsync(id);
-        }
+        }*/
         public async Task<IEnumerable<Actualreceivedtlip>> GetAllActualReceivedAsync()
         {
             return await _repository.GetAllActualReceivedAsync();
@@ -59,7 +69,15 @@ namespace Manage_Receive_Issues_Goods.Services
             var suppliers = await _repository.GetSuppliersForTodayAsync(currentWeekday);
             return suppliers;
         }
-
+        public async Task<IEnumerable<Supplier>> GetSuppliersByWeekdayAsync(int weekdayId)
+        {
+            var suppliers = await _repository.GetSuppliersForTodayAsync(weekdayId);
+            return suppliers;
+        }
+        public async Task<IEnumerable<Plandetailreceivedtlip>> GetAllCurrentPlanDetailsAsync()
+        {
+            return await _repository.GetAllCurrentPlanDetailsAsync();
+        }
 
         // Hàm tính toán ngày giao hàng cụ thể cho một lịch trình nhận hàng
         public DateTime GetDateForWeekday(int year, int weekOfYear, int weekdayId)
@@ -89,6 +107,8 @@ namespace Manage_Receive_Issues_Goods.Services
             var culture = System.Globalization.CultureInfo.CurrentCulture;
             return culture.Calendar.GetWeekOfYear(date, System.Globalization.CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
         }
+
+       
 
         public async Task<bool> DelaySupplierAsync(string supplierId)
         {
@@ -150,9 +170,9 @@ namespace Manage_Receive_Issues_Goods.Services
 			return await _repository.GetActualReceivedWithSupplierAsync(actualReceivedId);
 		}
 
-		public async Task<Actualreceivedtlip> GetActualReceivedEntryAsync(string supplierCode, DateTime actualDeliveryTime)
-		{
-			return await _repository.GetActualReceivedEntryAsync(supplierCode, actualDeliveryTime);
+		public async Task<Actualreceivedtlip> GetActualReceivedEntryAsync(string supplierCode, DateTime actualDeliveryTime, string asnNumber)
+        {
+			return await _repository.GetActualReceivedEntryAsync(supplierCode, actualDeliveryTime, asnNumber);
 		}
 
 		public async Task AddActualDetailAsync(Actualdetailtlip actualDetail)
@@ -163,6 +183,15 @@ namespace Manage_Receive_Issues_Goods.Services
         public async Task UpdateActualReceivedAsync(Actualreceivedtlip actualReceived)
         {
             await _repository.UpdateActualReceivedAsync(actualReceived);
+        }
+        public async Task<IEnumerable<Actualreceivedtlip>> GetAllActualReceivedLast7DaysAsync()
+        {
+            return await _repository.GetAllActualReceivedLast7DaysAsync();
+        }
+
+        public async Task<IEnumerable<Actualreceivedtlip>> GetAllActualReceivedAsyncById(int actualReceivedId)
+        {
+            return await _repository.GetAllActualReceivedAsyncById(actualReceivedId);
         }
     }
     

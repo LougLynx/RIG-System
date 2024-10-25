@@ -1,0 +1,46 @@
+
+2-3/month: (để tạm thành weekly)
+DNIA Trading 
+DNJP Trading 
+DNTH/DELT
+DNMY Trading
+DNMX
+
+
+HAL (thuộc tag nào)(để tạm trong KCN)
+
+DMNS(Monthly)
+------------------------------------------------------------------------------
+
+Ogino và G.S.Electech (trong API không có Ogino GSElectech, chỉ có GSE cambodia)
+
+-------------------------------------------------------------------------------
+HDVN và HAMADEN có cùng tên là HDVN thì là supplierCode code nào (done)
+-------------------------------------------------------------------------------
+DNJP có hai mã supllierCode
+
+Nippo có 3 code thì lấy mã nào
+
+DIAMET không có (không biết) mã code trong API
+
+DNIA có 2 mã code
+
+DIAS có 2 mã code
+
+TPR ko có mã code
+
+Fujikura có 2 mã code
+
+Tsuchiya có 2 mã code 
+
+DNTH/DSTH có phải đều cùng là DSTH
+
+DNKA không có mã code
+
+DNTH/DELT không có mã code
+
+Toyota Tsusho JP có 4 mã code
+
+DMNS không có mã code + hàng monthly nma kco tuần chỉ định
+
+NOK (monthly) có 2 mã code

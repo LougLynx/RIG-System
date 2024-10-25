@@ -21,78 +21,150 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
             _httpClient = httpClient;
         }
 
-        public async Task<IEnumerable<Plandetailreceivedtlip>> GetAllAsync()
+        public async Task<IEnumerable<Planreceivetlip>> GetAllPlanAsync()
+        {
+            return await _context.Planreceivetlips.ToListAsync();
+        }
+
+        public async Task<IEnumerable<Plandetailreceivedtlip>> GetAllPlanDetailAsync()
         {
             return await _context.Plandetailreceivedtlips
-                .Include(s => s.SupplierCode)
-                .Include(s => s.DeliveryTime)
+                .Include(s => s.SupplierCodeNavigation)
                 .Include(s => s.Weekday)
+                .Include(s => s.PlanId)
                 .ToListAsync();
         }
 
-        public async Task<Plandetailreceivedtlip> GetByIdAsync(int id)
+        public async Task<IEnumerable<Plandetailreceivedtlip>> GetAllPlanDetailByPlanIdAsync(int planId)
         {
             return await _context.Plandetailreceivedtlips
-                .Include(s => s.SupplierCode)
-                .Include(s => s.DeliveryTime)
+                .Include(s => s.SupplierCodeNavigation)
                 .Include(s => s.Weekday)
+                .Include(s => s.PlanId)
+                .Where(s => s.PlanId == planId)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Plandetailreceivedtlip>> GetAllCurrentPlanDetailsAsync()
+        {
+            // Lấy ra danh sách tất cả các kế hoạch
+            var plans = await _context.Planreceivetlips
+                .OrderBy(p => p.EffectiveDate)
+                .ToListAsync();
+
+            if (!plans.Any())
+            {
+                return Enumerable.Empty<Plandetailreceivedtlip>();
+            }
+
+            var today = DateOnly.FromDateTime(DateTime.Now);
+
+            // Tìm kế hoạch gần nhất
+            var closestPlan = plans
+                .Where(p => p.EffectiveDate <= today)
+                .OrderByDescending(p => p.EffectiveDate)
+                .FirstOrDefault();
+
+            if (closestPlan != null)
+            {
+                // Trả về danh sách các chi tiết kế hoạch của kế hoạch gần nhất
+                return await _context.Plandetailreceivedtlips
+                    .AsNoTracking()
+                    .Include(s => s.SupplierCodeNavigation)
+                    .Include(s => s.Weekday)
+                    .Where(pd => pd.PlanId == closestPlan.PlanId)
+                    .ToListAsync();
+            }
+
+            return Enumerable.Empty<Plandetailreceivedtlip>();
+        }
+
+
+        public async Task<Plandetailreceivedtlip> GetPlanDetailByIdAsync(int id)
+        {
+            return await _context.Plandetailreceivedtlips
+                .Include(s => s.SupplierCodeNavigation)
+                .Include(s => s.Weekday)
+                .Include(s => s.PlanId)
                 .FirstOrDefaultAsync(s => s.PlanDetailId == id);
         }
 
         public async Task<IEnumerable<Plandetailreceivedtlip>> GetSchedulesByWeekdayAsync(int weekdayId)
         {
             return await _context.Plandetailreceivedtlips
-                .Include(s => s.SupplierCode)
-                .Include(s => s.DeliveryTime)
+                .Include(s => s.SupplierCodeNavigation)
                 .Include(s => s.Weekday)
+                .Include(s => s.PlanId)
                 .Where(s => s.WeekdayId == weekdayId)
                 .ToListAsync();
         }
 
-        public async Task AddAsync(Plandetailreceivedtlip entity)
-        {
-            await _context.Plandetailreceivedtlips.AddAsync(entity);
-            await _context.SaveChangesAsync();
-        }
+        /*        public async Task AddAsync(Plandetailreceivedtlip entity)
+                {
+                    await _context.Plandetailreceivedtlips.AddAsync(entity);
+                    await _context.SaveChangesAsync();
+                }*/
 
-        public async Task UpdateAsync(Plandetailreceivedtlip entity)
-        {
-            _context.Plandetailreceivedtlips.Update(entity);
-            await _context.SaveChangesAsync();
-        }
+        /* public async Task UpdateAsync(Plandetailreceivedtlip entity)
+         {
+             _context.Plandetailreceivedtlips.Update(entity);
+             await _context.SaveChangesAsync();
+         }*/
 
-        public async Task DeleteAsync(int id)
-        {
-            var entity = await GetByIdAsync(id);
-            if (entity != null)
-            {
-                _context.Plandetailreceivedtlips.Remove(entity);
-                await _context.SaveChangesAsync();
-            }
-        }
+        /*   public async Task DeleteAsync(int id)
+           {
+               var entity = await GetByIdAsync(id);
+               if (entity != null)
+               {
+                   _context.Plandetailreceivedtlips.Remove(entity);
+                   await _context.SaveChangesAsync();
+               }
+           }*/
 
         public async Task<IEnumerable<Actualreceivedtlip>> GetAllActualReceivedAsync()
         {
             return await _context.Actualreceivedtlips
-                                 .Include(ar => ar.SupplierCodeNavigation) 
-                                 .Include(ar => ar.Actualdetailtlips) 
+                                 .Include(ar => ar.SupplierCodeNavigation)
+                                 .Include(ar => ar.Actualdetailtlips)
                                  .ToListAsync();
         }
 
+        public async Task<IEnumerable<Actualreceivedtlip>> GetAllActualReceivedAsyncById(int actualReceivedId)
+        {
+            return await _context.Actualreceivedtlips
+                         .Include(ar => ar.SupplierCodeNavigation)
+                         .Include(ar => ar.Actualdetailtlips)
+                         .Where(ar => ar.ActualReceivedId == actualReceivedId)
+                         .ToListAsync();
+        }
+        public async Task<IEnumerable<Actualreceivedtlip>> GetAllActualReceivedLast7DaysAsync()
+        {
+            var sevenDaysAgo = DateTime.Now.AddDays(-7);
+            return await _context.Actualreceivedtlips
+                                 .Include(ar => ar.SupplierCodeNavigation)
+                                 .Include(ar => ar.Actualdetailtlips)
+                                 .Where(ar => ar.ActualDeliveryTime >= sevenDaysAgo)
+                                 .ToListAsync();
+        }
+
+
         public async Task<IEnumerable<Supplier>> GetSuppliersForTodayAsync(int weekdayId)
         {
-            return (IEnumerable<Supplier>)await _context.Plandetailreceivedtlips
+            return await _context.Plandetailreceivedtlips
                 .Where(s => s.WeekdayId == weekdayId)
-                .OrderBy(s => s.DeliveryTime) 
-                .Select(s => s.SupplierCode)
-                .Distinct()
+                .OrderBy(s => s.DeliveryTime)
+                .GroupBy(s => s.SupplierCode)
+                .Select(g => g.First().SupplierCodeNavigation)
                 .ToListAsync();
         }
+
+
 
         public async Task<Plandetailreceivedtlip> GetScheduleBySupplierIdAsync(string supplierCode)
         {
             return await _context.Plandetailreceivedtlips.FirstOrDefaultAsync(s => s.SupplierCode == supplierCode);
         }
+
 
         public async Task<IEnumerable<AsnInformation>> GetAsnInformationAsync(DateTime inputDate)
         {
@@ -121,9 +193,21 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
 
         public async Task<IEnumerable<AsnDetailData>> GetAsnDetailAsync(string asnNumber, string doNumber, string invoice)
         {
-            string queryParam = !string.IsNullOrEmpty(asnNumber) ? $"inputAsn={asnNumber}" :
-                                !string.IsNullOrEmpty(doNumber) ? $"inputAsn={doNumber}" :
-                                !string.IsNullOrEmpty(invoice) ? $"inputAsn={invoice}" : null;
+            string queryParam = null;
+
+            if (!string.IsNullOrEmpty(asnNumber))
+            {
+                queryParam = $"inputAsn={asnNumber}";
+            }
+            else if (!string.IsNullOrEmpty(doNumber))
+            {
+                queryParam = $"inputAsn={doNumber}";
+            }
+            else if (!string.IsNullOrEmpty(invoice))
+            {
+                queryParam = $"inputAsn={invoice}";
+            }
+
 
             if (queryParam == null)
             {
@@ -175,28 +259,31 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
                                  .ToListAsync();
         }
 
-		public async Task<Actualreceivedtlip> GetActualReceivedWithSupplierAsync(int actualReceivedId)
-		{
-			return await _context.Actualreceivedtlips
-				.Include(a => a.SupplierCodeNavigation)
-				.FirstOrDefaultAsync(a => a.ActualReceivedId == actualReceivedId);
-		}
+        public async Task<Actualreceivedtlip> GetActualReceivedWithSupplierAsync(int actualReceivedId)
+        {
+            return await _context.Actualreceivedtlips
+                .Include(a => a.SupplierCodeNavigation)
+                .FirstOrDefaultAsync(a => a.ActualReceivedId == actualReceivedId);
+        }
 
-		public async Task<Actualreceivedtlip> GetActualReceivedEntryAsync(string supplierCode, DateTime actualDeliveryTime)
-		{
-			return await _context.Actualreceivedtlips
-				.Include(a => a.SupplierCodeNavigation)
-				.Include(a => a.Actualdetailtlips)
-				.Where(a => a.SupplierCode == supplierCode && a.ActualDeliveryTime == actualDeliveryTime)
-				.OrderByDescending(a => a.ActualReceivedId)
-				.FirstOrDefaultAsync();
-		}
+        public async Task<Actualreceivedtlip> GetActualReceivedEntryAsync(string supplierCode, DateTime actualDeliveryTime, string asnNumber)
+        {
+            return await _context.Actualreceivedtlips
+                .Include(a => a.SupplierCodeNavigation)
+                .Include(a => a.Actualdetailtlips)
+                .Where(a => a.SupplierCode == supplierCode &&
+                            a.ActualDeliveryTime == actualDeliveryTime &&
+                            (string.IsNullOrEmpty(asnNumber) || a.AsnNumber == asnNumber))
+                .OrderByDescending(a => a.ActualReceivedId)
+                .FirstOrDefaultAsync();
+        }
 
-		public async Task AddActualDetailAsync(Actualdetailtlip actualDetail)
-		{
-			_context.Actualdetailtlips.Add(actualDetail);
-			await _context.SaveChangesAsync();
-		}
+
+        public async Task AddActualDetailAsync(Actualdetailtlip actualDetail)
+        {
+            _context.Actualdetailtlips.Add(actualDetail);
+            await _context.SaveChangesAsync();
+        }
 
         public async Task UpdateActualReceivedAsync(Actualreceivedtlip actualReceived)
         {

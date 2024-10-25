@@ -36,6 +36,8 @@ public partial class Actualreceivedtlip
     [StringLength(100)]
     public string? Invoice { get; set; }
 
+    public bool IsCompleted { get; set; }
+
     [InverseProperty("ActualReceived")]
     public virtual ICollection<Actualdetailtlip> Actualdetailtlips { get; set; } = new List<Actualdetailtlip>();
 
