@@ -266,6 +266,7 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
         {
             _context.Actualreceivedtlips.Add(actualReceived);
             await _context.SaveChangesAsync();
+            Console.WriteLine("Add actual successfully!");
         }
 
         public async Task UpdateActualDetailTLIPAsync(string partNo, int actualReceivedId, int quantityRemain)
