@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
+using Manage_Receive_Issues_Goods.DTO;
 using Manage_Receive_Issues_Goods.Models;
 using Manage_Receive_Issues_Goods.Repositories;
 using Manage_Receive_Issues_Goods.Repository;
@@ -193,6 +194,21 @@ namespace Manage_Receive_Issues_Goods.Services
         {
             return await _repository.GetAllActualReceivedAsyncById(actualReceivedId);
         }
+        public async Task<IEnumerable<Actualreceivedtlip>> GetActualReceivedAsyncByInfor(string asnNumber, string doNumber, string invoice)
+        {
+            return await _repository.GetActualReceivedAsyncByInfor(asnNumber, doNumber, invoice);
+        }
+
+        public async Task UpdateActualReceivedCompletionAsync(int actualReceivedId, bool isCompleted)
+        {
+            await _repository.UpdateActualReceivedCompletionAsync(actualReceivedId, isCompleted);
+        }
+        public async Task<Actualreceivedtlip> GetActualReceivedByDetailsAsync(ActualReceivedTLIPDTO details)
+        {
+            return await _repository.GetActualReceivedByDetailsAsync(details);
+        }
+
+
     }
-    
+
 }

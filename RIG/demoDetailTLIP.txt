@@ -4,71 +4,103 @@
   "data": {
     "result": [
       {
-        "partNo": "HV101362-59310V",
+        "partNo": "HV012020-0420",
         "asnNumber": null,
-        "doNumber": "41025018",
+        "doNumber": "41028019",
         "invoice": null,
-        "quantiy": 1512,
+        "quantiy": 2304,
         "quantityRemain": 0
       },
       {
-        "partNo": "HV101362-60100V",
+        "partNo": "HV079640-0730",
         "asnNumber": null,
-        "doNumber": "41025018",
+        "doNumber": "41028019",
         "invoice": null,
-        "quantiy": 1440,
+        "quantiy": 3840,
+        "quantityRemain": 3840
+      },
+      {
+        "partNo": "HV079640-0910",
+        "asnNumber": null,
+        "doNumber": "41028019",
+        "invoice": null,
+        "quantiy": 3840,
+        "quantityRemain": 3840
+      },
+      {
+        "partNo": "HV079640-1140",
+        "asnNumber": null,
+        "doNumber": "41028019",
+        "invoice": null,
+        "quantiy": 3840,
+        "quantityRemain": 3840
+      },
+      {
+        "partNo": "HV079640-1180",
+        "asnNumber": null,
+        "doNumber": "41028019",
+        "invoice": null,
+        "quantiy": 6720,
+        "quantityRemain": 6720
+      },
+      {
+        "partNo": "HV079640-1190",
+        "asnNumber": null,
+        "doNumber": "41028019",
+        "invoice": null,
+        "quantiy": 6720,
+        "quantityRemain": 6720
+      },
+      {
+        "partNo": "HV192300-4140",
+        "asnNumber": null,
+        "doNumber": "41028019",
+        "invoice": null,
+        "quantiy": 576,
+        "quantityRemain": 576
+      },
+      {
+        "partNo": "HV192300-5010",
+        "asnNumber": null,
+        "doNumber": "41028019",
+        "invoice": null,
+        "quantiy": 576,
+        "quantityRemain": 576
+      },
+      {
+        "partNo": "HV192300-5050",
+        "asnNumber": null,
+        "doNumber": "41028019",
+        "invoice": null,
+        "quantiy": 2880,
+        "quantityRemain": 2880
+      },
+      {
+        "partNo": "HV192300-7031",
+        "asnNumber": null,
+        "doNumber": "41028019",
+        "invoice": null,
+        "quantiy": 576,
+        "quantityRemain": 576
+      },
+      {
+        "partNo": "HV230440-0020",
+        "asnNumber": null,
+        "doNumber": "41028019",
+        "invoice": null,
+        "quantiy": 9720,
+        "quantityRemain": 9720
+      },
+      {
+        "partNo": "HV270150-0010",
+        "asnNumber": null,
+        "doNumber": "41028019",
+        "invoice": null,
+        "quantiy": 2880,
         "quantityRemain": 0
-      },
-      {
-        "partNo": "HV101362-60800V",
-        "asnNumber": null,
-        "doNumber": "41025018",
-        "invoice": null,
-        "quantiy": 1728,
-        "quantityRemain": 1728
-      },
-      {
-        "partNo": "HV101362-6280",
-        "asnNumber": null,
-        "doNumber": "41025018",
-        "invoice": null,
-        "quantiy": 1440,
-        "quantityRemain": 1440
-      },
-      {
-        "partNo": "HV101362-6440",
-        "asnNumber": null,
-        "doNumber": "41025018",
-        "invoice": null,
-        "quantiy": 768,
-        "quantityRemain": 768
-      },
-      {
-        "partNo": "HV101362-64920V",
-        "asnNumber": null,
-        "doNumber": "41025018",
-        "invoice": null,
-        "quantiy": 720,
-        "quantityRemain": 720
-      },
-      {
-        "partNo": "HV101362-68000V",
-        "asnNumber": null,
-        "doNumber": "41025018",
-        "invoice": null,
-        "quantiy": 864,
-        "quantityRemain": 864
-      },
-      {
-        "partNo": "HV136200-73900V",
-        "asnNumber": null,
-        "doNumber": "41025018",
-        "invoice": null,
-        "quantiy": 1512,
-        "quantityRemain": 1512
       }
     ],
-    "id": 229,
+    "id": 729,
     "exception": null,
     "status": 5,
     "isCanceled": false,

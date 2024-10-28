@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Manage_Receive_Issues_Goods.Repository;
 using System.Text.Json;
 using Manage_Receive_Issues_Goods.Data;
+using Manage_Receive_Issues_Goods.DTO;
 
 namespace Manage_Receive_Issues_Goods.Repositories.Implementations
 {
@@ -137,6 +138,7 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
                          .Where(ar => ar.ActualReceivedId == actualReceivedId)
                          .ToListAsync();
         }
+
         public async Task<IEnumerable<Actualreceivedtlip>> GetAllActualReceivedLast7DaysAsync()
         {
             var sevenDaysAgo = DateTime.Now.AddDays(-7);
@@ -146,6 +148,32 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
                                  .Where(ar => ar.ActualDeliveryTime >= sevenDaysAgo)
                                  .ToListAsync();
         }
+
+        public async Task<IEnumerable<Actualreceivedtlip>> GetActualReceivedAsyncByInfor(string asnNumber, string doNumber, string invoice)
+        {
+            var query = _context.Actualreceivedtlips
+                                .Include(ar => ar.SupplierCodeNavigation)
+                                .Include(ar => ar.Actualdetailtlips)
+                                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(asnNumber))
+            {
+                query = query.Where(ar => ar.AsnNumber == asnNumber);
+            }
+
+            if (!string.IsNullOrEmpty(doNumber))
+            {
+                query = query.Where(ar => ar.DoNumber == doNumber);
+            }
+
+            if (!string.IsNullOrEmpty(invoice))
+            {
+                query = query.Where(ar => ar.Invoice == invoice);
+            }
+
+            return await query.ToListAsync();
+        }
+
 
 
         public async Task<IEnumerable<Supplier>> GetSuppliersForTodayAsync(int weekdayId)
@@ -291,5 +319,26 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
             await _context.SaveChangesAsync();
         }
 
+        public async Task UpdateActualReceivedCompletionAsync(int actualReceivedId, bool isCompleted)
+        {
+            var actualReceived = await _context.Actualreceivedtlips.FindAsync(actualReceivedId);
+            if (actualReceived == null)
+            {
+                throw new KeyNotFoundException("ActualReceived not found.");
+            }
+
+            actualReceived.IsCompleted = isCompleted;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Actualreceivedtlip> GetActualReceivedByDetailsAsync(ActualReceivedTLIPDTO details)
+        {
+            return await _context.Actualreceivedtlips
+                .FirstOrDefaultAsync(ar =>
+                    ar.SupplierCode == details.SupplierCode &&
+                    (string.IsNullOrEmpty(details.AsnNumber) || ar.AsnNumber == details.AsnNumber) &&
+                    (string.IsNullOrEmpty(details.DoNumber) || ar.DoNumber == details.DoNumber) &&
+                    (string.IsNullOrEmpty(details.Invoice) || ar.Invoice == details.Invoice));
+        }
     }
 }

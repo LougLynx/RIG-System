@@ -44,3 +44,6 @@ Toyota Tsusho JP có 4 mã code
 DMNS không có mã code + hàng monthly nma kco tuần chỉ định
 
 NOK (monthly) có 2 mã code
+
+-----------------------------------------------------------------------------------------
+Hiển thị được actual sang ngày hôm sau nếu qua ngày mà vẫn chưa xong
