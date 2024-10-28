@@ -9,7 +9,7 @@
         "doNumber": "41028019",
         "invoice": null,
         "quantiy": 2304,
-        "quantityRemain": 0
+        "quantityRemain": 2304
       },
       {
         "partNo": "HV079640-0730",

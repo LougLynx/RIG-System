@@ -294,17 +294,20 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
                 .FirstOrDefaultAsync(a => a.ActualReceivedId == actualReceivedId);
         }
 
-        public async Task<Actualreceivedtlip> GetActualReceivedEntryAsync(string supplierCode, DateTime actualDeliveryTime, string asnNumber)
+        public async Task<Actualreceivedtlip> GetActualReceivedEntryAsync(string supplierCode, DateTime actualDeliveryTime, string asnNumber = null, string doNumber = null, string invoice = null)
         {
             return await _context.Actualreceivedtlips
                 .Include(a => a.SupplierCodeNavigation)
                 .Include(a => a.Actualdetailtlips)
                 .Where(a => a.SupplierCode == supplierCode &&
                             a.ActualDeliveryTime == actualDeliveryTime &&
-                            (string.IsNullOrEmpty(asnNumber) || a.AsnNumber == asnNumber))
+                            (string.IsNullOrEmpty(asnNumber) || a.AsnNumber == asnNumber) &&
+                            (string.IsNullOrEmpty(doNumber) || a.DoNumber == doNumber) &&
+                            (string.IsNullOrEmpty(invoice) || a.Invoice == invoice))
                 .OrderByDescending(a => a.ActualReceivedId)
                 .FirstOrDefaultAsync();
         }
+
 
 
         public async Task AddActualDetailAsync(Actualdetailtlip actualDetail)

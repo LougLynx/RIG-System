@@ -171,9 +171,9 @@ namespace Manage_Receive_Issues_Goods.Services
 			return await _repository.GetActualReceivedWithSupplierAsync(actualReceivedId);
 		}
 
-		public async Task<Actualreceivedtlip> GetActualReceivedEntryAsync(string supplierCode, DateTime actualDeliveryTime, string asnNumber)
+		public async Task<Actualreceivedtlip> GetActualReceivedEntryAsync(string supplierCode, DateTime actualDeliveryTime, string asnNumber = null, string doNumber = null, string invoice = null)
         {
-			return await _repository.GetActualReceivedEntryAsync(supplierCode, actualDeliveryTime, asnNumber);
+			return await _repository.GetActualReceivedEntryAsync(supplierCode, actualDeliveryTime, asnNumber, doNumber, invoice);
 		}
 
 		public async Task AddActualDetailAsync(Actualdetailtlip actualDetail)

@@ -24,7 +24,6 @@ namespace Manage_Receive_Issues_Goods.Controllers
         private readonly ILogger<TLIPWarehouseController> _logger;
         private readonly RigContext _context;
         private List<AsnInformation> previousData = new List<AsnInformation>();
-        private Timer _timer;
         public TLIPWarehouseController(
             ISchedulereceivedTLIPService schedulereceivedService, 
             IHubContext<UpdateReceiveTLIPHub> hubContext,
@@ -35,7 +34,6 @@ namespace Manage_Receive_Issues_Goods.Controllers
             _hubContext = hubContext;
             _logger = logger;
             _context = context;
-            _timer = new Timer(async _ => await FetchData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5000));
         }
 
         public IActionResult ScheduleReceive()
@@ -381,7 +379,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
         }
 
 
-        [HttpGet]
+       /* [HttpGet]
         public async Task<IActionResult> ParseAsnInformationFromFile()
         {
             var asnInformationList = await ParseAsnInformationFromFileAsync();
@@ -423,7 +421,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
                 }
                 return asnInformationList;
             }
-        }
+        }*/
 
         [HttpPost]
         public async Task<IActionResult> UpdateActualDetailTLIP(string partNo, int actualReceivedId, int quantityRemain)
@@ -454,7 +452,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
 
 
 
-        [HttpGet]
+        /*[HttpGet]
         public async Task<IActionResult> ParseAsnDetailFromFile(string asnNumber, string doNumber, string invoice)
         {
             var asnInformationList = await ParseAsnDetailFromFileAsync(asnNumber, doNumber, invoice);
@@ -498,7 +496,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
 
 				return asnDetailList;
 			}
-		}
+		}*/
 
 
         [HttpPost]
@@ -589,104 +587,107 @@ namespace Manage_Receive_Issues_Goods.Controllers
 
 
 
-        [HttpGet]
-        public async Task<IActionResult> FetchData()
-        {
-            try
-            {
-                _logger.LogInformation("fetchData called at {Time}", DateTime.Now.ToString("T"));
-                var now = DateTime.Now;
-                var nextData = await _schedulereceivedService.GetAsnInformationAsync(now);
+        /* [HttpGet]
+         public async Task<IActionResult> FetchData()
+         {
+             try
+             {
+                 _logger.LogInformation("fetchData called at {Time}", DateTime.Now.ToString("T"));
+                 var now = DateTime.Now;
+                 var nextData = await _schedulereceivedService.GetAsnInformationAsync(now);
 
-                foreach (var nextItem in nextData)
-                {
-                    var previousItem = previousData.FirstOrDefault(item =>
-                        (item.AsnNumber != null && item.AsnNumber == nextItem.AsnNumber) ||
-                        (item.AsnNumber == null && item.DoNumber != null && item.DoNumber == nextItem.DoNumber) ||
-                        (item.AsnNumber == null && item.DoNumber == null && item.Invoice != null && item.Invoice == nextItem.Invoice)
-                    );
+                 foreach (var nextItem in nextData)
+                 {
+                     var previousItem = previousData.FirstOrDefault(item =>
+                         (item.AsnNumber != null && item.AsnNumber == nextItem.AsnNumber) ||
+                         (item.AsnNumber == null && item.DoNumber != null && item.DoNumber == nextItem.DoNumber) ||
+                         (item.AsnNumber == null && item.DoNumber == null && item.Invoice != null && item.Invoice == nextItem.Invoice)
+                     );
 
-                    var exists = await _schedulereceivedService.GetActualReceivedByDetailsAsync(new ActualReceivedTLIPDTO
-                    {
-                        SupplierCode = nextItem.SupplierCode,
-                        AsnNumber = nextItem.AsnNumber,
-                        DoNumber = nextItem.DoNumber,
-                        Invoice = nextItem.Invoice
-                    });
+                     var exists = await _schedulereceivedService.GetActualReceivedByDetailsAsync(new ActualReceivedTLIPDTO
+                     {
+                         SupplierCode = nextItem.SupplierCode,
+                         AsnNumber = nextItem.AsnNumber,
+                         DoNumber = nextItem.DoNumber,
+                         Invoice = nextItem.Invoice
+                     });
 
-                    if (exists == null)
-                    {
-                        if (previousItem != null && !previousItem.ReceiveStatus && nextItem.ReceiveStatus)
-                        {
-                            var actualReceived = new Actualreceivedtlip
-                            {
-                                ActualDeliveryTime = now,
-                                SupplierCode = nextItem.SupplierCode,
-                                AsnNumber = nextItem.AsnNumber,
-                                DoNumber = nextItem.DoNumber,
-                                Invoice = nextItem.Invoice,
-                                IsCompleted = nextItem.IsCompleted
-                            };
+                     if (exists == null)
+                     {
+                         if (previousItem != null && !previousItem.ReceiveStatus && nextItem.ReceiveStatus)
+                         {
+                             var actualReceived = new Actualreceivedtlip
+                             {
+                                 ActualDeliveryTime = now,
+                                 SupplierCode = nextItem.SupplierCode,
+                                 AsnNumber = nextItem.AsnNumber,
+                                 DoNumber = nextItem.DoNumber,
+                                 Invoice = nextItem.Invoice,
+                                 IsCompleted = nextItem.IsCompleted
+                             };
 
-                            await _schedulereceivedService.AddActualReceivedAsync(actualReceived);
+                             await _schedulereceivedService.AddActualReceivedAsync(actualReceived);
 
-                            var actualReceivedEntry = await _schedulereceivedService.GetActualReceivedEntryAsync(actualReceived.SupplierCode, actualReceived.ActualDeliveryTime, actualReceived.AsnNumber);
+                             var actualReceivedEntry = await _schedulereceivedService.GetActualReceivedEntryAsync(actualReceived.SupplierCode, actualReceived.ActualDeliveryTime, actualReceived.AsnNumber);
 
-                            var asnDetails = await _schedulereceivedService.GetAsnDetailAsync(actualReceivedEntry.AsnNumber, actualReceivedEntry.DoNumber, actualReceivedEntry.Invoice);
+                             var asnDetails = await _schedulereceivedService.GetAsnDetailAsync(actualReceivedEntry.AsnNumber, actualReceivedEntry.DoNumber, actualReceivedEntry.Invoice);
 
-                            foreach (var asnDetail in asnDetails)
-                            {
-                                var actualDetail = new Actualdetailtlip
-                                {
-                                    ActualReceivedId = actualReceivedEntry.ActualReceivedId,
-                                    PartNo = asnDetail.PartNo,
-                                    Quantity = asnDetail.Quantity,
-                                    QuantityRemain = asnDetail.QuantityRemain
-                                };
+                             foreach (var asnDetail in asnDetails)
+                             {
+                                 var actualDetail = new Actualdetailtlip
+                                 {
+                                     ActualReceivedId = actualReceivedEntry.ActualReceivedId,
+                                     PartNo = asnDetail.PartNo,
+                                     Quantity = asnDetail.Quantity,
+                                     QuantityRemain = asnDetail.QuantityRemain
+                                 };
 
-                                await _schedulereceivedService.AddActualDetailAsync(actualDetail);
-                            }
-                        }
+                                 await _schedulereceivedService.AddActualDetailAsync(actualDetail);
+                             }
+                         }
 
-                        if (previousItem != null && !previousItem.IsCompleted && nextItem.IsCompleted)
-                        {
-                            var actualReceived = await _schedulereceivedService.GetActualReceivedByDetailsAsync(new ActualReceivedTLIPDTO
-                            {
-                                SupplierCode = previousItem.SupplierCode,
-                                AsnNumber = previousItem.AsnNumber,
-                                DoNumber = previousItem.DoNumber,
-                                Invoice = previousItem.Invoice
-                            });
+                         if (previousItem != null && !previousItem.IsCompleted && nextItem.IsCompleted)
+                         {
+                             var actualReceived = await _schedulereceivedService.GetActualReceivedByDetailsAsync(new ActualReceivedTLIPDTO
+                             {
+                                 SupplierCode = previousItem.SupplierCode,
+                                 AsnNumber = previousItem.AsnNumber,
+                                 DoNumber = previousItem.DoNumber,
+                                 Invoice = previousItem.Invoice
+                             });
 
-                            if (actualReceived != null)
-                            {
-                                await _schedulereceivedService.UpdateActualReceivedCompletionAsync(actualReceived.ActualReceivedId, true);
-                                Console.WriteLine("Updated ActualReceived IsCompleted to true successfully.");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (!nextItem.ReceiveStatus)
-                        {
-                            Console.WriteLine("Duplicate data detected in API for ActualReceivedId: " + nextItem.AsnNumber + ", " + nextItem.DoNumber + ", " + nextItem.Invoice + ", " + exists.ActualReceivedId);
-                            await _schedulereceivedService.UpdateActualReceivedCompletionAsync(exists.ActualReceivedId, true);
-                            Console.WriteLine("Updated ActualReceived IsCompleted to true successfully.");
-                        }
-                    }
-                }
+                             if (actualReceived != null)
+                             {
+                                 await _schedulereceivedService.UpdateActualReceivedCompletionAsync(actualReceived.ActualReceivedId, true);
+                                 Console.WriteLine("Updated ActualReceived IsCompleted to true successfully.");
+                             }
+                         }
+                     }
+                     else
+                     {
+                         if (!nextItem.ReceiveStatus)
+                         {
+                             Console.WriteLine("Duplicate data detected in API for ActualReceivedId: " + nextItem.AsnNumber + ", " + nextItem.DoNumber + ", " + nextItem.Invoice + ", " + exists.ActualReceivedId);
+                             await _schedulereceivedService.UpdateActualReceivedCompletionAsync(exists.ActualReceivedId, true);
+                             Console.WriteLine("Updated ActualReceived IsCompleted to true successfully.");
+                         }
+                     }
+                 }
 
-                previousData = nextData.ToList();
-                return Ok(nextData);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error fetching data: " + ex.Message);
-                return StatusCode(500, "Internal server error");
-            }
-        }
+                 previousData = nextData.ToList();
+                 return Ok(nextData);
+             }
+             catch (Exception ex)
+             {
+                 Console.WriteLine("Error fetching data: " + ex.Message);
+                 return StatusCode(500, "Internal server error");
+             }
+         }*/
 
-        [HttpGet]
+
+
+
+        /*[HttpGet]
         public async Task<IActionResult> FetchDataDetail()
         {
             try
@@ -727,7 +728,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
                 _logger.LogError(ex, "Error fetching data detail");
                 return StatusCode(500, "Internal server error");
             }
-        }
+        }*/
 
 
 

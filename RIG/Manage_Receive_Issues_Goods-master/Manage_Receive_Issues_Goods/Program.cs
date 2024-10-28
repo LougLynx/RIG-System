@@ -47,8 +47,12 @@ builder.Services.AddScoped<ISchedulereceivedTLIPRepository, SchedulereceivedTLIP
 builder.Services.AddScoped<IScheduleReceivedDensoService, ScheduleReceivedDensoService>();
 builder.Services.AddScoped<ISchedulereceivedTLIPService, SchedulereceivedTLIPService>();
 
+builder.Services.AddHostedService<DataFetchingBackgroundService>();
+
+builder.Services.AddScoped<TLIPWarehouseController>();
+
 // Register ILogger
-   builder.Services.AddLogging();
+builder.Services.AddLogging();
 
 var app = builder.Build();
 

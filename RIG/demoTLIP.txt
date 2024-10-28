@@ -33,7 +33,7 @@
         "supplierName": "",
         "etaDate": "2024-10-28T00:00:00",
         "etaDateString": "2024-10-28",
-        "receiveStatus": true,
+        "receiveStatus": false,
         "isCompleted": false
       },
       {

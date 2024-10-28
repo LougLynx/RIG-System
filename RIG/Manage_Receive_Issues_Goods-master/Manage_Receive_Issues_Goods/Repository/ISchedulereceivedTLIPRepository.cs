@@ -23,7 +23,7 @@ namespace Manage_Receive_Issues_Goods.Repository
         Task UpdateActualDetailTLIPAsync(string partNo, int actualReceivedId, int quantityRemain);
         Task<IEnumerable<Actualdetailtlip>> GetActualDetailsByReceivedIdAsync(int actualReceivedId);
 		Task<Actualreceivedtlip> GetActualReceivedWithSupplierAsync(int actualReceivedId);
-        Task<Actualreceivedtlip> GetActualReceivedEntryAsync(string supplierCode, DateTime actualDeliveryTime, string asnNumber);
+        Task<Actualreceivedtlip> GetActualReceivedEntryAsync(string supplierCode, DateTime actualDeliveryTime, string asnNumber = null, string doNumber = null, string invoice = null);
         Task AddActualDetailAsync(Actualdetailtlip actualDetail);
         Task UpdateActualReceivedAsync(Actualreceivedtlip actualReceived);
         Task<IEnumerable<Actualreceivedtlip>> GetAllActualReceivedLast7DaysAsync();
