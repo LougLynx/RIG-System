@@ -310,8 +310,8 @@ namespace Manage_Receive_Issues_Goods.Controllers
 
         public async Task<List<AsnInformation>> ParseAsnInformationFromFileAsync()
         {
-            string filePath = @"D:\Project Stock Delivery\RIG\RIG\demoTLIP.txt";
-			//string filePath = @"F:\FU\Semester_5\PRN212\Self_Study\DS_RIG\RIG\demoTLIP.txt";
+           // string filePath = @"D:\Project Stock Delivery\RIG\RIG\demoTLIP.txt";
+			string filePath = @"F:\FU\Semester_5\PRN212\Self_Study\DS_RIG\RIG\demoTLIP.txt";
 			using (var reader = new StreamReader(filePath))
             {
                 var fileContent = await reader.ReadToEndAsync();
@@ -382,8 +382,8 @@ namespace Manage_Receive_Issues_Goods.Controllers
 
 		public async Task<List<AsnDetailData>> ParseAsnDetailFromFileAsync(string asnNumber, string doNumber, string invoice)
 		{
-            string filePath = @"D:\Project Stock Delivery\RIG\RIG\demoDetailTLIP.txt";
-           // string filePath = @"F:\FU\Semester_5\PRN212\Self_Study\DS_RIG\RIG\demoDetailTLIP.txt"; 
+            //string filePath = @"D:\Project Stock Delivery\RIG\RIG\demoDetailTLIP.txt";
+           string filePath = @"F:\FU\Semester_5\PRN212\Self_Study\DS_RIG\RIG\demoDetailTLIP.txt"; 
 
 			using (var reader = new StreamReader(filePath))
 			{
