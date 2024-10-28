@@ -47,6 +47,8 @@ builder.Services.AddScoped<ISchedulereceivedTLIPRepository, SchedulereceivedTLIP
 builder.Services.AddScoped<IScheduleReceivedDensoService, ScheduleReceivedDensoService>();
 builder.Services.AddScoped<ISchedulereceivedTLIPService, SchedulereceivedTLIPService>();
 
+// Register ILogger
+   builder.Services.AddLogging();
 
 var app = builder.Build();
 
@@ -75,5 +77,11 @@ app.MapHub<UpdateReceiveDensoHub>("/updateReceiveDensoHub");
 app.MapHub<UpdateReceiveTLIPHub>("/updateReceiveTLIPHub");
 app.MapRazorPages();
 
+/*var serviceProvider = app.Services;
+var timer = new Timer(async _ =>
+{
+    var controller = serviceProvider.GetService<TLIPWarehouseController>();
+    await controller.FetchData();
+}, null, TimeSpan.Zero, TimeSpan.FromSeconds(5));*/
 
 app.Run();

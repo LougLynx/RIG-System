@@ -31,7 +31,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
 
             var suppliers = await _schedulereceivedService.GetSuppliersByWeekdayAsync(effectiveWeekdayId);
 
-            Console.WriteLine($"Weekday {effectiveWeekdayId}: {suppliers.Count()} suppliers found.");
+            //Console.WriteLine($"Weekday {effectiveWeekdayId}: {suppliers.Count()} suppliers found.");
 
             foreach (var supplier in suppliers)
             {

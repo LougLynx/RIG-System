@@ -59,38 +59,80 @@
             data.forEach(function (actualReceived) {
                 var modalId = 'eventModal-' + actualReceived.ActualReceivedId;
                 var modalHtml = `
-                    <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true" data-actual="">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="eventModalLabel">Chi tiết chuyến hàng</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p id="eventDetails-${actualReceived.ActualReceivedId}"></p>
-                                    <h5 class="modal-title" id="completionPercentage-${actualReceived.ActualReceivedId}"></h5>
-                                    <table id="stagesTable-${actualReceived.ActualReceivedId}" class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Mã sản phẩm</th>
-                                                <th>Số lượng</th>
-                                                <th>Trạng thái</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="stagesTableBody-${actualReceived.ActualReceivedId}">
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-warning" id="delayButton-${actualReceived.ActualReceivedId}">Delay</button>
-                                </div>
+            <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true" data-actual="">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="eventModalLabel">Chi tiết chuyến hàng</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p id="eventDetails-${actualReceived.ActualReceivedId}"></p>
+                            <h5 class="modal-title" id="completionPercentage-${actualReceived.ActualReceivedId}"></h5>
+                            <table id="stagesTable-${actualReceived.ActualReceivedId}" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Mã sản phẩm</th>
+                                        <th>Số lượng</th>
+                                        <th>Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stagesTableBody-${actualReceived.ActualReceivedId}">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+                modalsContainer.append(modalHtml);
+            });
+
+            // Fetch current plan details with dates
+            getPlanDetailReceived().then(function (data) {
+                data.forEach(function (planDetail) {
+                    var modalId = 'planModal-' + planDetail.PlanDetailId;
+
+                    // Calculate end time
+                    var deliveryTimeParts = planDetail.DeliveryTime.split(':');
+                    var leadTimeParts = planDetail.LeadTime.split(':');
+                    var start = new Date(planDetail.SpecificDate);
+                    start.setHours(parseInt(deliveryTimeParts[0], 10));
+                    start.setMinutes(parseInt(deliveryTimeParts[1], 10));
+                    start.setSeconds(parseInt(deliveryTimeParts[2], 10));
+
+                    var end = new Date(start);
+                    end.setHours(end.getHours() + parseInt(leadTimeParts[0], 10));
+                    end.setMinutes(end.getMinutes() + parseInt(leadTimeParts[1], 10));
+                    end.setSeconds(end.getSeconds() + parseInt(leadTimeParts[2], 10));
+
+                    var formattedStart = start.toLocaleTimeString();
+                    var formattedEnd = end.toLocaleTimeString();
+
+                    var modalHtml = `
+                <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="planModalLabel" aria-hidden="true" data-plan="">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="planModalLabel">Chi tiết kế hoạch</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p id="planDetails-${planDetail.PlanDetailId}"><strong>Nhà cung cấp:</strong> ${planDetail.SupplierName}<br><strong>Nhận lúc: </strong>${formattedStart}<br><strong>Kết thúc lúc: </strong>${formattedEnd}</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-warning" id="delayButton-${planDetail.PlanDetailId}">Delay</button>
                             </div>
                         </div>
-                    </div>`;
-                modalsContainer.append(modalHtml);
+                    </div>
+                </div>`;
+                    modalsContainer.append(modalHtml);
+                });
+            }).catch(function (error) {
+                console.error("Error fetching plan details:", error);
             });
         });
     }
+
 
     function formatDateToLocalString(date) {
         const year = date.getFullYear();
@@ -457,23 +499,37 @@
 
     });
 
+/*    async function fetchActualReceivedByInfor(asnNumber, doNumber, invoice) {
+        try {
+            const response = await fetch(`/TLIPWarehouse/GetActualReceivedByInfor?asnNumber=${asnNumber}&doNumber=${doNumber}&invoice=${invoice}`);
+            if (response.ok) {
+                const data = await response.json();
+                return data;
+            } else {
+                console.error("Failed to fetch data:", response.statusText);
+            }
+        } catch (error) {
+            console.error("Error in fetchActualReceived:", error);
+        }
+    }
+
     function getAsnDetail(asnNumber, doNumber, invoice) {
-        //return fetch(`/TLIPWarehouse/GetAsnDetail?asnNumber=${asnNumber}&doNumber=${doNumber}&invoice=${invoice}`)
-        return fetch(`/TLIPWarehouse/ParseAsnDetailFromFile?asnNumber=${asnNumber}&doNumber=${doNumber}&invoice=${invoice}`)
+        return fetch(`/TLIPWarehouse/GetAsnDetail?asnNumber=${asnNumber}&doNumber=${doNumber}&invoice=${invoice}`)
+        //return fetch(`/TLIPWarehouse/ParseAsnDetailFromFile?asnNumber=${asnNumber}&doNumber=${doNumber}&invoice=${invoice}`)
             .then(response => response.json());
     }
     function getActualReceivedEntry(supplierCode, actualDeliveryTime, ansNumber) {
         return fetch(`/TLIPWarehouse/GetActualReceivedEntry?supplierCode=${supplierCode}&actualDeliveryTime=${actualDeliveryTime}&ansNumber=${ansNumber}`)
             .then(response => response.json());
-    }
+    }*/
 
-    var previousData = [];
+  /*  var previousData = [];
     async function fetchData() {
         console.log('fetchData called at', new Date().toLocaleTimeString());
 
         try {
-            const response = await fetch('/TLIPWarehouse/ParseAsnInformationFromFile');
-            //const response = await fetch('/TLIPWarehouse/GetAsnInformation');
+            const response = await fetch('/TLIPWarehouse/GetAsnInformation');
+            //const response = await fetch('/TLIPWarehouse/ParseAsnInformationFromFile');
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -482,132 +538,162 @@
                 throw new Error('Empty response');
             }
             const nextData = JSON.parse(text);
-            //console.log('Data fetched:', nextData);
             var now = new Date();
-            nextData.forEach(async (nextItem) => {
+            console.log("nextData:", nextData);
+            for (const nextItem of nextData) {
                 var previousItem = previousData.find(item =>
                     (item.AsnNumber && item.AsnNumber === nextItem.AsnNumber) ||
                     (!item.AsnNumber && item.DoNumber && item.DoNumber === nextItem.DoNumber) ||
                     (!item.AsnNumber && !item.DoNumber && item.Invoice && item.Invoice === nextItem.Invoice)
                 );
-                //console.log('previousItem:', previousItem);
 
-                if (previousItem && !previousItem.ReceiveStatus && nextItem.ReceiveStatus) {
-                    var actualReceived = {
-                        ActualDeliveryTime: formatDateTime(now),
-                        SupplierCode: nextItem.SupplierCode,
-                        AsnNumber: nextItem.AsnNumber,
-                        DoNumber: nextItem.DoNumber,
-                        Invoice: nextItem.Invoice,
-                        IsCompleted: nextItem.IsCompleted
-                    };
-                    //console.log('Posting data:', actualReceived);
-                    //console.log('ADD DATA ĐÂYYYYYYYY');
+                try {
+                    const exists = await fetchActualReceivedByInfor(nextItem.AsnNumber, nextItem.DoNumber, nextItem.Invoice);
+                    //console.log("exists:", exists);
+                    if (!exists) {
+                        if (previousItem && !previousItem.ReceiveStatus && nextItem.ReceiveStatus) {
+                            var actualReceived = {
+                                ActualDeliveryTime: formatDateTime(now),
+                                SupplierCode: nextItem.SupplierCode,
+                                AsnNumber: nextItem.AsnNumber,
+                                DoNumber: nextItem.DoNumber,
+                                Invoice: nextItem.Invoice,
+                                IsCompleted: nextItem.IsCompleted
+                            };
 
-                    await fetch('/TLIPWarehouse/AddActualReceived', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(actualReceived)
-                    });
+                            await fetch('/TLIPWarehouse/AddActualReceived', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(actualReceived)
+                            });
 
-                    const actualReceivedEntryResponse = await fetch(`/TLIPWarehouse/GetActualReceivedEntry?supplierCode=${actualReceived.SupplierCode}&actualDeliveryTime=${actualReceived.ActualDeliveryTime}&asnNumber=${actualReceived.AsnNumber}`);
-                    const actualReceivedEntry = await actualReceivedEntryResponse.json();
-                    //console.log('Retrieved actualReceivedEntry:', actualReceivedEntry);
+                            const actualReceivedEntryResponse = await fetch(`/TLIPWarehouse/GetActualReceivedEntry?supplierCode=${actualReceived.SupplierCode}&actualDeliveryTime=${actualReceived.ActualDeliveryTime}&asnNumber=${actualReceived.AsnNumber}`);
+                            const actualReceivedEntry = await actualReceivedEntryResponse.json();
 
-                    const asnDetails = await getAsnDetail(
-                        actualReceivedEntry.AsnNumber ? actualReceivedEntry.AsnNumber : '',
-                        actualReceivedEntry.DoNumber ? actualReceivedEntry.DoNumber : '',
-                        actualReceivedEntry.Invoice ? actualReceivedEntry.Invoice : ''
-                    );
-                    //console.log('ASN Details trong fetchData:', asnDetails);
+                            const asnDetails = await getAsnDetail(
+                                actualReceivedEntry.AsnNumber ? actualReceivedEntry.AsnNumber : '',
+                                actualReceivedEntry.DoNumber ? actualReceivedEntry.DoNumber : '',
+                                actualReceivedEntry.Invoice ? actualReceivedEntry.Invoice : ''
+                            );
 
-                    const addActualDetailPromises = asnDetails.map(asnDetail => {
-                        const actualDetail = {
-                            ActualReceivedId: actualReceivedEntry.ActualReceivedId,
-                            PartNo: asnDetail.PartNo,
-                            Quantity: asnDetail.Quantity,
-                            QuantityRemain: asnDetail.QuantityRemain
-                        };
-                        //console.log('ADD ASNDETAIL ĐÂYYYYYYYY');
+                            const addActualDetailPromises = asnDetails.map(asnDetail => {
+                                const actualDetail = {
+                                    ActualReceivedId: actualReceivedEntry.ActualReceivedId,
+                                    PartNo: asnDetail.PartNo,
+                                    Quantity: asnDetail.Quantity,
+                                    QuantityRemain: asnDetail.QuantityRemain
+                                };
 
-                        return fetch('/TLIPWarehouse/AddActualDetail', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(actualDetail)
-                        }).then(response => {
-                            if (!response.ok) {
-                                console.error('Failed to post ActualDetailTLIP:', response.statusText);
+                                return fetch('/TLIPWarehouse/AddActualDetail', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(actualDetail)
+                                }).then(response => {
+                                    if (!response.ok) {
+                                        console.error('Failed to post ActualDetailTLIP:', response.statusText);
+                                    }
+                                }).catch(err => {
+                                    console.error('Error posting ActualDetailTLIP:', err.toString());
+                                });
+                            });
+
+                            await Promise.all(addActualDetailPromises);
+
+                            const updatedActualReceivedEntryResponse = await fetch(`/TLIPWarehouse/GetActualReceivedById?actualReceivedId=${actualReceivedEntry.ActualReceivedId}`);
+                            if (!updatedActualReceivedEntryResponse.ok) {
+                                throw new Error('Network response was not ok ' + updatedActualReceivedEntryResponse.statusText);
                             }
-                        }).catch(err => {
-                            console.error('Error posting ActualDetailTLIP:', err.toString());
-                        });
-                    });
+                            const updatedActualReceivedEntry = await updatedActualReceivedEntryResponse.json();
+                            if (!updatedActualReceivedEntry) {
+                                console.error('No data returned from API');
+                            } else {
+                                console.log('Data received from API:', updatedActualReceivedEntry);
+                            }
+                        }
 
-                    await Promise.all(addActualDetailPromises);
+                        if (previousItem && !previousItem.IsCompleted && nextItem.IsCompleted) {
+                            try {
+                                const response = await fetch('/TLIPWarehouse/GetActualReceivedByDetails', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        SupplierCode: previousItem.SupplierCode,
+                                        AsnNumber: previousItem.AsnNumber,
+                                        DoNumber: previousItem.DoNumber,
+                                        Invoice: previousItem.Invoice
+                                    })
+                                });
 
-                    const updatedActualReceivedEntryResponse = await fetch(`/TLIPWarehouse/GetActualReceivedById?actualReceivedId=${actualReceivedEntry.ActualReceivedId}`);
-                    if (!updatedActualReceivedEntryResponse.ok) {
-                        throw new Error('Network response was not ok ' + updatedActualReceivedEntryResponse.statusText);
-                    }
-                    const updatedActualReceivedEntry = await updatedActualReceivedEntryResponse.json();
-                    if (!updatedActualReceivedEntry) {
-                        console.error('No data returned from API');
+                                if (!response.ok) {
+                                    throw new Error('Failed to fetch actual received item');
+                                }
+
+                                const actualReceived = await response.json();
+
+                                const response2 = await fetch(`/TLIPWarehouse/UpdateActualReceivedCompletion?actualReceivedId=${actualReceived.ActualReceivedId}&isCompleted=true`, {
+                                    method: 'POST'
+                                });
+                                if (response2.ok) {
+                                    console.log("Updated ActualReceived IsCompleted to true successfully.");
+                                } else {
+                                    console.error("Failed to update ActualReceived IsCompleted to true:", response2.statusText);
+                                }
+
+                            } catch (error) {
+                                console.error("Failed to update ActualReceived and ActualDetails: ", error);
+                            }
+                        }
+
                     } else {
-                        console.log('Data received from API:', updatedActualReceivedEntry);
-                    }
-                }
+                        if (!nextItem.ReceiveStatus) {
+                            let event = calendar.getEventById(`actual-${exists.ActualReceivedId}`);
+                            event.setProp('backgroundColor', '#C51019');
+                            console.warn("Duplicate data detected in API for ActualReceivedId:", nextItem.AsnNumber, nextItem.DoNumber, nextItem.Invoice, exists.ActualReceivedId);
+                            try {
+                                const response = await fetch('/TLIPWarehouse/GetActualReceivedByDetails', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        SupplierCode: nextItem.SupplierCode,
+                                        AsnNumber: nextItem.AsnNumber,
+                                        DoNumber: nextItem.DoNumber,
+                                        Invoice: nextItem.Invoice
+                                    })
+                                });
 
-                if (previousItem && !previousItem.IsCompleted && nextItem.IsCompleted) {
-                    try {
-                        const response = await fetch('/TLIPWarehouse/GetActualReceivedByDetails', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                SupplierCode: previousItem.SupplierCode,
-                                AsnNumber: previousItem.AsnNumber,
-                                DoNumber: previousItem.DoNumber,
-                                Invoice: previousItem.Invoice
-                            })
-                        });
+                                if (!response.ok) {
+                                    throw new Error('Failed to fetch actual received item');
+                                }
 
-                        if (!response.ok) {
-                            throw new Error('Failed to fetch actual received item');
+                                const actualReceived = await response.json();
+
+                                const response2 = await fetch(`/TLIPWarehouse/UpdateActualReceivedCompletion?actualReceivedId=${actualReceived.ActualReceivedId}&isCompleted=true`, {
+                                    method: 'POST'
+                                });
+                                if (response2.ok) {
+                                    console.log("Updated ActualReceived IsCompleted to true successfully.");
+                                } else {
+                                    console.error("Failed to update ActualReceived IsCompleted to true:", response2.statusText);
+                                }
+
+                            } catch (error) {
+                                console.error("Failed to update ActualReceived and ActualDetails: ", error);
+                            }
                         }
-
-                        const actualReceived = await response.json();
-
-                        /* // Update all ActualDetails' QuantityRemain to 0
-                         const response1 = await fetch(`/TLIPWarehouse/UpdateActualDetailsQuantityRemain?actualReceivedId=${actualReceived.ActualReceivedId}&quantityRemain=0`, {
-                             method: 'POST'
-                         });
-                         if (response1.ok) {
-                             console.log("Updated ActualDetails' QuantityRemain to 0 successfully.");
-                         } else {
-                             console.error("Failed to update ActualDetails' QuantityRemain to 0:", response1.statusText);
-                         }*/
-
-                        // Update IsCompleted to true
-                        const response2 = await fetch(`/TLIPWarehouse/UpdateActualReceivedCompletion?actualReceivedId=${actualReceived.ActualReceivedId}&isCompleted=true`, {
-                            method: 'POST'
-                        });
-                        if (response2.ok) {
-                            console.log("Updated ActualReceived IsCompleted to true successfully.");
-                        } else {
-                            console.error("Failed to update ActualReceived IsCompleted to true:", response2.statusText);
-                        }
-
-                    } catch (error) {
-                        console.error("Failed to update ActualReceived and ActualDetails: ", error);
                     }
+                } catch (error) {
+                    console.error("Error checking actual received data:", error);
                 }
+            }
 
-            });
             previousData = nextData;
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -615,10 +701,11 @@
     }
 
 
-    setInterval(fetchData, 5000);
+
+    setInterval(fetchData, 5000);*/
 
 
-    function fetchDataDetail() {
+  /*  function fetchDataDetail() {
         getIncompleteActualReceived().then(data => {
             //console.log("Data actual nè: ", data);
             data.forEach(actualReceived => {
@@ -657,7 +744,7 @@
 
 
     // Start polling every 5 seconds
-    setInterval(fetchDataDetail, 5000);
+    setInterval(fetchDataDetail, 5000);*/
 
 
     function populateStagesTable(asnDetails, actualReceivedId) {
@@ -838,7 +925,7 @@
                 //console.log("actualReceived skrtttt:", actualReceived);
                 if (!actualReceived.IsCompleted) {
                     if (actualReceived.CompletionPercentage < 100) {
-                        const formattedEnd = formatDateTime(new Date());
+                        const formattedEnd = formatDateTime(new Date());    
                         updateEventEndInDatabase(actualReceived.ActualReceivedId, formattedEnd);
                         updateCalendarEvent(actualReceived);
                         //console.log("actualReceived: Update tiếp nè");
@@ -895,45 +982,6 @@
 
     calendar.render();
 
-    /* function fetchResources(date) {
-         fetch(`/api/ResourcesReceivedTLIP?date=${date}`)
-             .then(response => response.json())
-             .then(resources => {
-                 calendar.refetchResources(resources);
-             });
-     }*/
-
-    //function getCurrentDate(dateNow) {
-    //    console.log("dateNow: ", dateNow);
-    //    fetch('/api/ResourcesReceivedTLIP/GetWeekday', {
-    //        method: 'POST',
-    //        headers: {
-    //            'Content-Type': 'application/json'
-    //        },
-    //        body: JSON.stringify({ date: dateNow })
-    //    })
-    //        .then(response => response.json())
-    //        .then(data => {
-    //            console.log("Weekday: ", data.WeekdayId);
-    //            fetchResources(data.WeekdayId);
-    //        })
-    //        .catch(error => {
-    //            console.error("Error fetching weekday: ", error);
-    //        });
-    //}
-    //function fetchResources(weekdayId) {
-    //    fetch(`/api/ResourcesReceivedTLIP?weekdayId=${weekdayId}`)
-    //        .then(response => response.json())
-    //        .then(data => {
-    //            console.log("Fetched resources:", data); // Log the fetched data
-    //            calendar.refetchResources(data);
-    //            console.log("Resources refetched"); // Log after refetching resources
-
-    //        })
-    //        .catch(error => {
-    //            console.error("Error fetching resources: ", error);
-    //        });
-    //}
     function getCurrentDate(dateNow) {
 
         const today = new Date().toISOString().split('T')[0];
@@ -951,28 +999,11 @@
     }
 
 
-    /*  function getWeekdayId(date) {
-          return fetch('/api/ResourcesReceivedTLIP/GetWeekday', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ Date: date })
-          })
-              .then(response => response.json())
-              .then(data => data.WeekdayId);
-      }*/
-
-    // Function to get resources based on weekday ID
+    
     function fetchResources(weekdayId) {
         return fetch(`/api/ResourcesReceivedTLIP?weekdayId=${weekdayId}`)
             .then(response => response.json());
     }
-
-
-    // Gọi hàm getCurrentDate khi DOMContentLoaded
-    //getCurrentDate();
-
 
 
     //Tải nhà cung cấp lên khi tải trang 

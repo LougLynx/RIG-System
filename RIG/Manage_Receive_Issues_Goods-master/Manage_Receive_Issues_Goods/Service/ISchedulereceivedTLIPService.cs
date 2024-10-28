@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Manage_Receive_Issues_Goods.DTO;
 using Manage_Receive_Issues_Goods.Models;
 
 namespace Manage_Receive_Issues_Goods.Services
@@ -33,5 +34,8 @@ namespace Manage_Receive_Issues_Goods.Services
         Task<IEnumerable<Plandetailreceivedtlip>> GetAllPlanDetailByPlanIdAsync(int planId);
         Task<IEnumerable<Plandetailreceivedtlip>> GetAllCurrentPlanDetailsAsync();
         Task<IEnumerable<Supplier>> GetSuppliersByWeekdayAsync(int weekdayId);
+        Task<IEnumerable<Actualreceivedtlip>> GetActualReceivedAsyncByInfor(string asnNumber, string doNumber, string invoice);
+        Task UpdateActualReceivedCompletionAsync(int actualReceivedId, bool isCompleted);
+        Task<Actualreceivedtlip> GetActualReceivedByDetailsAsync(ActualReceivedTLIPDTO details);
     }
 }
