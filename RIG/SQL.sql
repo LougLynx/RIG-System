@@ -135,7 +135,7 @@
 ('J01', 'DNJP'),
 ('TD30', 'DNMY'),
 ('TD50', 'DIAS'),
-('TD60', 'HDVN'),
+('TD60', 'HDVN Trading'),
 ('TD11', 'DNIA'),
 ('TD51', 'DIAS'),
 ('TD70', 'SKD'),
@@ -187,7 +187,9 @@
 		`EffectiveDate` date NOT NULL, -- New field to indicate when the plan should start being applied
 		PRIMARY KEY (`PlanID`)
 	) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-    
+    -- ------------------------------------------------------------------
+    INSERT INTO `PlanReceiveTLIP` (`PlanName`, `EffectiveDate`) VALUES
+	('Kế hoạch nhận hàng 2024', '2024-10-01');
     
 	-- --------------------------------------------------------
 	DROP TABLE IF EXISTS `PlanDetailReceivedTLIP`;
@@ -198,19 +200,15 @@
 	  `DeliveryTime` time NOT NULL,
 	  `WeekdayID` int NOT NULL,
 	  `LeadTime` time NOT NULL,
+      `PlanType` ENUM('Weekly', 'Monthly', 'Bi-Monthly') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+	`WeekOfMonth` int DEFAULT NULL, -- For monthly plans, specify which week of the month
+	`OccurrencesPerMonth` int DEFAULT NULL, -- For bi-monthly plans, specify number of occurrences per month
 	  PRIMARY KEY (`PlanDetailID`),
 	  FOREIGN KEY (`SupplierCode`) REFERENCES `Supplier`(`SupplierCode`),
 	  FOREIGN KEY (`WeekdayID`) REFERENCES `Weekday`(`WeekdayID`),
 	  FOREIGN KEY (`PlanID`) REFERENCES `PlanReceiveTLIP`(`PlanID`)
 	) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-
-
-	-- Insert dữ liệu vào bảng ScheduleReceived cho các kế hoạch Plan
-	INSERT INTO `PlanDetailReceivedTLIP` (`PlanID`, `SupplierCode`, `DeliveryTime`, `WeekdayID`, `LeadTime`) VALUES
-	(1, 'SUP001', '08:00:00', 1, '00:30:00'),
-	(1, 'SUP002', '09:00:00', 2, '01:00:00'),
-	(1, 'SUP003', '10:00:00', 3, '01:30:00');
 
 	-- --------------------------------------------------------
 	DROP TABLE IF EXISTS `ActualReceivedTLIP`;
@@ -222,6 +220,7 @@
       `AsnNumber` nvarchar(100) ,
       `DoNumber` varchar(100) ,
       `Invoice` varchar(100) ,
+      `IsCompleted` bool NOT NULL ,
 	  PRIMARY KEY (`ActualReceivedID`),
 	 FOREIGN KEY (`SupplierCode`) REFERENCES `Supplier`(`SupplierCode`)
 	) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -239,14 +238,6 @@
 	) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
--- ------------------------------------------------------------------------------------
-
-
-	-- Insert dữ liệu vào bảng ActualReceived cho các lần nhận hàng thực tế (Actual)
-	INSERT INTO `ActualReceivedTLIP` (`ActualDeliveryTime`, `ActualLeadTime`, `SupplierCode`) VALUES
-	('2024-10-15 08:00:00', 30, 'SUP001'),
-	('2024-10-15 09:00:00', null, 'SUP002'),
-	('2024-10-15 10:00:00', 90, 'SUP003');
 
 	-- --------------------------------------------------------
 	-- Dumping structure for table Plans
