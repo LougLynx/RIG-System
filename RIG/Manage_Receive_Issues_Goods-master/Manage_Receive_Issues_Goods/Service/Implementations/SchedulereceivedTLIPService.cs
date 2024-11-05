@@ -6,6 +6,7 @@ using Manage_Receive_Issues_Goods.Models;
 using Manage_Receive_Issues_Goods.Repositories;
 using Manage_Receive_Issues_Goods.Repository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 
 namespace Manage_Receive_Issues_Goods.Services
 {
@@ -18,45 +19,6 @@ namespace Manage_Receive_Issues_Goods.Services
             _repository = repository;
         }
 
-        public async Task<IEnumerable<Planreceivetlip>> GetAllPlanAsync()
-        {
-            return await _repository.GetAllPlanAsync();
-        }
-        public async Task<IEnumerable<Plandetailreceivedtlip>> GetAllPlanDetailAsync()
-        {
-            return await _repository.GetAllPlanDetailAsync();
-        }
-
-        public async Task<IEnumerable<Plandetailreceivedtlip>> GetAllPlanDetailByPlanIdAsync(int planId)
-        {
-            return await _repository.GetAllPlanDetailByPlanIdAsync(planId); 
-        }
-
-        public async Task<Plandetailreceivedtlip> GetPlanDetailByIdAsync(int id)
-        {
-            return await _repository.GetPlanDetailByIdAsync(id);
-        }
-
-        
-            public async Task<IEnumerable<Plandetailreceivedtlip>> GetSchedulesByWeekdayAsync(int weekdayId)
-        {
-            return await _repository.GetSchedulesByWeekdayAsync(weekdayId);
-        }
-
-      /*  public async Task AddScheduleAsync(Plandetailreceivedtlip schedule)
-        {
-            await _repository.AddAsync(schedule);
-        }*/
-
-      /*  public async Task UpdateScheduleAsync(Plandetailreceivedtlip schedule)
-        {
-            await _repository.UpdateAsync(schedule);
-        }*/
-
-       /* public async Task DeleteScheduleAsync(int id)
-        {
-            await _repository.DeleteAsync(id);
-        }*/
         public async Task<IEnumerable<Actualreceivedtlip>> GetAllActualReceivedAsync()
         {
             return await _repository.GetAllActualReceivedAsync();
@@ -64,8 +26,10 @@ namespace Manage_Receive_Issues_Goods.Services
 
         public async Task<IEnumerable<Supplier>> GetSuppliersForTodayAsync()
         {
-            int currentWeekday = (int)DateTime.Now.DayOfWeek; // Lấy thứ hiện tại (0 = Sunday, 1 = Monday, ...)
-            if (currentWeekday == 0) currentWeekday = 7; // Chuyển đổi 0 (Chủ Nhật) thành 7 cho phù hợp với bảng Weekday
+            // Lấy thứ hiện tại (0 = Sunday, 1 = Monday, ...)
+            int currentWeekday = (int)DateTime.Now.DayOfWeek; 
+            // Chuyển đổi 0 (Chủ Nhật) thành 7 cho phù hợp với bảng Weekday
+            if (currentWeekday == 0) currentWeekday = 7; 
 
             var suppliers = await _repository.GetSuppliersForTodayAsync(currentWeekday);
             return suppliers;
@@ -101,6 +65,19 @@ namespace Manage_Receive_Issues_Goods.Services
 
             return targetDate;
         }
+        public DateTime GetDateForWeekday(int weekdayId)
+        {
+            DateTime today = DateTime.Today;
+            int currentWeekday = (int)today.DayOfWeek;
+
+            // Calculate the target date within the next 7 days
+            int daysToAdd = (weekdayId - currentWeekday + 7) % 7;
+            DateTime targetDate = today.AddDays(daysToAdd);
+
+            return targetDate;
+        }
+
+
 
         // Hàm tính tuần trong năm
         public int GetWeekOfYear(DateTime date)
@@ -109,39 +86,35 @@ namespace Manage_Receive_Issues_Goods.Services
             return culture.Calendar.GetWeekOfYear(date, System.Globalization.CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
         }
 
-       
+
 
         public async Task<bool> DelaySupplierAsync(string supplierId)
         {
-           /* var schedule = await GetScheduleBySupplierIdAsync(supplierId);
-            if (schedule == null) return false;
+            /* var schedule = await GetScheduleBySupplierIdAsync(supplierId);
+             if (schedule == null) return false;
 
-            var allSchedules = await GetSchedulesByWeekdayAsync(schedule.WeekdayId);
-            var otherSchedules = allSchedules.Where(s => s.SupplierCode != supplierId).OrderBy(s => s.DeliveryTime.Time1).ToList();
+             var allSchedules = await GetSchedulesByWeekdayAsync(schedule.WeekdayId);
+             var otherSchedules = allSchedules.Where(s => s.SupplierCode != supplierId).OrderBy(s => s.DeliveryTime.Time1).ToList();
 
-            foreach (var otherSchedule in otherSchedules)
-            {
-                if (otherSchedule.LeadTime <= schedule.LeadTime)
-                {
-                    // Swap delivery times
-                    var tempTime = schedule.DeliveryTime;
-                    schedule.DeliveryTime = otherSchedule.DeliveryTime;
-                    otherSchedule.DeliveryTime = tempTime;
+             foreach (var otherSchedule in otherSchedules)
+             {
+                 if (otherSchedule.LeadTime <= schedule.LeadTime)
+                 {
+                     // Swap delivery times
+                     var tempTime = schedule.DeliveryTime;
+                     schedule.DeliveryTime = otherSchedule.DeliveryTime;
+                     otherSchedule.DeliveryTime = tempTime;
 
-                    await UpdateScheduleAsync(schedule);
-                    await UpdateScheduleAsync(otherSchedule);
-                    return true;
-                }
-            }
+                     await UpdateScheduleAsync(schedule);
+                     await UpdateScheduleAsync(otherSchedule);
+                     return true;
+                 }
+             }
 
-            // If no suitable schedule found, move to end of the day
-            schedule.DeliveryTime = new Time { Time1 = TimeOnly.FromDateTime(DateTime.Today.AddHours(23).AddMinutes(59)) };
-            await UpdateScheduleAsync(schedule);*/
+             // If no suitable schedule found, move to end of the day
+             schedule.DeliveryTime = new Time { Time1 = TimeOnly.FromDateTime(DateTime.Today.AddHours(23).AddMinutes(59)) };
+             await UpdateScheduleAsync(schedule);*/
             return true;
-        }
-        public async Task<Plandetailreceivedtlip> GetScheduleBySupplierIdAsync(string supplierId)
-        {
-            return await _repository.GetScheduleBySupplierIdAsync(supplierId);
         }
 
         public async Task<IEnumerable<AsnInformation>> GetAsnInformationAsync(DateTime inputDate)
@@ -166,20 +139,20 @@ namespace Manage_Receive_Issues_Goods.Services
         {
             return await _repository.GetActualDetailsByReceivedIdAsync(actualReceivedId);
         }
-		public async Task<Actualreceivedtlip> GetActualReceivedWithSupplierAsync(int actualReceivedId)
-		{
-			return await _repository.GetActualReceivedWithSupplierAsync(actualReceivedId);
-		}
-
-		public async Task<Actualreceivedtlip> GetActualReceivedEntryAsync(string supplierCode, DateTime actualDeliveryTime, string asnNumber = null, string doNumber = null, string invoice = null)
+        public async Task<Actualreceivedtlip> GetActualReceivedWithSupplierAsync(int actualReceivedId)
         {
-			return await _repository.GetActualReceivedEntryAsync(supplierCode, actualDeliveryTime, asnNumber, doNumber, invoice);
-		}
+            return await _repository.GetActualReceivedWithSupplierAsync(actualReceivedId);
+        }
 
-		public async Task AddActualDetailAsync(Actualdetailtlip actualDetail)
-		{
-			await _repository.AddActualDetailAsync(actualDetail);
-		}
+        public async Task<Actualreceivedtlip> GetActualReceivedEntryAsync(string supplierCode, string actualDeliveryTime, string asnNumber = null, string doNumber = null, string invoice = null)
+        {
+            return await _repository.GetActualReceivedEntryAsync(supplierCode, actualDeliveryTime, asnNumber, doNumber, invoice);
+        }
+
+        public async Task AddActualDetailAsync(Actualdetailtlip actualDetail)
+        {
+            await _repository.AddActualDetailAsync(actualDetail);
+        }
 
         public async Task UpdateActualReceivedAsync(Actualreceivedtlip actualReceived)
         {
@@ -209,6 +182,49 @@ namespace Manage_Receive_Issues_Goods.Services
         }
 
 
-    }
+        public async Task AddAllPlanDetailsToHistoryAsync()
+        {
+            var currentYear = DateTime.Now.Year;
+            var currentWeekOfYear = GetWeekOfYear(DateTime.Now);
+            var yesterday = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
+            var planDetails = await _repository.GetAllCurrentPlanDetailsAsync();
 
+            foreach (var planDetail in planDetails)
+            {
+                var exists = await _repository.ExistsInHistoryPlanReceivedAsync(planDetail.PlanDetailId, yesterday);
+                if (!exists)
+                {
+                    var specificDate = GetDateForWeekday(currentYear, currentWeekOfYear,planDetail.WeekdayId);
+                    if (specificDate.Date == yesterday.ToDateTime(TimeOnly.MinValue).Date)
+                    {
+                        var historyEntry = new Historyplanreceivedtlip
+                        {
+                            PlanDetailId = planDetail.PlanDetailId,
+                            HistoryDate = yesterday
+                        };
+                        await _repository.AddHistoryPlanReceivedAsync(historyEntry);
+                    }
+                }
+            }
+        }
+
+
+
+        public async Task AddAllActualToHistoryAsync(int actualReceivedId)
+        {
+            var historyEntry = new Historyplanreceivedtlip
+            {
+                ActualReceivedId = actualReceivedId,
+                HistoryDate = DateOnly.FromDateTime(DateTime.Now)
+            };
+            await _repository.AddHistoryPlanReceivedAsync(historyEntry);
+        }
+
+        public async Task<IEnumerable<Historyplanreceivedtlip>> GetPlanActualDetailsInHistoryAsync()
+        {
+            return await _repository.GetPlanActualDetailsInHistoryAsync();
+        }
+    }
 }
+
+

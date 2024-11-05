@@ -40,6 +40,9 @@ public partial class Plandetailreceivedtlip
 
     public int? OccurrencesPerMonth { get; set; }
 
+    [InverseProperty("PlanDetail")]
+    public virtual ICollection<Historyplanreceivedtlip> Historyplanreceivedtlips { get; set; } = new List<Historyplanreceivedtlip>();
+
     [ForeignKey("PlanId")]
     [InverseProperty("Plandetailreceivedtlips")]
     public virtual Planreceivetlip Plan { get; set; } = null!;

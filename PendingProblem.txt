@@ -47,3 +47,8 @@ NOK (monthly) có 2 mã code
 
 -----------------------------------------------------------------------------------------
 Hiển thị được actual sang ngày hôm sau nếu qua ngày mà vẫn chưa xong
+
+(Pending) làm thêm phần delay
+
+Làm thêm phần thêm chuyến trong ngày (sửa lại DB)
+

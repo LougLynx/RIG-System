@@ -39,6 +39,8 @@ public partial class RigContext : IdentityDbContext
 
     public virtual DbSet<Efmigrationshistory> Efmigrationshistories { get; set; }
 
+    public virtual DbSet<Historyplanreceivedtlip> Historyplanreceivedtlips { get; set; }
+
     public virtual DbSet<Plandetailreceivedtlip> Plandetailreceivedtlips { get; set; }
 
     public virtual DbSet<Planreceivetlip> Planreceivetlips { get; set; }
@@ -168,6 +170,15 @@ public partial class RigContext : IdentityDbContext
         modelBuilder.Entity<Efmigrationshistory>(entity =>
         {
             entity.HasKey(e => e.MigrationId).HasName("PRIMARY");
+        });
+
+        modelBuilder.Entity<Historyplanreceivedtlip>(entity =>
+        {
+            entity.HasKey(e => e.HistoryId).HasName("PRIMARY");
+
+            entity.HasOne(d => d.ActualReceived).WithMany(p => p.Historyplanreceivedtlips).HasConstraintName("historyplanreceivedtlip_ibfk_2");
+
+            entity.HasOne(d => d.PlanDetail).WithMany(p => p.Historyplanreceivedtlips).HasConstraintName("historyplanreceivedtlip_ibfk_1");
         });
 
         modelBuilder.Entity<Plandetailreceivedtlip>(entity =>

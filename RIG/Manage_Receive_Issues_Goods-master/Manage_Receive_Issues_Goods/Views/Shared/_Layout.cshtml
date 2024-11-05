@@ -30,24 +30,23 @@
 
         @if (SignInManager.IsSignedIn(User))
         {
+
+            <img src="~/images/defaultAvatar.png" alt="Avatar" class="rounded-circle" style="width: 250px; height: 250px; margin-left: -16px;" />
+            
             <h4 class="text-light text-center"><b>@User.Identity.Name</b></h4>
 
-        }
-        @if (SignInManager.IsSignedIn(User))
-        {
+        
             <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
             <a class="nav-link text-light" asp-area="" asp-controller="TLIPWarehouse" asp-action="ScheduleReceive">TLIP</a>
             <a class="nav-link text-light" asp-area="" asp-controller="DensoWarehouse" asp-action="ScheduleReceive">Denso</a>
+            <a class="nav-link text-light" asp-area="" asp-controller="Important" asp-action="Index">Important</a>
 
             <form method="post" asp-controller="Account" asp-action="Logout">
                 <button type="submit" style="width:auto" class="nav-link btn btn-link py-0">
                     Logout
                 </button>
             </form>
-
         }
-
-
     </div>
 
     <div id="main">
@@ -56,6 +55,12 @@
             <h1 class="h2"><b>@ViewData["Title"]</b></h1>
         </div>
         @RenderBody()
+    </div>
+
+    <div id="loadingOverlay" style="display: none;">
+        @* <img src="~/images/skibidi11.gif" alt="Loading..." /> *@
+        @* <img src="~/images/loadingIcon.gif" alt="Loading..." /> *@
+        <img src="~/images/densoDance.gif" alt="Loading..." />
     </div>
 </body>
 </html>

@@ -9,6 +9,16 @@
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/css/custom.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
+    <style>
+        body {
+            font-family: "Lato", sans-serif;
+            background-image: url('/images/white.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+        }
+    </style>
 </head>
 <body>
     <div style="display: flex; gap: 10px;">
@@ -16,8 +26,19 @@
         <a class="nav-link btn btn-dark" asp-area="" asp-controller="TLIPWarehouse" asp-action="ScheduleIssued">Issued</a>
     </div>
 
+    <!-- Legend -->
+    <div id="legend" style="margin-top: 20px;">
+        <ul style="list-style: none; padding: 0; display: flex; gap: 20px;">
+            <li><span style="display: inline-block; width: 20px; height: 20px; background-color: #C7B44F; margin-right: 10px;"></span><i>Đang xử lý (hoặc có hàng về kho trong)</i></li>
+            <li><span style="display: inline-block; width: 20px; height: 20px; background-color: green; margin-right: 10px;"></span><i>Đã hoàn thành lên rack</i></li>
+            <li><span style="display: inline-block; width: 20px; height: 20px; background-color: red; margin-right: 10px;"></span><i>Bị lỗi</i></li>
+        </ul>
+    </div>
+    
+
+
     <!-- Title with Real-time Clock -->
-    <i> <h1 class="center-align"><span id="currentTime"></span></h1> </i>
+    <h1 class="center-align" style="font-style: italic;"><span id="currentTime"></span></h1>
 
     <!-- Calendar -->
     <div id='calendar'></div>
@@ -31,93 +52,100 @@
     <!-- Modal -->
     <div id="modalsContainer"></div>
 
-    @section Scripts {
+   @section Scripts {
+        @* <script src="~/dist/js/calendarReceiveTLIP.bundle.js"></script> *@
         <script src="~/js/tlip/calendarReceiveTLIP.js"></script>
-           <script>
-    $(document).ready(function () {
-        // Fetch actual received data
-        $.getJSON('@Url.Action("GetActualReceived", "TLIPWarehouse")', function (data) {
-            var modalsContainer = $('#modalsContainer');
-            data.forEach(function (actualReceived) {
-                var modalId = 'eventModal-' + actualReceived.ActualReceivedId;
-                var modalHtml = `
-                    <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true" data-actual="">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="eventModalLabel">Chi tiết chuyến hàng</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p id="eventDetails-${actualReceived.ActualReceivedId}"></p>
-                                    <h5 class="modal-title" id="completionPercentage-${actualReceived.ActualReceivedId}"></h5>
-                                    <table id="stagesTable-${actualReceived.ActualReceivedId}" class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Mã sản phẩm</th>
-                                                <th>Số lượng</th>
-                                                <th>Trạng thái</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="stagesTableBody-${actualReceived.ActualReceivedId}">
-                                            <!-- Giai đoạn sẽ được hiển thị ở đây -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                             
-                            </div>
-                        </div>
-                    </div>`;
-                modalsContainer.append(modalHtml);
+  
+        <script>
+            $(document).ready(function () {
+                // Fetch actual received data
+                $.getJSON('@Url.Action("GetActualReceived", "TLIPWarehouse")', function (data) {
+                    console.log("Actual Received Data:", data); // Log the data
+                    var modalsContainer = $('#modalsContainer');
+                    data.forEach(function (actualReceived) {
+                        var modalId = 'eventModal-' + actualReceived.ActualReceivedId;
+                        var progressBarId = 'progressBar-' + actualReceived.ActualReceivedId;
+                        var modalHtml = `
+                                            <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true" data-actual="">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="eventModalLabel"><strong>Chi tiết chuyến hàng</strong></h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p id="eventDetails-${actualReceived.ActualReceivedId}"></p>
+                                                            <h5 class="modal-title" id="completionPercentage-${actualReceived.ActualReceivedId}"></h5>
+                                                            <div class="progress">
+                                                                <div id="${progressBarId}" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+                                                            </div>
+                                                            <table id="stagesTable-${actualReceived.ActualReceivedId}" class="table table-bordered">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Mã sản phẩm</th>
+                                                                        <th>Số lượng</th>
+                                                                        <th>Trạng thái</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody id="stagesTableBody-${actualReceived.ActualReceivedId}">
+                                                                    <!-- Giai đoạn sẽ được hiển thị ở đây -->
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>`;
+                        modalsContainer.append(modalHtml);
+                    });
+                });
+
+                // Fetch current plan details with dates
+                $.getJSON('@Url.Action("GetCurrentPlanDetailsWithDates", "TLIPWarehouse")', function (data) {
+                    console.log("Plan Details Data:", data); // Log the data
+                    var modalsContainer = $('#modalsContainer');
+                    data.forEach(function (planDetail) {
+                        var modalId = 'planModal-' + planDetail.PlanDetailId;
+
+                        // Calculate end time
+                        var deliveryTimeParts = planDetail.DeliveryTime.split(':');
+                        var leadTimeParts = planDetail.LeadTime.split(':');
+                        var start = new Date(planDetail.SpecificDate);
+                        start.setHours(parseInt(deliveryTimeParts[0], 10));
+                        start.setMinutes(parseInt(deliveryTimeParts[1], 10));
+                        start.setSeconds(parseInt(deliveryTimeParts[2], 10));
+
+                        var end = new Date(start);
+                        end.setHours(end.getHours() + parseInt(leadTimeParts[0], 10));
+                        end.setMinutes(end.getMinutes() + parseInt(leadTimeParts[1], 10));
+                        end.setSeconds(end.getSeconds() + parseInt(leadTimeParts[2], 10));
+
+                        var formattedStart = start.toLocaleTimeString();
+                        var formattedEnd = end.toLocaleTimeString();
+
+                        var modalHtml = `
+                                            <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="planModalLabel" aria-hidden="true" data-plan="">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="planModalLabel">Chi tiết kế hoạch</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p id="planDetails-${planDetail.PlanDetailId}"><strong>Nhà cung cấp:</strong> ${planDetail.SupplierName}<br><strong>Nhận lúc: </strong>${formattedStart}<br><strong>Kết thúc lúc: </strong>${formattedEnd}</p>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-warning" id="delayButton-${planDetail.PlanDetailId}">Delay</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>`;
+                        modalsContainer.append(modalHtml);
+                    });
+                });
             });
-        });
-
-        // Fetch current plan details with dates
-        $.getJSON('@Url.Action("GetCurrentPlanDetailsWithDates", "TLIPWarehouse")', function (data) {
-            var modalsContainer = $('#modalsContainer');
-            data.forEach(function (planDetail) {
-                var modalId = 'planModal-' + planDetail.PlanDetailId;
-
-                // Calculate end time
-                var deliveryTimeParts = planDetail.DeliveryTime.split(':');
-                var leadTimeParts = planDetail.LeadTime.split(':');
-                var start = new Date(planDetail.SpecificDate);
-                start.setHours(parseInt(deliveryTimeParts[0], 10));
-                start.setMinutes(parseInt(deliveryTimeParts[1], 10));
-                start.setSeconds(parseInt(deliveryTimeParts[2], 10));
-
-                var end = new Date(start);
-                end.setHours(end.getHours() + parseInt(leadTimeParts[0], 10));
-                end.setMinutes(end.getMinutes() + parseInt(leadTimeParts[1], 10));
-                end.setSeconds(end.getSeconds() + parseInt(leadTimeParts[2], 10));
-
-                var formattedStart = start.toLocaleTimeString();
-                var formattedEnd = end.toLocaleTimeString();
-
-                var modalHtml = `
-                    <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="planModalLabel" aria-hidden="true" data-plan="">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="planModalLabel">Chi tiết kế hoạch</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                        <p id="planDetails-${planDetail.PlanDetailId}"><strong>Nhà cung cấp:</strong> ${planDetail.SupplierName}<br><strong>Nhận lúc: </strong>${formattedStart}<br><strong>Kết thúc lúc: </strong>${formattedEnd}</p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-warning" id="delayButton-${planDetail.PlanDetailId}">Delay</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
-                modalsContainer.append(modalHtml);
-            });
-        });
-    });
-</script>
-
+        </script>
 
     }
+
 </body>
 </html>

@@ -41,6 +41,9 @@ public partial class Actualreceivedtlip
     [InverseProperty("ActualReceived")]
     public virtual ICollection<Actualdetailtlip> Actualdetailtlips { get; set; } = new List<Actualdetailtlip>();
 
+    [InverseProperty("ActualReceived")]
+    public virtual ICollection<Historyplanreceivedtlip> Historyplanreceivedtlips { get; set; } = new List<Historyplanreceivedtlip>();
+
     [ForeignKey("SupplierCode")]
     [InverseProperty("Actualreceivedtlips")]
     public virtual Supplier SupplierCodeNavigation { get; set; } = null!;

@@ -13,6 +13,7 @@
         public int? WeekOfMonth { get; set; }
         public int? OccurrencesPerMonth { get; set; }
         public DateTime SpecificDate { get; set; }
+        public DateOnly HistoryDate { get; set; }
 
     }
 }
