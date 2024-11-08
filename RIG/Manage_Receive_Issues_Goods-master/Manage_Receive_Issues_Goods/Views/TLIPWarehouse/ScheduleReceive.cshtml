@@ -7,35 +7,102 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="~/css/custom.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
+     <link href= 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css'> 
+    <script src= 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js'></script> 
+    <script src= 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script> 
     <style>
-        body {
-            font-family: "Lato", sans-serif;
-            background-image: url('/images/white.jpg');
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            background-position: center;
+
+        /*   body {
+                font-family: "Lato", sans-serif;
+                background-image: url('/images/white.jpg');
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                background-position: center;
+            } */
+
+        .marquee {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
         }
+
+        .marquee-content {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+            position: absolute;
+            top: 245px;
+            right: 0;
+        }
+
+            .marquee-content > div {
+                display: inline-block;
+                margin-right: 20px;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+        .supplier-block {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: inline-block;
+            word-wrap: break-word;
+            white-space: nowrap;
+        }
+
     </style>
+
+
 </head>
 <body>
     <div style="display: flex; gap: 10px;">
         <a class="nav-link btn btn-dark" asp-area="" asp-controller="TLIPWarehouse" asp-action="ScheduleReceive">Received</a>
         <a class="nav-link btn btn-dark" asp-area="" asp-controller="TLIPWarehouse" asp-action="ScheduleIssued">Issued</a>
     </div>
+    @*  <div></div><br>
+    <div></div><br>
+    <div></div> *@
+    <!-- Suppliers List -->
+    <div id="suppliersList">
+        <h3><strong><i>Suppliers for Today</i></strong></h3>
+
+        <div class="marquee">
+            <div class="marquee-content" id="suppliersListContent"></div>
+        </div>
+    </div>
+
+    <!-- Suppliers List -->
+    @*   <div id="suppliersList">
+    <h3><strong><i>Suppliers for Today</i></strong></h3>
+    <ul id="suppliersListContent"></ul>
+    </div> *@
+    <div></div>
+    <br>
+    <div></div>
+    <br>
+    <div></div>
+    <br>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+
 
     <!-- Legend -->
     <div id="legend" style="margin-top: 20px;">
         <ul style="list-style: none; padding: 0; display: flex; gap: 20px;">
-            <li><span style="display: inline-block; width: 20px; height: 20px; background-color: #C7B44F; margin-right: 10px;"></span><i>Đang xử lý (hoặc có hàng về kho trong)</i></li>
+            <li><span style="display: inline-block; width: 20px; height: 20px; background-color: #C7B44F; margin-right: 10px;"></span><i>Đang xử lý (hoặc có hàng về kho trong vì hàng này ko quản lý bằng PalletMark)</i></li>
             <li><span style="display: inline-block; width: 20px; height: 20px; background-color: green; margin-right: 10px;"></span><i>Đã hoàn thành lên rack</i></li>
-            <li><span style="display: inline-block; width: 20px; height: 20px; background-color: red; margin-right: 10px;"></span><i>Bị lỗi</i></li>
+            <li><span style="display: inline-block; width: 20px; height: 20px; background-color: red; margin-right: 10px;"></span><i>Bị lỗi(Hiện tại trong trường hợp trùng Invoice)</i></li>
         </ul>
     </div>
-    
-
 
     <!-- Title with Real-time Clock -->
     <h1 class="center-align" style="font-style: italic;"><span id="currentTime"></span></h1>
@@ -43,109 +110,186 @@
     <!-- Calendar -->
     <div id='calendar'></div>
 
-    <!-- Suppliers List -->
-    <div id="suppliersList">
-        <h3>Suppliers for Today</h3>
-        <ul id="suppliersListContent"></ul>
-    </div>
-
     <!-- Modal -->
     <div id="modalsContainer"></div>
 
-   @section Scripts {
-        @* <script src="~/dist/js/calendarReceiveTLIP.bundle.js"></script> *@
+    @section Scripts {
         <script src="~/js/tlip/calendarReceiveTLIP.js"></script>
-  
+      
         <script>
-            $(document).ready(function () {
-                // Fetch actual received data
-                $.getJSON('@Url.Action("GetActualReceived", "TLIPWarehouse")', function (data) {
-                    console.log("Actual Received Data:", data); // Log the data
-                    var modalsContainer = $('#modalsContainer');
-                    data.forEach(function (actualReceived) {
-                        var modalId = 'eventModal-' + actualReceived.ActualReceivedId;
-                        var progressBarId = 'progressBar-' + actualReceived.ActualReceivedId;
-                        var modalHtml = `
-                                            <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true" data-actual="">
-                                                <div class="modal-dialog">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title" id="eventModalLabel"><strong>Chi tiết chuyến hàng</strong></h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <p id="eventDetails-${actualReceived.ActualReceivedId}"></p>
-                                                            <h5 class="modal-title" id="completionPercentage-${actualReceived.ActualReceivedId}"></h5>
-                                                            <div class="progress">
-                                                                <div id="${progressBarId}" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
-                                                            </div>
-                                                            <table id="stagesTable-${actualReceived.ActualReceivedId}" class="table table-bordered">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Mã sản phẩm</th>
-                                                                        <th>Số lượng</th>
-                                                                        <th>Trạng thái</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody id="stagesTableBody-${actualReceived.ActualReceivedId}">
-                                                                    <!-- Giai đoạn sẽ được hiển thị ở đây -->
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>`;
-                        modalsContainer.append(modalHtml);
-                    });
+            function showActualModalInResource(supplierCode) {
+                $.getJSON('@Url.Action("GetActualReceivedBySupplier", "TLIPWarehouse")', { supplierCode: supplierCode }, function (response) {
+                    var data = response.data;
+                    // Xóa modal cũ nếu tồn tại
+                    var existingModal = document.getElementById('actualModal');
+                    if (existingModal) {
+                        existingModal.remove();
+                    }
+
+                    if (data && data.length > 0) {
+                        var tableRows = data.map(actual => `
+                            <tr>
+                                <td>${actual.AsnNumber}</td>
+                                <td>${actual.DoNumber}</td>
+                                <td>${actual.Invoice}</td>
+                                <td>${new Date(actual.ActualDeliveryTime).toLocaleString('vi-VN', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    second: '2-digit'
+                                })}</td>
+                            </tr>
+                        `).join('');
+
+                        var modalContent = `
+                        <div class="modal fade" id="actualModal" tabindex="-1" aria-labelledby="actualModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="actualModalLabel">Chi tiết thực tế của ${supplierCode}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>ASN Number</th>
+                                                    <th>DO Number</th>
+                                                    <th>Invoice</th>
+                                                    <th>Nhận lúc</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${tableRows}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                        document.body.insertAdjacentHTML('beforeend', modalContent);
+                        $('#actualModal').modal('show');
+                    } else {
+                        console.error('No data received for supplier:', supplierCode);
+                          var modalContent = `
+                        <div class="modal fade" id="actualModal" tabindex="-1" aria-labelledby="actualModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="actualModalLabel">Chi tiết thực tế của ${supplierCode}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>ASN Number</th>
+                                                    <th>DO Number</th>
+                                                    <th>Invoice</th>
+                                                    <th>Nhận lúc</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                        document.body.insertAdjacentHTML('beforeend', modalContent);
+                        $('#actualModal').modal('show');
+                    }
+                }).fail(function (error) {
+                    console.error('Error fetching actual received data:', error);
                 });
+            }
 
-                // Fetch current plan details with dates
-                $.getJSON('@Url.Action("GetCurrentPlanDetailsWithDates", "TLIPWarehouse")', function (data) {
-                    console.log("Plan Details Data:", data); // Log the data
-                    var modalsContainer = $('#modalsContainer');
-                    data.forEach(function (planDetail) {
-                        var modalId = 'planModal-' + planDetail.PlanDetailId;
+                        function showPlanDetailModalInResource(supplierCode) {
+                $.getJSON('@Url.Action("GetPlanDetailsBySupplierCode", "TLIPWarehouse")', { supplierCode: supplierCode }, function (response) {
+                    console.log("Plan detail: ", response);
+                    var data = response; // Assuming the response is the data array directly
+                    // Remove old modal if it exists
+                    var existingModal = document.getElementById('planDetailModal');
+                    if (existingModal) {
+                        existingModal.remove();
+                    }
 
-                        // Calculate end time
-                        var deliveryTimeParts = planDetail.DeliveryTime.split(':');
-                        var leadTimeParts = planDetail.LeadTime.split(':');
-                        var start = new Date(planDetail.SpecificDate);
-                        start.setHours(parseInt(deliveryTimeParts[0], 10));
-                        start.setMinutes(parseInt(deliveryTimeParts[1], 10));
-                        start.setSeconds(parseInt(deliveryTimeParts[2], 10));
+                    if (data && data.length > 0) {
+                        var tableRows = data.map((plandetail, index) => `
+                            <tr>
+                                <td>Chuyến ${index + 1}</td>
+                                 <td>${plandetail.DeliveryTime}</td>
+                            </tr>
+                        `).join('');
 
-                        var end = new Date(start);
-                        end.setHours(end.getHours() + parseInt(leadTimeParts[0], 10));
-                        end.setMinutes(end.getMinutes() + parseInt(leadTimeParts[1], 10));
-                        end.setSeconds(end.getSeconds() + parseInt(leadTimeParts[2], 10));
-
-                        var formattedStart = start.toLocaleTimeString();
-                        var formattedEnd = end.toLocaleTimeString();
-
-                        var modalHtml = `
-                                            <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="planModalLabel" aria-hidden="true" data-plan="">
-                                                <div class="modal-dialog">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title" id="planModalLabel">Chi tiết kế hoạch</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <p id="planDetails-${planDetail.PlanDetailId}"><strong>Nhà cung cấp:</strong> ${planDetail.SupplierName}<br><strong>Nhận lúc: </strong>${formattedStart}<br><strong>Kết thúc lúc: </strong>${formattedEnd}</p>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-warning" id="delayButton-${planDetail.PlanDetailId}">Delay</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>`;
-                        modalsContainer.append(modalHtml);
-                    });
+                        var modalContent = `
+                        <div class="modal fade" id="planDetailModal" tabindex="-1" aria-labelledby="planDetailModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="planDetailModalLabel">Chi tiết kế hoạch của ${supplierCode}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Chuyến</th>
+                                                    <th>Delivery Time</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${tableRows}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                        document.body.insertAdjacentHTML('beforeend', modalContent);
+                        $('#planDetailModal').modal('show');
+                    } else {
+                        console.error('No data received for supplier:', supplierCode);
+                        var modalContent = `
+                        <div class="modal fade" id="planDetailModal" tabindex="-1" aria-labelledby="planDetailModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="planDetailModalLabel">Chi tiết kế hoạch của ${supplierCode}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Chuyến</th>
+                                                    <th>Delivery Time</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                        document.body.insertAdjacentHTML('beforeend', modalContent);
+                        $('#planDetailModal').modal('show');
+                    }
+                }).fail(function (error) {
+                    console.error('Error fetching plan details:', error);
                 });
-            });
+            }
+
+
+
         </script>
 
-    }
 
+
+    }
 </body>
 </html>

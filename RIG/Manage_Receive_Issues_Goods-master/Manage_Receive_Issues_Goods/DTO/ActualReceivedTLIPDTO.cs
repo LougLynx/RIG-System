@@ -11,6 +11,7 @@
         public string? Invoice { get; set; }
         public string SupplierName { get; set; }
         public double CompletionPercentage { get; set; }
+        public double OnRackCompletionPercentage { get; set; }
         public bool IsCompleted { get; set; }
         public List<ActualDetailTLIPDTO> ActualDetails { get; set; }
     }

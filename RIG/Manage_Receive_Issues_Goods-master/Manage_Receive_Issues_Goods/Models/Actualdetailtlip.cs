@@ -21,6 +21,8 @@ public partial class Actualdetailtlip
 
     public int? QuantityRemain { get; set; }
 
+    public int? QuantityScan { get; set; }
+
     [Column("ActualReceivedID")]
     public int ActualReceivedId { get; set; }
 

@@ -8,5 +8,6 @@
         public string Invoice { get; set; }
         public int Quantity { get; set; }
         public int QuantityRemain { get; set; }
+        public int QuantityScan { get; set; }
     }
 }

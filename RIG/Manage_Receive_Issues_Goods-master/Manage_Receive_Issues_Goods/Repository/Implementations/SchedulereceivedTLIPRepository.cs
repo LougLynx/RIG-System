@@ -56,6 +56,40 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
             return Enumerable.Empty<Plandetailreceivedtlip>();
         }
 
+        public async Task<IEnumerable<Plandetailreceivedtlip>> GetAllCurrentPlanDetailsBySupplierCodeAsync(string supplierCode)
+        {
+            // Lấy ra danh sách tất cả các kế hoạch
+            var plans = await _context.Planreceivetlips
+                .OrderBy(p => p.EffectiveDate)
+                .ToListAsync();
+
+            if (!plans.Any())
+            {
+                return Enumerable.Empty<Plandetailreceivedtlip>();
+            }
+
+            var today = DateOnly.FromDateTime(DateTime.Now);
+
+            // Tìm kế hoạch gần nhất
+            var closestPlan = plans
+                .Where(p => p.EffectiveDate <= today)
+                .OrderByDescending(p => p.EffectiveDate)
+                .FirstOrDefault();
+
+            if (closestPlan != null)
+            {
+                // Trả về danh sách các chi tiết kế hoạch của kế hoạch gần nhất
+                return await _context.Plandetailreceivedtlips
+                    .AsNoTracking()
+                    .Include(s => s.SupplierCodeNavigation)
+                    .Include(s => s.Weekday)
+                    .Where(pd => pd.PlanId == closestPlan.PlanId && pd.SupplierCode == supplierCode)
+                    .ToListAsync();
+            }
+
+            return Enumerable.Empty<Plandetailreceivedtlip>();
+        }
+
         public async Task<IEnumerable<Actualreceivedtlip>> GetAllActualReceivedAsync()
         {
             return await _context.Actualreceivedtlips
@@ -126,12 +160,35 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
             return suppliers;
         }
 
+        public async Task<int> GetSupplierTripCountAsync(string supplierCode, int weekdayId)
+        {
+            return await _context.Plandetailreceivedtlips
+                .Where(p => p.SupplierCode == supplierCode && p.WeekdayId == weekdayId)
+                .CountAsync();
+        }
+        public async Task<IEnumerable<TripCountTLIPDTO>> GeActualTripCountForTodayAsync()
+        {
+            var today = DateTime.Today;
+            var suppliersWithTripCount = await _context.Actualreceivedtlips
+                .Where(a => a.ActualDeliveryTime.Date == today)
+                .GroupBy(a => new { a.SupplierCode, a.SupplierCodeNavigation.SupplierName })
+                .Select(g => new TripCountTLIPDTO
+                {
+                    SupplierCode = g.Key.SupplierCode,
+                    SupplierName = g.Key.SupplierName,
+                    ActualDeliveryTime = g.Max(a => a.ActualDeliveryTime),
+                    TripCount = g.Count()
+                })
+                .ToListAsync();
+
+            return suppliersWithTripCount;
+        }
 
 
         public async Task<IEnumerable<AsnInformation>> GetAsnInformationAsync(DateTime inputDate)
         {
             var response = await _httpClient.GetAsync($"{_baseApiUrl}GetAsnInformation?inputDate={inputDate:yyyy-MM-dd}");
-            response.EnsureSuccessStatusCode();
+            // response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             var jsonDocument = JsonDocument.Parse(content);
             var dataObjects = jsonDocument.RootElement.GetProperty("data").GetProperty("result");
@@ -177,7 +234,7 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
             }
 
             var response = await _httpClient.GetAsync($"{_baseApiUrl}GetDetailDataByAsn?{queryParam}");
-            response.EnsureSuccessStatusCode();
+            // response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             var jsonDocument = JsonDocument.Parse(content);
             var dataObjects = jsonDocument.RootElement.GetProperty("data").GetProperty("result");
@@ -190,7 +247,8 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
                     DoNumber = r.GetProperty("doNumber").GetString(),
                     Invoice = r.GetProperty("invoice").GetString(),
                     Quantity = r.GetProperty("quantiy").GetInt32(),
-                    QuantityRemain = r.GetProperty("quantityRemain").GetInt32()
+                    QuantityRemain = r.GetProperty("quantityRemain").GetInt32(),
+                    QuantityScan = r.GetProperty("quantityScan").GetInt32()
                 }).ToList();
             }
             return new List<AsnDetailData>();
@@ -203,14 +261,22 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
             Console.WriteLine("Add actual successfully in REPOSITORY!");
         }
 
-        public async Task UpdateActualDetailTLIPAsync(string partNo, int actualReceivedId, int quantityRemain)
+        public async Task UpdateActualDetailTLIPAsync(string partNo, int actualReceivedId, int? quantityRemain, int? quantityScan)
         {
             var actualDetail = await _context.Actualdetailtlips
                 .FirstOrDefaultAsync(ad => ad.PartNo == partNo && ad.ActualReceivedId == actualReceivedId);
 
             if (actualDetail != null)
             {
-                actualDetail.QuantityRemain = quantityRemain;
+                if (quantityRemain != null)
+                {
+                    actualDetail.QuantityRemain = quantityRemain;
+                   
+                }
+                if (quantityScan != null)
+                {
+                    actualDetail.QuantityScan = quantityScan;
+                }
                 await _context.SaveChangesAsync();
             }
         }
@@ -300,9 +366,18 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
         {
             return await _context.Historyplanreceivedtlips
                 .Include(h => h.PlanDetail)
-                    .ThenInclude(pd => pd.SupplierCodeNavigation) 
+                    .ThenInclude(pd => pd.SupplierCodeNavigation)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Actualreceivedtlip>> GetActualReceivedBySupplierForTodayAsync(string supplierCode)
+        {
+            var today = DateTime.Today;
+            return await _context.Actualreceivedtlips
+                .Where(ar => ar.SupplierCode == supplierCode && ar.ActualDeliveryTime.Date == today)
+                .ToListAsync();
+        }
+
 
     }
 }

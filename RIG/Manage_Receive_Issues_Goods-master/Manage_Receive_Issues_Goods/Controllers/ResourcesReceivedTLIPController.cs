@@ -38,15 +38,18 @@ namespace Manage_Receive_Issues_Goods.Controllers
                 resources.Add(new
                 {
                     id = $"{supplier.SupplierCode}_Plan",
-                    title = $"Plan - {supplier.SupplierName}",
-                    eventColor = "#1E2B37"
+                    title = $"Plan  {supplier.SupplierName}",
+                    eventColor = "#1E2B37",
+                    supplierCode = supplier.SupplierCode
                 });
 
                 resources.Add(new
                 {
                     id = $"{supplier.SupplierCode}_Actual",
-                    title = $"Actual - {supplier.SupplierName}",
-                    eventColor = "#C7B44F"
+                    title = $"Actual  {supplier.SupplierName}",
+                    eventColor = "#C7B44F",
+                    supplierCode = supplier.SupplierCode
+
                 });
             }
 

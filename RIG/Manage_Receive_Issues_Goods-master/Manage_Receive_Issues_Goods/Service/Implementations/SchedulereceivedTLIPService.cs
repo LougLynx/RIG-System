@@ -39,11 +39,40 @@ namespace Manage_Receive_Issues_Goods.Services
             var suppliers = await _repository.GetSuppliersForTodayAsync(weekdayId);
             return suppliers;
         }
+        public async Task<IEnumerable<TripCountTLIPDTO>> GeActualTripCountForTodayAsync()
+        {
+            return await _repository.GeActualTripCountForTodayAsync(); ;
+        }
+
+        public async Task<IEnumerable<(Supplier Supplier, int TripCount)>> GetSuppliersWithTripCountForTodayAsync()
+        {
+            int currentWeekday = (int)DateTime.Now.DayOfWeek;
+            if (currentWeekday == 0) currentWeekday = 7;
+
+            var suppliers = await _repository.GetSuppliersForTodayAsync(currentWeekday);
+            var supplierTripCounts = new List<(Supplier Supplier, int TripCount)>();
+
+            foreach (var supplier in suppliers)
+            {
+                var tripCount = await _repository.GetSupplierTripCountAsync(supplier.SupplierCode, currentWeekday);
+                supplierTripCounts.Add((supplier, tripCount));
+            }
+
+            return supplierTripCounts;
+        }
+
+        public async Task<int> GetSupplierTripCountAsync(string supplierCode, int weekdayId)
+        {
+            return await _repository.GetSupplierTripCountAsync(supplierCode, weekdayId);
+        }
         public async Task<IEnumerable<Plandetailreceivedtlip>> GetAllCurrentPlanDetailsAsync()
         {
             return await _repository.GetAllCurrentPlanDetailsAsync();
         }
-
+        public async Task<IEnumerable<Plandetailreceivedtlip>> GetAllCurrentPlanDetailsBySupplierCodeAsync(string supplierCode)
+        {
+            return await _repository.GetAllCurrentPlanDetailsBySupplierCodeAsync(supplierCode);
+        }
         // Hàm tính toán ngày giao hàng cụ thể cho một lịch trình nhận hàng
         public DateTime GetDateForWeekday(int year, int weekOfYear, int weekdayId)
         {
@@ -131,9 +160,9 @@ namespace Manage_Receive_Issues_Goods.Services
         {
             await _repository.AddActualReceivedAsync(actualReceived);
         }
-        public async Task UpdateActualDetailTLIPAsync(string partNo, int actualReceivedId, int quantityRemain)
+        public async Task UpdateActualDetailTLIPAsync(string partNo, int actualReceivedId, int? quantityRemain, int? quantityScan)
         {
-            await _repository.UpdateActualDetailTLIPAsync(partNo, actualReceivedId, quantityRemain);
+            await _repository.UpdateActualDetailTLIPAsync(partNo, actualReceivedId, quantityRemain, quantityScan);
         }
         public async Task<IEnumerable<Actualdetailtlip>> GetActualDetailsByReceivedIdAsync(int actualReceivedId)
         {
@@ -223,6 +252,11 @@ namespace Manage_Receive_Issues_Goods.Services
         public async Task<IEnumerable<Historyplanreceivedtlip>> GetPlanActualDetailsInHistoryAsync()
         {
             return await _repository.GetPlanActualDetailsInHistoryAsync();
+        }
+
+        public async Task<IEnumerable<Actualreceivedtlip>> GetActualReceivedBySupplierForTodayAsync(string supplierCode)
+        {
+            return await _repository.GetActualReceivedBySupplierForTodayAsync(supplierCode);
         }
     }
 }

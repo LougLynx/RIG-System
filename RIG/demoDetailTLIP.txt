@@ -4,71 +4,34 @@
   "data": {
     "result": [
       {
-        "partNo": "VN079617-1990",
-        "asnNumber": "S4Y05K1M02E15",
-        "doNumber": "41105030",
+        "partNo": "VN012031-0140",
+        "asnNumber": "M4Y05K1M01E26",
+        "doNumber": "41108009",
         "invoice": null,
-        "quantiy": 4480,
-        "quantityRemain": 4480
+        "quantiy": 20736,
+        "quantityRemain": 20736,
+        "quantityScan": 0
       },
       {
-        "partNo": "VN079617-2030",
-        "asnNumber": "S4Y05K1M02E15",
-        "doNumber": "41105030",
+        "partNo": "VN012031-0040",
+        "asnNumber": "M4Y05K1M01E26",
+        "doNumber": "41108009",
         "invoice": null,
-        "quantiy": 840,
-        "quantityRemain": 840
+        "quantiy": 12000,
+        "quantityRemain": 12000,
+        "quantityScan": 0
       },
       {
-        "partNo": "VN079617-2250",
-        "asnNumber": "S4Y05K1M02E15",
-        "doNumber": "41105030",
+        "partNo": "VN012031-0130",
+        "asnNumber": "M4Y05K1M01E26",
+        "doNumber": "41108009",
         "invoice": null,
-        "quantiy": 1680,
-        "quantityRemain": 1680
-      },
-      {
-        "partNo": "VN079617-2300",
-        "asnNumber": "S4Y05K1M02E15",
-        "doNumber": "41105030",
-        "invoice": null,
-        "quantiy": 840,
-        "quantityRemain": 840
-      },
-      {
-        "partNo": "VN079630-0590",
-        "asnNumber": "S4Y05K1M02E15",
-        "doNumber": "41105030",
-        "invoice": null,
-        "quantiy": 960,
-        "quantityRemain": 960
-      },
-      {
-        "partNo": "VN079630-0610",
-        "asnNumber": "S4Y05K1M02E15",
-        "doNumber": "41105030",
-        "invoice": null,
-        "quantiy": 960,
-        "quantityRemain": 960
-      },
-      {
-        "partNo": "VN229717-0760",
-        "asnNumber": "S4Y05K1M02E15",
-        "doNumber": "41105030",
-        "invoice": null,
-        "quantiy": 4480,
-        "quantityRemain": 4480
-      },
-      {
-        "partNo": "VN229717-0830",
-        "asnNumber": "S4Y05K1M02E15",
-        "doNumber": "41105030",
-        "invoice": null,
-        "quantiy": 6720,
-        "quantityRemain": 6720
+        "quantiy": 11520,
+        "quantityRemain": 11520,
+        "quantityScan": 0
       }
     ],
-    "id": 153223,
+    "id": 22303,
     "exception": null,
     "status": 5,
     "isCanceled": false,

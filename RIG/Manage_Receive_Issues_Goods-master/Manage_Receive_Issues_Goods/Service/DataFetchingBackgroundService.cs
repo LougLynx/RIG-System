@@ -20,7 +20,7 @@ public class DataFetchingBackgroundService : BackgroundService
     private readonly ILogger<DataFetchingBackgroundService> _logger;
     private readonly IHubContext<UpdateReceiveTLIPHub> _hubContext;
     private List<AsnInformation> previousData = new List<AsnInformation>();
-    private DateTime _lastRunDate = DateTime.MinValue;
+    private DateOnly _lastRunDate = DateOnly.MinValue;
 
     public DataFetchingBackgroundService(IServiceProvider serviceProvider, ILogger<DataFetchingBackgroundService> logger, IHubContext<UpdateReceiveTLIPHub> hubContext)
     {
@@ -40,12 +40,15 @@ public class DataFetchingBackgroundService : BackgroundService
                     var service = scope.ServiceProvider.GetRequiredService<ISchedulereceivedTLIPService>();
 
                     _logger.LogInformation("ExecuteAsync called at {Time}", DateTime.Now.ToString("T"));
-                    _logger.LogInformation("_lastRunDate is {_lastRunDate.Date}", _lastRunDate.Date);
+                    _logger.LogInformation("_lastRunDate is {_lastRunDate.Date}", _lastRunDate);
 
-                    if (DateTime.Now.Date > _lastRunDate.Date)
+                    var currentDate = DateOnly.FromDateTime(DateTime.UtcNow);
+
+                    if (_lastRunDate != currentDate)
                     {
+                        _lastRunDate = currentDate;
+
                         await service.AddAllPlanDetailsToHistoryAsync();
-                        _lastRunDate = DateTime.Now;
                     }
                     // Gọi hàm FetchData
                     await FetchData(service);
@@ -61,11 +64,14 @@ public class DataFetchingBackgroundService : BackgroundService
                         {
                             if (!actualReceivedDTO.IsCompleted && actualReceivedDTO.CompletionPercentage < 100)
                             {
+                                await _hubContext.Clients.All.SendAsync("UpdateLeadtime", actualReceivedDTO);
                                 var formattedEnd = DateTime.Now;
                                 actualReceivedDTO.ActualDeliveryTime = formattedEnd;
 
-                                var actualReceived = MapToEntity(actualReceivedDTO);
+                                var actualReceived = MapToActualReceivedEntity(actualReceivedDTO);
                                 await UpdateActualLeadTime(actualReceived, service);
+                               
+
                             }
                         }
                     }
@@ -83,7 +89,7 @@ public class DataFetchingBackgroundService : BackgroundService
 
 
 
-    private Actualreceivedtlip MapToEntity(ActualReceivedTLIPDTO dto)
+    private Actualreceivedtlip MapToActualReceivedEntity(ActualReceivedTLIPDTO dto)
     {
         return new Actualreceivedtlip
         {
@@ -104,7 +110,7 @@ public class DataFetchingBackgroundService : BackgroundService
     }
 
 
-    private ActualReceivedTLIPDTO MapToDTO(Actualreceivedtlip actualReceived)
+    private ActualReceivedTLIPDTO MapToActualReceivedDTO(Actualreceivedtlip actualReceived)
     {
         return new ActualReceivedTLIPDTO
         {
@@ -117,6 +123,7 @@ public class DataFetchingBackgroundService : BackgroundService
             Invoice = actualReceived.Invoice,
             SupplierName = actualReceived.SupplierCodeNavigation.SupplierName,
             CompletionPercentage = CalculateCompletionPercentage(actualReceived),
+            OnRackCompletionPercentage = CalculateOnRackCompletionPercentage(actualReceived),
             IsCompleted = actualReceived.IsCompleted,
             ActualDetails = actualReceived.Actualdetailtlips.Select(detail => new ActualDetailTLIPDTO
             {
@@ -124,7 +131,8 @@ public class DataFetchingBackgroundService : BackgroundService
                 ActualReceivedId = detail.ActualReceivedId,
                 PartNo = detail.PartNo,
                 Quantity = detail.Quantity ?? 0,
-                QuantityRemain = detail.QuantityRemain ?? 0
+                QuantityRemain = detail.QuantityRemain ?? 0,
+                QuantityScan = detail.QuantityScan ?? 0
             }).ToList()
         };
     }
@@ -134,13 +142,10 @@ public class DataFetchingBackgroundService : BackgroundService
         _logger.LogInformation("FetchData called at {Time}", DateTime.Now.ToString("T"));
         //Lấy dữ liệu từ API
 
-        var now = DateTime.Now;
-        var nextData = await service.GetAsnInformationAsync(now);
+        //var now = DateTime.Now;
+        //var nextData = await service.GetAsnInformationAsync(now);
 
-        //var nextData = await ParseAsnInformationFromFileAsync();
-
-
-        //_logger.LogInformation($"Next Data: {JsonSerializer.Serialize(nextData)}");
+        var nextData = await ParseAsnInformationFromFileAsync();
 
         foreach (var nextItem in nextData)
         {
@@ -164,7 +169,6 @@ public class DataFetchingBackgroundService : BackgroundService
                 //Nếu dữ liệu chưa tồn tại thì thêm vào database
                 if (previousItem != null && !previousItem.ReceiveStatus && nextItem.ReceiveStatus)
                 {
-                    Console.WriteLine("Change status first!");
 
                     var actualReceived = new Actualreceivedtlip
                     {
@@ -177,12 +181,9 @@ public class DataFetchingBackgroundService : BackgroundService
                     };
 
                     await service.AddActualReceivedAsync(actualReceived);
-                    //Console.WriteLine("Add actual successfully in BackgroundService!");
-                    //_logger.LogInformation($"SupplierCode: {actualReceived.SupplierCode}, ActualDeliveryTime: {actualReceived.ActualDeliveryTime}, AsnNumber: {actualReceived.AsnNumber}, DoNumber: {actualReceived.DoNumber}, Invoice: {actualReceived.Invoice}");
-
+                    
                     //Phải parse vì ActualDeliveryTime đang ở dạng MM/dd/yyyy HH:mm:ss
                     var formattedDateTime = actualReceived.ActualDeliveryTime.ToString("yyyy-MM-dd HH:mm:ss");
-                    //_logger.LogInformation($"Formatted ActualDeliveryTime: {formattedDateTime}");
 
                     var actualReceivedEntry = await service.GetActualReceivedEntryAsync(
                                                             actualReceived.SupplierCode,
@@ -190,8 +191,7 @@ public class DataFetchingBackgroundService : BackgroundService
                                                             actualReceived.AsnNumber,
                                                             actualReceived.DoNumber,
                                                             actualReceived.Invoice);
-                    var actualReceivedDTO = MapToDTO(actualReceivedEntry);
-                    //_logger.LogInformation($"ActualReceivedEntry: {JsonSerializer.Serialize(actualReceivedDTO)}");
+                    var actualReceivedDTO = MapToActualReceivedDTO(actualReceivedEntry);
 
                     if (actualReceivedEntry != null)
                     {
@@ -212,7 +212,8 @@ public class DataFetchingBackgroundService : BackgroundService
                                     ActualReceivedId = actualReceivedEntry.ActualReceivedId,
                                     PartNo = asnDetail.PartNo,
                                     Quantity = asnDetail.Quantity,
-                                    QuantityRemain = asnDetail.QuantityRemain
+                                    QuantityRemain = asnDetail.QuantityRemain,
+                                    QuantityScan = asnDetail.QuantityScan
                                 };
 
                                 await service.AddActualDetailAsync(actualDetail);
@@ -348,7 +349,8 @@ public class DataFetchingBackgroundService : BackgroundService
                         DoNumber = element.GetProperty("doNumber").GetString(),
                         Invoice = element.GetProperty("invoice").GetString(),
                         Quantity = element.GetProperty("quantiy").GetInt32(),
-                        QuantityRemain = element.GetProperty("quantityRemain").GetInt32()
+                        QuantityRemain = element.GetProperty("quantityRemain").GetInt32(),
+                        QuantityScan = element.GetProperty("quantityScan").GetInt32()
                     });
                 }
             }
@@ -358,27 +360,29 @@ public class DataFetchingBackgroundService : BackgroundService
     }
 
 
-
-
     private async Task FetchDataDetail(ISchedulereceivedTLIPService service)
     {
         var actualReceivedList = await GetIncompleteActualReceived(service);
         foreach (var actualReceived in actualReceivedList)
         {
-            var asnDetails = await service.GetAsnDetailAsync(
-            //var asnDetails = await ParseAsnDetailFromFile(
+            //var asnDetails = await service.GetAsnDetailAsync(
+            var asnDetails = await ParseAsnDetailFromFile(
             actualReceived.AsnNumber ?? string.Empty,
             actualReceived.DoNumber ?? string.Empty,
             actualReceived.Invoice ?? string.Empty
         );
-            //_logger.LogInformation($"ASN Details: {JsonSerializer.Serialize(asnDetails)}");
             if (asnDetails != null && asnDetails.Any())
             {
                 foreach (var asnDetail in asnDetails)
                 {
                     if (asnDetail.QuantityRemain == 0)
                     {
-                        await service.UpdateActualDetailTLIPAsync(asnDetail.PartNo, actualReceived.ActualReceivedId, 0);
+                        await service.UpdateActualDetailTLIPAsync(asnDetail.PartNo, actualReceived.ActualReceivedId, 0, null);
+                    }
+
+                    if (asnDetail.QuantityScan != 0)
+                    {
+                        await service.UpdateActualDetailTLIPAsync(asnDetail.PartNo, actualReceived.ActualReceivedId, null, asnDetail.QuantityScan);
                     }
                 }
             }
@@ -404,9 +408,11 @@ public class DataFetchingBackgroundService : BackgroundService
                 PartNo = detail.PartNo,
                 Quantity = detail.Quantity ?? 0,
                 QuantityRemain = detail.QuantityRemain ?? 0,
+                QuantityScan = detail.QuantityScan ?? 0,
                 ActualReceivedId = detail.ActualReceivedId
             }).ToList(),
-            CompletionPercentage = CalculateCompletionPercentage(ar)
+            CompletionPercentage = CalculateCompletionPercentage(ar),
+            OnRackCompletionPercentage = CalculateOnRackCompletionPercentage(ar)
         }).FirstOrDefault();
 
         if (actualReceivedDTO == null)
@@ -417,7 +423,7 @@ public class DataFetchingBackgroundService : BackgroundService
 
         //_logger.LogInformation("ActualReceivedDTO: {ActualReceivedDTO}", JsonSerializer.Serialize(actualReceivedDTO));
 
-        await _hubContext.Clients.All.SendAsync("UpdateCalendar", actualReceivedDTO);
+        await _hubContext.Clients.All.SendAsync("UpdateCalendar", actualReceivedDTO); 
     }
 
 
@@ -425,7 +431,7 @@ public class DataFetchingBackgroundService : BackgroundService
     {
         var actualReceivedList = await service.GetAllActualReceivedAsync();
         var incompleteActualReceivedDTOList = actualReceivedList
-            .Where(actualReceived => CalculateCompletionPercentage(actualReceived) < 100)
+            .Where(actualReceived => CalculateOnRackCompletionPercentage(actualReceived) < 100)
             .Select(ar => new ActualReceivedTLIPDTO
             {
                 ActualReceivedId = ar.ActualReceivedId,
@@ -443,9 +449,11 @@ public class DataFetchingBackgroundService : BackgroundService
                     PartNo = detail.PartNo,
                     Quantity = detail.Quantity ?? 0,
                     QuantityRemain = detail.QuantityRemain ?? 0,
+                    QuantityScan = detail.QuantityScan ?? 0,
                     ActualReceivedId = detail.ActualReceivedId
                 }).ToList(),
-                CompletionPercentage = CalculateCompletionPercentage(ar)
+                CompletionPercentage = CalculateCompletionPercentage(ar),
+                OnRackCompletionPercentage = CalculateOnRackCompletionPercentage(ar)
             }).ToList();
 
         return incompleteActualReceivedDTOList;
@@ -455,6 +463,15 @@ public class DataFetchingBackgroundService : BackgroundService
     {
         var totalItems = actualReceived.Actualdetailtlips.Count;
         var completedItems = actualReceived.Actualdetailtlips.Count(detail => detail.QuantityRemain == 0);
+
+        if (totalItems == 0) return 0;
+        return (completedItems / (double)totalItems) * 100;
+    }
+
+    private double CalculateOnRackCompletionPercentage(Actualreceivedtlip actualReceived)
+    {
+        var totalItems = actualReceived.Actualdetailtlips.Count;
+        var completedItems = actualReceived.Actualdetailtlips.Count(detail => detail.QuantityScan != 0);
 
         if (totalItems == 0) return 0;
         return (completedItems / (double)totalItems) * 100;

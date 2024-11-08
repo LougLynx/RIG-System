@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Manage_Receive_Issues_Goods.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class TLIPWarehouseController : Controller
     {
         private readonly ISchedulereceivedTLIPService _schedulereceivedService;
@@ -52,10 +52,36 @@ namespace Manage_Receive_Issues_Goods.Controllers
         public async Task<JsonResult> GetSuppliersForToday()
         {
             var suppliers = await _schedulereceivedService.GetSuppliersForTodayAsync();
-            var supplierList = suppliers.Select(s => new { supplierName = s.SupplierName }).ToList();
+            var supplierList = suppliers.Select(s => new
+            {
+                supplierCode = s.SupplierCode,
+                supplierName = s.SupplierName
+            }).ToList();
             return Json(supplierList);
         }
 
+
+        [HttpGet]
+        public async Task<JsonResult> GetPlanTripCountForToday()
+        {
+            var suppliersWithTripCount = await _schedulereceivedService.GetSuppliersWithTripCountForTodayAsync();
+            var result = suppliersWithTripCount.Select(s => new TripCountTLIPDTO
+            {
+                SupplierCode = s.Supplier.SupplierCode,
+                SupplierName = s.Supplier.SupplierName,
+                TripCount = s.TripCount
+            }).ToList();
+
+            return Json(result);
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GeActualTripCountForToday()
+        {
+            var suppliersWithTripCount = await _schedulereceivedService.GeActualTripCountForTodayAsync();
+
+            return Json(suppliersWithTripCount);
+        }
 
         [HttpGet]
         public async Task<JsonResult> GetCurrentPlanDetailsWithDates()
@@ -85,6 +111,39 @@ namespace Manage_Receive_Issues_Goods.Controllers
 
             return Json(planDetailsWithDates);
         }
+
+        [HttpGet]
+        public async Task<JsonResult> GetPlanDetailsBySupplierCode(string supplierCode)
+        {
+            var today = DateTime.Today;
+            var planDetails = await _schedulereceivedService.GetAllCurrentPlanDetailsBySupplierCodeAsync(supplierCode);
+            var planDetailsWithDates = new List<PlanDetailTLIPDTO>();
+
+            if (planDetails != null && planDetails.Any())
+            {
+                planDetailsWithDates = planDetails
+                    .Where(planDetail => _schedulereceivedService.GetDateForWeekday(planDetail.WeekdayId).Date == today)
+                    .Select(planDetail =>
+                    {
+                        var specificDate = _schedulereceivedService.GetDateForWeekday(planDetail.WeekdayId);
+
+                        return new PlanDetailTLIPDTO
+                        {
+                            PlanDetailId = planDetail.PlanDetailId,
+                            SupplierCode = planDetail.SupplierCode,
+                            SupplierName = planDetail.SupplierCodeNavigation?.SupplierName,
+                            LeadTime = planDetail.LeadTime,
+                            DeliveryTime = planDetail.DeliveryTime,
+                            PlanId = planDetail.PlanId,
+                            WeekdayId = planDetail.WeekdayId,
+                            SpecificDate = specificDate
+                        };
+                    }).ToList();
+            }
+
+            return Json(planDetailsWithDates);
+        }
+
 
 
         [HttpGet]
@@ -157,6 +216,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
                         PartNo = detail.PartNo,
                         Quantity = detail.Quantity ?? 0,
                         QuantityRemain = detail.QuantityRemain ?? 0,
+                        QuantityScan = detail.QuantityScan ?? 0,
                         ActualReceivedId = detail.ActualReceivedId
                     }).ToList(),
                     CompletionPercentage = CalculateCompletionPercentage(ar)
@@ -192,6 +252,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
                             PartNo = detail.PartNo,
                             Quantity = detail.Quantity ?? 0,
                             QuantityRemain = detail.QuantityRemain ?? 0,
+                            QuantityScan = detail.QuantityScan ?? 0,
                             ActualReceivedId = detail.ActualReceivedId
                         }).ToList(),
                         CompletionPercentage = CalculateCompletionPercentage(ar)
@@ -228,6 +289,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
                     PartNo = detail.PartNo,
                     Quantity = detail.Quantity ?? 0,
                     QuantityRemain = detail.QuantityRemain ?? 0,
+                    QuantityScan = detail.QuantityScan ?? 0,
                     ActualReceivedId = detail.ActualReceivedId
                 }).ToList(),
                 CompletionPercentage = CalculateCompletionPercentage(ar)
@@ -271,6 +333,41 @@ namespace Manage_Receive_Issues_Goods.Controllers
             await _context.SaveChangesAsync();
 
             return Ok();
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetActualReceivedBySupplier(string supplierCode)
+        {
+            if (string.IsNullOrEmpty(supplierCode))
+            {
+                return Json(new { success = false, message = "Supplier code is required." });
+            }
+
+            try
+            {
+                var actualReceivedList = await _schedulereceivedService.GetActualReceivedBySupplierForTodayAsync(supplierCode);
+                var result = actualReceivedList.Select(ar => new ActualReceivedTLIPDTO
+                {
+                    ActualReceivedId = ar.ActualReceivedId,
+                    ActualDeliveryTime = ar.ActualDeliveryTime,
+                    ActualLeadTime = ar.ActualLeadTime,
+                    SupplierCode = ar.SupplierCode,
+                    AsnNumber = ar.AsnNumber,
+                    DoNumber = ar.DoNumber,
+                    Invoice = ar.Invoice,
+                    SupplierName = ar.SupplierCodeNavigation?.SupplierName,
+                    CompletionPercentage = CalculateCompletionPercentage(ar),
+                    IsCompleted = ar.IsCompleted
+                    
+                });
+
+                return Json(new { success = true, data = result });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching actual received data for supplier {SupplierCode}", supplierCode);
+                return Json(new { success = false, message = "An error occurred while fetching data." });
+            }
         }
 
 
