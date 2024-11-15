@@ -1,0 +1,4 @@
+API:
+    + Các chỉ thị được upload trên FIFO (hay còn gọi là phần Plan)
+    + Chi tiết của chỉ thị đó 
+    + Tín hiệu đã tạo CML

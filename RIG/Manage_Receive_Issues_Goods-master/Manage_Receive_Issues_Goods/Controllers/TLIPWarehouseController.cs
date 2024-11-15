@@ -23,7 +23,6 @@ namespace Manage_Receive_Issues_Goods.Controllers
         private readonly IHubContext<UpdateReceiveTLIPHub> _hubContext;
         private readonly ILogger<TLIPWarehouseController> _logger;
         private readonly RigContext _context;
-        private List<AsnInformation> previousData = new List<AsnInformation>();
         public TLIPWarehouseController(
             ISchedulereceivedTLIPService schedulereceivedService,
             IHubContext<UpdateReceiveTLIPHub> hubContext,
@@ -44,9 +43,31 @@ namespace Manage_Receive_Issues_Goods.Controllers
         public IActionResult ScheduleIssued()
         {
             return View();
+
         }
 
+        public async Task<IActionResult> SupplierList()
+        {
+            var suppliers = await _schedulereceivedService.GetAllSuppliersAsync();
+            return View(suppliers);
+        }
 
+        public async Task<IActionResult> PlanList()
+        {
+            var allSupplier = await _schedulereceivedService.GetAllSuppliersAsync();
+            var planDetails = await _schedulereceivedService.GetAllCurrentPlanDetailsAsync();
+            var planDetailsDTO = new List<PlanDetailTLIPDTO>();
+
+            if (planDetails != null && planDetails.Any())
+            {
+                planDetailsDTO = planDetails.Select(planDetail =>
+                {
+                    return _schedulereceivedService.MapToPlanDetailTLIPDTO(planDetail); ;
+                }).ToList();
+            }
+            ViewData["AllSuppliers"] = allSupplier;
+            return View(planDetailsDTO);
+        }
 
         [HttpGet]
         public async Task<JsonResult> GetSuppliersForToday()
@@ -94,23 +115,15 @@ namespace Manage_Receive_Issues_Goods.Controllers
                 planDetailsWithDates = planDetails.Select(planDetail =>
                 {
                     var specificDate = _schedulereceivedService.GetDateForWeekday(planDetail.WeekdayId);
-
-                    return new PlanDetailTLIPDTO
-                    {
-                        PlanDetailId = planDetail.PlanDetailId,
-                        SupplierCode = planDetail.SupplierCode,
-                        SupplierName = planDetail.SupplierCodeNavigation?.SupplierName,
-                        LeadTime = planDetail.LeadTime,
-                        DeliveryTime = planDetail.DeliveryTime,
-                        PlanId = planDetail.PlanId,
-                        WeekdayId = planDetail.WeekdayId,
-                        SpecificDate = specificDate
-                    };
+                    var dto = _schedulereceivedService.MapToPlanDetailTLIPDTO(planDetail);
+                    dto.SpecificDate = specificDate;
+                    return dto;
                 }).ToList();
             }
 
             return Json(planDetailsWithDates);
         }
+
 
         [HttpGet]
         public async Task<JsonResult> GetPlanDetailsBySupplierCode(string supplierCode)
@@ -127,24 +140,14 @@ namespace Manage_Receive_Issues_Goods.Controllers
                     {
                         var specificDate = _schedulereceivedService.GetDateForWeekday(planDetail.WeekdayId);
 
-                        return new PlanDetailTLIPDTO
-                        {
-                            PlanDetailId = planDetail.PlanDetailId,
-                            SupplierCode = planDetail.SupplierCode,
-                            SupplierName = planDetail.SupplierCodeNavigation?.SupplierName,
-                            LeadTime = planDetail.LeadTime,
-                            DeliveryTime = planDetail.DeliveryTime,
-                            PlanId = planDetail.PlanId,
-                            WeekdayId = planDetail.WeekdayId,
-                            SpecificDate = specificDate
-                        };
+                        var dto = _schedulereceivedService.MapToPlanDetailTLIPDTO(planDetail);
+                        dto.SpecificDate = specificDate;
+                        return dto;
                     }).ToList();
             }
 
             return Json(planDetailsWithDates);
         }
-
-
 
         [HttpGet]
         public async Task<JsonResult> GetPlanActualDetailsInHistory()
@@ -157,7 +160,6 @@ namespace Manage_Receive_Issues_Goods.Controllers
                 result = details.Select(d =>
                 {
                     var planDetail = d.PlanDetail;
-                    var supplierCodeNavigation = planDetail?.SupplierCodeNavigation;
 
                     var deliveryTime = planDetail?.DeliveryTime ?? default(TimeOnly);
                     var historyDate = d.HistoryDate.HasValue ? d.HistoryDate.Value : default(DateOnly);
@@ -168,26 +170,16 @@ namespace Manage_Receive_Issues_Goods.Controllers
                         specificDate = historyDate.ToDateTime(deliveryTime);
                     }
 
-                    return new PlanDetailTLIPDTO
-                    {
-                        PlanDetailId = planDetail?.PlanDetailId ?? 0,
-                        PlanId = planDetail?.PlanId ?? 0,
-                        SupplierCode = planDetail?.SupplierCode,
-                        SupplierName = supplierCodeNavigation?.SupplierName,
-                        DeliveryTime = deliveryTime,
-                        WeekdayId = planDetail?.WeekdayId ?? 0,
-                        LeadTime = planDetail?.LeadTime ?? default(TimeOnly),
-                        PlanType = planDetail?.PlanType,
-                        WeekOfMonth = planDetail?.WeekOfMonth ?? 0,
-                        HistoryDate = historyDate,
-                        SpecificDate = specificDate ?? default(DateTime)
-                    };
+                    var dto = _schedulereceivedService.MapToPlanDetailTLIPDTO(planDetail);
+                    dto.HistoryDate = historyDate;
+                    dto.SpecificDate = specificDate ?? default(DateTime);
+
+                    return dto;
                 }).ToList();
             }
 
             return Json(result);
         }
-
 
 
 
@@ -199,114 +191,13 @@ namespace Manage_Receive_Issues_Goods.Controllers
 
             if (actualReceivedList != null && actualReceivedList.Any())
             {
-                actualReceivedDTOList = actualReceivedList.Select(ar => new ActualReceivedTLIPDTO
+                actualReceivedDTOList = actualReceivedList.Select(ar =>
                 {
-                    ActualReceivedId = ar.ActualReceivedId,
-                    ActualDeliveryTime = ar.ActualDeliveryTime,
-                    ActualLeadTime = ar.ActualLeadTime,
-                    SupplierCode = ar.SupplierCode,
-                    SupplierName = ar.SupplierCodeNavigation?.SupplierName,
-                    AsnNumber = ar.AsnNumber,
-                    DoNumber = ar.DoNumber,
-                    Invoice = ar.Invoice,
-                    IsCompleted = ar.IsCompleted,
-                    ActualDetails = ar.Actualdetailtlips.Select(detail => new ActualDetailTLIPDTO
-                    {
-                        ActualDetailId = detail.ActualDetailId,
-                        PartNo = detail.PartNo,
-                        Quantity = detail.Quantity ?? 0,
-                        QuantityRemain = detail.QuantityRemain ?? 0,
-                        QuantityScan = detail.QuantityScan ?? 0,
-                        ActualReceivedId = detail.ActualReceivedId
-                    }).ToList(),
-                    CompletionPercentage = CalculateCompletionPercentage(ar)
+                    return _schedulereceivedService.MapToActualReceivedTLIPDTO(ar);
                 }).ToList();
             }
-
             return Json(actualReceivedDTOList);
         }
-
-
-        [HttpGet]
-        public async Task<IActionResult> GetIncompleteActualReceived()
-        {
-            try
-            {
-                var actualReceivedList = await _schedulereceivedService.GetAllActualReceivedAsync();
-                var incompleteActualReceivedDTOList = actualReceivedList
-                    .Where(actualReceived => CalculateCompletionPercentage(actualReceived) < 100)
-                    .Select(ar => new ActualReceivedTLIPDTO
-                    {
-                        ActualReceivedId = ar.ActualReceivedId,
-                        ActualDeliveryTime = ar.ActualDeliveryTime,
-                        ActualLeadTime = ar.ActualLeadTime,
-                        SupplierCode = ar.SupplierCode,
-                        SupplierName = ar.SupplierCodeNavigation?.SupplierName,
-                        AsnNumber = ar.AsnNumber,
-                        DoNumber = ar.DoNumber,
-                        Invoice = ar.Invoice,
-                        IsCompleted = ar.IsCompleted,
-                        ActualDetails = ar.Actualdetailtlips.Select(detail => new ActualDetailTLIPDTO
-                        {
-                            ActualDetailId = detail.ActualDetailId,
-                            PartNo = detail.PartNo,
-                            Quantity = detail.Quantity ?? 0,
-                            QuantityRemain = detail.QuantityRemain ?? 0,
-                            QuantityScan = detail.QuantityScan ?? 0,
-                            ActualReceivedId = detail.ActualReceivedId
-                        }).ToList(),
-                        CompletionPercentage = CalculateCompletionPercentage(ar)
-                    }).ToList();
-
-                return Ok(incompleteActualReceivedDTOList);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error fetching incomplete actual received data");
-                return StatusCode(500, "Internal server error");
-            }
-        }
-
-
-        [HttpGet]
-        public async Task<JsonResult> GetAllActualReceivedLast7Days()
-        {
-            var actualReceivedList = await _schedulereceivedService.GetAllActualReceivedLast7DaysAsync();
-            var actualReceivedDTOList = actualReceivedList.Select(ar => new ActualReceivedTLIPDTO
-            {
-                ActualReceivedId = ar.ActualReceivedId,
-                ActualDeliveryTime = ar.ActualDeliveryTime,
-                ActualLeadTime = ar.ActualLeadTime,
-                SupplierCode = ar.SupplierCode,
-                SupplierName = ar.SupplierCodeNavigation?.SupplierName,
-                AsnNumber = ar.AsnNumber,
-                DoNumber = ar.DoNumber,
-                Invoice = ar.Invoice,
-                IsCompleted = ar.IsCompleted,
-                ActualDetails = ar.Actualdetailtlips.Select(detail => new ActualDetailTLIPDTO
-                {
-                    ActualDetailId = detail.ActualDetailId,
-                    PartNo = detail.PartNo,
-                    Quantity = detail.Quantity ?? 0,
-                    QuantityRemain = detail.QuantityRemain ?? 0,
-                    QuantityScan = detail.QuantityScan ?? 0,
-                    ActualReceivedId = detail.ActualReceivedId
-                }).ToList(),
-                CompletionPercentage = CalculateCompletionPercentage(ar)
-            }).ToList();
-
-            return Json(actualReceivedDTOList);
-        }
-
-        private double CalculateCompletionPercentage(Actualreceivedtlip actualReceived)
-        {
-            var totalItems = actualReceived.Actualdetailtlips.Count;
-            var completedItems = actualReceived.Actualdetailtlips.Count(detail => detail.QuantityRemain == 0);
-
-            if (totalItems == 0) return 0;
-            return (completedItems / (double)totalItems) * 100;
-        }
-
 
         [HttpGet]
         public async Task<IActionResult> GetActualDetailsByReceivedId(int actualReceivedId)
@@ -314,7 +205,6 @@ namespace Manage_Receive_Issues_Goods.Controllers
             var actualDetails = await _schedulereceivedService.GetActualDetailsByReceivedIdAsync(actualReceivedId);
             return Json(actualDetails);
         }
-
 
         [HttpPost]
         public async Task<IActionResult> UpdateActualDetailsQuantityRemain(int actualReceivedId, int quantityRemain)
@@ -346,19 +236,10 @@ namespace Manage_Receive_Issues_Goods.Controllers
             try
             {
                 var actualReceivedList = await _schedulereceivedService.GetActualReceivedBySupplierForTodayAsync(supplierCode);
-                var result = actualReceivedList.Select(ar => new ActualReceivedTLIPDTO
+                var result = actualReceivedList.Select(ar => 
                 {
-                    ActualReceivedId = ar.ActualReceivedId,
-                    ActualDeliveryTime = ar.ActualDeliveryTime,
-                    ActualLeadTime = ar.ActualLeadTime,
-                    SupplierCode = ar.SupplierCode,
-                    AsnNumber = ar.AsnNumber,
-                    DoNumber = ar.DoNumber,
-                    Invoice = ar.Invoice,
-                    SupplierName = ar.SupplierCodeNavigation?.SupplierName,
-                    CompletionPercentage = CalculateCompletionPercentage(ar),
-                    IsCompleted = ar.IsCompleted
-                    
+                    return _schedulereceivedService.MapToActualReceivedTLIPDTO(ar);
+
                 });
 
                 return Json(new { success = true, data = result });
@@ -371,5 +252,12 @@ namespace Manage_Receive_Issues_Goods.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<JsonResult> GetTagNameRule()
+        {
+            var tagnameRule = await _schedulereceivedService.GetAllTagNameRuleAsync();
+
+            return Json(tagnameRule);
+        }
     }
 }

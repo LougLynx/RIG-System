@@ -18,7 +18,6 @@ namespace Manage_Receive_Issues_Goods.Controllers
             _schedulereceivedService = schedulereceivedService;
         }
 
-        // GET: api/Resources
         [HttpGet]
         public async Task<IActionResult> GetResources([FromQuery] int? weekdayId)
         {
@@ -31,22 +30,38 @@ namespace Manage_Receive_Issues_Goods.Controllers
 
             var suppliers = await _schedulereceivedService.GetSuppliersByWeekdayAsync(effectiveWeekdayId);
 
+
             //Console.WriteLine($"Weekday {effectiveWeekdayId}: {suppliers.Count()} suppliers found.");
 
             foreach (var supplier in suppliers)
             {
-                resources.Add(new
+                var tagNameRules = await _schedulereceivedService.GetAllTagNameRuleAsync();
+                string tagName = supplier.SupplierCode;
+                bool isTagNameAssigned = false;
+
+                foreach (var rule in tagNameRules)
                 {
-                    id = $"{supplier.SupplierCode}_Plan",
-                    title = $"Plan  {supplier.SupplierName}",
+                    if (rule.SupplierCode == supplier.SupplierCode)
+                    {
+                        tagName = rule.TagName;
+                        isTagNameAssigned = true;
+                        break;
+                    }
+                }
+                string title = isTagNameAssigned ? tagName : supplier.SupplierName;
+                resources.Add(new
+
+                {
+                    id = $"{tagName}_Plan",
+                    title = $"Plan  {title}",
                     eventColor = "#1E2B37",
                     supplierCode = supplier.SupplierCode
                 });
 
                 resources.Add(new
                 {
-                    id = $"{supplier.SupplierCode}_Actual",
-                    title = $"Actual  {supplier.SupplierName}",
+                    id = $"{tagName}_Actual",
+                    title = $"Actual  {title}",
                     eventColor = "#C7B44F",
                     supplierCode = supplier.SupplierCode
 

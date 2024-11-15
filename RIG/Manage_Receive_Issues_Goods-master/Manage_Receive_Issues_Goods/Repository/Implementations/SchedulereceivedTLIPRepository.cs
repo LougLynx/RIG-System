@@ -253,6 +253,31 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
             }
             return new List<AsnDetailData>();
         }
+        public async Task<IEnumerable<Actualreceivedtlip>> GetAsnDetailInDataBaseAsync(string asnNumber, string doNumber, string invoice)
+        {
+            var query = _context.Actualreceivedtlips
+                                .Include(ar => ar.SupplierCodeNavigation)
+                                .Include(ar => ar.Actualdetailtlips)
+                                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(asnNumber))
+            {
+                query = query.Where(ar => ar.AsnNumber == asnNumber);
+            }
+
+            if (!string.IsNullOrEmpty(doNumber))
+            {
+                query = query.Where(ar => ar.DoNumber == doNumber);
+            }
+
+            if (!string.IsNullOrEmpty(invoice))
+            {
+                query = query.Where(ar => ar.Invoice == invoice);
+            }
+
+            return await query.ToListAsync();
+        }
+
 
         public async Task AddActualReceivedAsync(Actualreceivedtlip actualReceived)
         {
@@ -378,6 +403,14 @@ namespace Manage_Receive_Issues_Goods.Repositories.Implementations
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Supplier>> GetAllSuppliersAsync()
+        {
+            return await _context.Suppliers.ToListAsync();
+        }
 
+        public async Task<IEnumerable<Tagnamereceivetlip>> GetAllTagNameRuleAsync()
+        {
+            return await _context.Tagnamereceivetlips.ToListAsync();
+        }
     }
 }

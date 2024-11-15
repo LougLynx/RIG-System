@@ -4,34 +4,70 @@
   "data": {
     "result": [
       {
-        "partNo": "VN012031-0140",
-        "asnNumber": "M4Y05K1M01E26",
-        "doNumber": "41108009",
+        "partNo": "VN270133-0010",
+        "asnNumber": "O4Y15K1M05A01",
+        "doNumber": "41115089",
         "invoice": null,
-        "quantiy": 20736,
-        "quantityRemain": 20736,
+        "quantiy": 400,
+        "quantityRemain": 400,
         "quantityScan": 0
       },
       {
-        "partNo": "VN012031-0040",
-        "asnNumber": "M4Y05K1M01E26",
-        "doNumber": "41108009",
+        "partNo": "VN197427-0090",
+        "asnNumber": "O4Y15K1M05A01",
+        "doNumber": "41115089",
         "invoice": null,
-        "quantiy": 12000,
-        "quantityRemain": 12000,
+        "quantiy": 450,
+        "quantityRemain": 450,
         "quantityScan": 0
       },
       {
-        "partNo": "VN012031-0130",
-        "asnNumber": "M4Y05K1M01E26",
-        "doNumber": "41108009",
+        "partNo": "VN012075-0040",
+        "asnNumber": "M4Y15K1M03A02",
+        "doNumber": "41115090",
         "invoice": null,
-        "quantiy": 11520,
-        "quantityRemain": 11520,
+        "quantiy": 4000,
+        "quantityRemain": 4000,
+        "quantityScan": 0
+      },
+      {
+        "partNo": "VN082042-0070",
+        "asnNumber": "M4Y15K1M03A02",
+        "doNumber": "41115090",
+        "invoice": null,
+        "quantiy": 8000,
+        "quantityRemain": 8000,
+        "quantityScan": 0
+      },
+      {
+        "partNo": "VN012020-0390",
+        "asnNumber": "M4Y15K1M03A02",
+        "doNumber": "41115090",
+        "invoice": null,
+        "quantiy": 896,
+        "quantityRemain": 896,
+        "quantityScan": 0
+      },
+      {
+        "partNo": "VN082019-0011",
+        "asnNumber": "H4Y13K1M02A03",
+        "doNumber": "41115049",
+        "invoice": null,
+        "quantiy": 1344,
+        "quantityRemain": 1344,
+        "quantityScan": 0
+      },
+      {
+        "partNo": "VN082017-0023",
+        "asnNumber": "H4Y13K1M02A03",
+        "doNumber": "41115049",
+        "invoice": null,
+        "quantiy": 1512,
+        "quantityRemain": 1512,
         "quantityScan": 0
       }
     ],
-    "id": 22303,
+    "id": 57261,
     "exception": null,
     "status": 5,
     "isCanceled": false,

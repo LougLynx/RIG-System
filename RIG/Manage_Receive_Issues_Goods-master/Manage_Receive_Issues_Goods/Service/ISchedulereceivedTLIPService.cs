@@ -33,9 +33,15 @@ namespace Manage_Receive_Issues_Goods.Services
         Task AddAllActualToHistoryAsync(int actualReceivedId);
         Task<IEnumerable<Historyplanreceivedtlip>> GetPlanActualDetailsInHistoryAsync();
         Task<IEnumerable<(Supplier Supplier, int TripCount)>> GetSuppliersWithTripCountForTodayAsync();
-        Task<int> GetSupplierTripCountAsync(string supplierCode, int weekdayId);
         Task<IEnumerable<TripCountTLIPDTO>> GeActualTripCountForTodayAsync();
         Task<IEnumerable<Actualreceivedtlip>> GetActualReceivedBySupplierForTodayAsync(string supplierCode);
         Task<IEnumerable<Plandetailreceivedtlip>> GetAllCurrentPlanDetailsBySupplierCodeAsync(string supplierCode);
+        Task<IEnumerable<Actualreceivedtlip>> GetAsnDetailInDataBaseAsync(string asnNumber, string doNumber, string invoice);
+        Task<IEnumerable<Supplier>> GetAllSuppliersAsync();
+        Task UpdateActualLeadTime(Actualreceivedtlip actualReceived, DateTime leadTimeUpdate);
+        Task<List<Actualreceivedtlip>> GetIncompleteActualReceived();
+        ActualReceivedTLIPDTO MapToActualReceivedTLIPDTO(Actualreceivedtlip entity);
+        PlanDetailTLIPDTO MapToPlanDetailTLIPDTO(Plandetailreceivedtlip entity);
+        Task<IEnumerable<Tagnamereceivetlip>> GetAllTagNameRuleAsync();
     }
 }

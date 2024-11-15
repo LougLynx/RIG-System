@@ -6,6 +6,7 @@
         public int PlanId { get; set; }
         public string SupplierCode { get; set; } = null!;
         public string SupplierName { get; set; } = null!;
+        public string TagName { get; set; } = null!;
         public TimeOnly DeliveryTime { get; set; }
         public int WeekdayId { get; set; }
         public TimeOnly LeadTime { get; set; }

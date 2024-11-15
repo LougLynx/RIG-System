@@ -32,5 +32,8 @@ namespace Manage_Receive_Issues_Goods.Repository
         Task<IEnumerable<TripCountTLIPDTO>> GeActualTripCountForTodayAsync();
         Task<IEnumerable<Actualreceivedtlip>> GetActualReceivedBySupplierForTodayAsync(string supplierCode);
         Task<IEnumerable<Plandetailreceivedtlip>> GetAllCurrentPlanDetailsBySupplierCodeAsync(string supplierCode);
+        Task<IEnumerable<Actualreceivedtlip>> GetAsnDetailInDataBaseAsync(string asnNumber, string doNumber, string invoice);
+        Task<IEnumerable<Supplier>> GetAllSuppliersAsync();
+        Task<IEnumerable<Tagnamereceivetlip>> GetAllTagNameRuleAsync();
     }
 }

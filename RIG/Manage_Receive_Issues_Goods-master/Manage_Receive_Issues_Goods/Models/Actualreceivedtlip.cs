@@ -38,6 +38,9 @@ public partial class Actualreceivedtlip
 
     public bool IsCompleted { get; set; }
 
+    [StringLength(100)]
+    public string? TagName { get; set; }
+
     [InverseProperty("ActualReceived")]
     public virtual ICollection<Actualdetailtlip> Actualdetailtlips { get; set; } = new List<Actualdetailtlip>();
 

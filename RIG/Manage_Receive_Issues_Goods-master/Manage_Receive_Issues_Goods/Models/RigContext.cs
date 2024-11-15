@@ -53,6 +53,8 @@ public partial class RigContext : IdentityDbContext
 
     public virtual DbSet<Supplier> Suppliers { get; set; }
 
+    public virtual DbSet<Tagnamereceivetlip> Tagnamereceivetlips { get; set; }
+
     public virtual DbSet<Weekday> Weekdays { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -229,6 +231,11 @@ public partial class RigContext : IdentityDbContext
         modelBuilder.Entity<Supplier>(entity =>
         {
             entity.HasKey(e => e.SupplierCode).HasName("PRIMARY");
+        });
+
+        modelBuilder.Entity<Tagnamereceivetlip>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
         });
 
         modelBuilder.Entity<Weekday>(entity =>

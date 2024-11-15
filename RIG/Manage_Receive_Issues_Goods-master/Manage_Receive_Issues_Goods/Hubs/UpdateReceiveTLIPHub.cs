@@ -15,11 +15,10 @@ namespace Manage_Receive_Issues_Goods.Hubs
             _context = context;
         }
 
-        /*public async Task UpdateCalendar(Actualreceivedtlip actualReceived)
+        public async Task UpdateCalendar(Actualreceivedtlip actualReceived)
         {
-            _logger.LogInformation("UpdateCalendar called with DATA AHHAHAHAHA: {actualReceived}", actualReceived);
             await Clients.All.SendAsync("UpdateCalendar", actualReceived);
-               
-        }*/
+
+        }
     }
 }

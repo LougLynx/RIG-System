@@ -23,7 +23,6 @@ namespace Manage_Receive_Issues_Goods.Services
         {
             return await _repository.GetAllActualReceivedAsync();
         }
-
         public async Task<IEnumerable<Supplier>> GetSuppliersForTodayAsync()
         {
             // Lấy thứ hiện tại (0 = Sunday, 1 = Monday, ...)
@@ -43,7 +42,6 @@ namespace Manage_Receive_Issues_Goods.Services
         {
             return await _repository.GeActualTripCountForTodayAsync(); ;
         }
-
         public async Task<IEnumerable<(Supplier Supplier, int TripCount)>> GetSuppliersWithTripCountForTodayAsync()
         {
             int currentWeekday = (int)DateTime.Now.DayOfWeek;
@@ -60,11 +58,6 @@ namespace Manage_Receive_Issues_Goods.Services
 
             return supplierTripCounts;
         }
-
-        public async Task<int> GetSupplierTripCountAsync(string supplierCode, int weekdayId)
-        {
-            return await _repository.GetSupplierTripCountAsync(supplierCode, weekdayId);
-        }
         public async Task<IEnumerable<Plandetailreceivedtlip>> GetAllCurrentPlanDetailsAsync()
         {
             return await _repository.GetAllCurrentPlanDetailsAsync();
@@ -73,6 +66,7 @@ namespace Manage_Receive_Issues_Goods.Services
         {
             return await _repository.GetAllCurrentPlanDetailsBySupplierCodeAsync(supplierCode);
         }
+
         // Hàm tính toán ngày giao hàng cụ thể cho một lịch trình nhận hàng
         public DateTime GetDateForWeekday(int year, int weekOfYear, int weekdayId)
         {
@@ -105,7 +99,6 @@ namespace Manage_Receive_Issues_Goods.Services
 
             return targetDate;
         }
-
 
 
         // Hàm tính tuần trong năm
@@ -160,14 +153,17 @@ namespace Manage_Receive_Issues_Goods.Services
         {
             await _repository.AddActualReceivedAsync(actualReceived);
         }
+
         public async Task UpdateActualDetailTLIPAsync(string partNo, int actualReceivedId, int? quantityRemain, int? quantityScan)
         {
             await _repository.UpdateActualDetailTLIPAsync(partNo, actualReceivedId, quantityRemain, quantityScan);
         }
+
         public async Task<IEnumerable<Actualdetailtlip>> GetActualDetailsByReceivedIdAsync(int actualReceivedId)
         {
             return await _repository.GetActualDetailsByReceivedIdAsync(actualReceivedId);
         }
+
         public async Task<Actualreceivedtlip> GetActualReceivedWithSupplierAsync(int actualReceivedId)
         {
             return await _repository.GetActualReceivedWithSupplierAsync(actualReceivedId);
@@ -187,6 +183,7 @@ namespace Manage_Receive_Issues_Goods.Services
         {
             await _repository.UpdateActualReceivedAsync(actualReceived);
         }
+
         public async Task<IEnumerable<Actualreceivedtlip>> GetAllActualReceivedLast7DaysAsync()
         {
             return await _repository.GetAllActualReceivedLast7DaysAsync();
@@ -196,6 +193,7 @@ namespace Manage_Receive_Issues_Goods.Services
         {
             return await _repository.GetAllActualReceivedAsyncById(actualReceivedId);
         }
+
         public async Task<IEnumerable<Actualreceivedtlip>> GetActualReceivedAsyncByInfor(string asnNumber, string doNumber, string invoice)
         {
             return await _repository.GetActualReceivedAsyncByInfor(asnNumber, doNumber, invoice);
@@ -205,11 +203,11 @@ namespace Manage_Receive_Issues_Goods.Services
         {
             await _repository.UpdateActualReceivedCompletionAsync(actualReceivedId, isCompleted);
         }
+
         public async Task<Actualreceivedtlip> GetActualReceivedByDetailsAsync(ActualReceivedTLIPDTO details)
         {
             return await _repository.GetActualReceivedByDetailsAsync(details);
         }
-
 
         public async Task AddAllPlanDetailsToHistoryAsync()
         {
@@ -237,8 +235,6 @@ namespace Manage_Receive_Issues_Goods.Services
             }
         }
 
-
-
         public async Task AddAllActualToHistoryAsync(int actualReceivedId)
         {
             var historyEntry = new Historyplanreceivedtlip
@@ -257,6 +253,118 @@ namespace Manage_Receive_Issues_Goods.Services
         public async Task<IEnumerable<Actualreceivedtlip>> GetActualReceivedBySupplierForTodayAsync(string supplierCode)
         {
             return await _repository.GetActualReceivedBySupplierForTodayAsync(supplierCode);
+        }
+
+        public async Task<IEnumerable<Actualreceivedtlip>> GetAsnDetailInDataBaseAsync(string asnNumber, string doNumber, string invoice)
+        {
+            return await _repository.GetAsnDetailInDataBaseAsync(asnNumber, doNumber, invoice);
+        }
+        public async Task<IEnumerable<Supplier>> GetAllSuppliersAsync()
+        {
+            return await _repository.GetAllSuppliersAsync();
+        }
+        public async Task<IEnumerable<Tagnamereceivetlip>> GetAllTagNameRuleAsync()
+        {
+            return await _repository.GetAllTagNameRuleAsync();
+        }
+
+        public async Task UpdateActualLeadTime(Actualreceivedtlip actualReceived, DateTime leadTimeUpdate)
+        {
+            
+            if (actualReceived == null || actualReceived.ActualReceivedId <= 0)
+            {
+                Console.WriteLine("Invalid ActualReceived entry.");
+                return;
+            }
+
+            try
+            {
+                var existingActualReceived = await GetActualReceivedWithSupplierAsync(actualReceived.ActualReceivedId);
+
+                if (existingActualReceived != null)
+                {
+                    var leadTime = leadTimeUpdate - existingActualReceived.ActualDeliveryTime;
+                    existingActualReceived.ActualLeadTime = TimeOnly.FromTimeSpan(leadTime);
+                    await UpdateActualReceivedAsync(existingActualReceived);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating ActualLeadTime: {ex.Message}");
+            }
+        }
+
+        public async Task<List<Actualreceivedtlip>> GetIncompleteActualReceived()
+        {
+            var actualReceivedList = await GetAllActualReceivedAsync();
+            var incompleteActualReceivedList = actualReceivedList
+                .Where(actualReceived => !actualReceived.IsCompleted)
+                .ToList();
+
+            return incompleteActualReceivedList;
+        }
+
+
+
+
+        public ActualReceivedTLIPDTO MapToActualReceivedTLIPDTO(Actualreceivedtlip entity)
+        {
+            return new ActualReceivedTLIPDTO
+            {
+                ActualReceivedId = entity.ActualReceivedId,
+                ActualDeliveryTime = entity.ActualDeliveryTime,
+                ActualLeadTime = entity.ActualLeadTime,
+                SupplierCode = entity.SupplierCode,
+                SupplierName = entity.SupplierCodeNavigation?.SupplierName,
+                TagName = entity.TagName,
+                AsnNumber = entity.AsnNumber,
+                DoNumber = entity.DoNumber,
+                Invoice = entity.Invoice,
+                IsCompleted = entity.IsCompleted,
+                CompletionPercentage = CalculateCompletionPercentage(entity),
+                OnRackCompletionPercentage = CalculateOnRackCompletionPercentage(entity),
+                ActualDetails = entity.Actualdetailtlips.Select(d => new ActualDetailTLIPDTO
+                {
+                    ActualDetailId = d.ActualDetailId,
+                    PartNo = d.PartNo,
+                    Quantity = d.Quantity ?? 0,
+                    QuantityRemain = d.QuantityRemain ?? 0,
+                    QuantityScan = d.QuantityScan ?? 0,
+                    ActualReceivedId = d.ActualReceivedId
+                }).ToList()
+            };
+        }
+        public PlanDetailTLIPDTO MapToPlanDetailTLIPDTO(Plandetailreceivedtlip entity)
+        {
+            return new PlanDetailTLIPDTO
+            {
+                PlanDetailId = entity?.PlanDetailId ?? 0,
+                PlanId = entity?.PlanId ?? 0,
+                SupplierCode = entity?.SupplierCode,
+                SupplierName = entity?.SupplierCodeNavigation?.SupplierName,
+                TagName = entity?.TagName,
+                DeliveryTime = entity?.DeliveryTime ?? default(TimeOnly),
+                WeekdayId = entity?.WeekdayId ?? 0,
+                LeadTime = entity?.LeadTime ?? default(TimeOnly),
+                PlanType = entity?.PlanType,
+                WeekOfMonth = entity?.WeekOfMonth ?? 0
+            };
+        }
+        private double CalculateOnRackCompletionPercentage(Actualreceivedtlip actualReceived)
+        {
+            var totalItems = actualReceived.Actualdetailtlips.Count;
+            var completedItems = actualReceived.Actualdetailtlips.Count(detail => detail.QuantityScan != 0);
+
+            if (totalItems == 0) return 0;
+            return (completedItems / (double)totalItems) * 100;
+        }
+        private double CalculateCompletionPercentage(Actualreceivedtlip actualReceived)
+        {
+            var totalItems = actualReceived.Actualdetailtlips.Count;
+            var completedItems = actualReceived.Actualdetailtlips.Count(detail => detail.QuantityScan == 0);
+
+            if (totalItems == 0) return 0;
+            return (completedItems / (double)totalItems) * 100;
         }
     }
 }

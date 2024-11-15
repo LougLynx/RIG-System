@@ -10,7 +10,9 @@
         console.error("Failed to connect SignalR: ", err.toString());
     });
 
-
+    /**
+     * Cập nhật sự kiện của lịch
+     */
     notificationConnection.on("UpdateCalendar", function (actualReceived) {
         if (actualReceived && typeof actualReceived === 'object' && !Array.isArray(actualReceived)) {
             console.log("Received update via SignalR:", actualReceived);
@@ -73,6 +75,11 @@
         }
     });
 
+
+
+    /**
+     * Cập nhật sự kiện bị lỗi
+     */
     notificationConnection.on("ErrorReceived", function (actualReceivedId, supplierName, isCompleted) {
         let event = calendar.getEventById(`actual-${actualReceivedId}`);
         if (event) {
@@ -94,14 +101,35 @@
         }
     });
 
+
+
+    /**
+     * Cập nhật thời gian xử lý của sự kiện
+     */
     notificationConnection.on("UpdateLeadtime", function (actualReceived) {
         console.log("Received update leadtime via SignalR:", actualReceived);
         actualReceived = convertToPascalCase(actualReceived);
         console.log("Received update after parse:", actualReceived);
-
         updateCalendarEvent(actualReceived);
     });
 
+
+    /**
+     * Cập nhật màu xanh đối sự kiện đã IsCompleted
+     */
+    notificationConnection.on("UpdateColorDone", function (actualReceivedId) {
+        let event = calendar.getEventById(`actual-${actualReceivedId}`);
+        if (event) {
+            event.setProp('backgroundColor', '#3E7D3E');
+        } else {
+            console.error(`Event with ID actual-${actualReceivedId} not found.`);
+        }
+    });
+
+
+    /**
+     * Parse các thuộc tính của object về dạng PascalCase (viết hoa chữ cái đầu)
+     */
     function convertToPascalCase(obj) {
         if (Array.isArray(obj)) {
             return obj.map(item => convertToPascalCase(item));
@@ -116,6 +144,10 @@
     }
 
 
+
+    /**
+     * Cập nhật các sự kiện actual + plan lại từ db (chủ yếu được gọi để tạo modal)
+     */
     function updateActualReceivedList() {
         getActualReceived().then(function (data) {
             var modalsContainer = $('#modalsContainer');
@@ -124,23 +156,27 @@
             data.forEach(function (actualReceived) {
                 var modalId = 'eventModal-' + actualReceived.ActualReceivedId;
                 var progressBarId = 'progressBar-' + actualReceived.ActualReceivedId;
+                var eventDetailsId = 'eventDetails-' + actualReceived.ActualReceivedId;
+                var completionPercentageId = 'completionPercentage-' + actualReceived.ActualReceivedId;
+                var stagesTableBodyId = 'stagesTableBody-' + actualReceived.ActualReceivedId;
+                var stagesTableId = 'stagesTable-' + actualReceived.ActualReceivedId;
+
                 var modalHtml = `
                         <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true" data-actual="">
                             <div class="modal-dialog modal-lg">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="eventModalLabel"><strong>Chi tiết chuyến hàng</strong></h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <p id="eventDetails-${actualReceived.ActualReceivedId}"></p>
+                                        <p id="${eventDetailsId}"></p>
                                         	<div class="row justify-content-center"> 
-                                        <h5 class="modal-title" id="completionPercentage-${actualReceived.ActualReceivedId}"></h5>
+                                        <h5 class="modal-title" id="${completionPercentageId}"></h5>
                                         <div class="container"> 
                                         <div class="progress">
                                             <div id="${progressBarId}" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
                                         </div>
-                                        <table id="stagesTable-${actualReceived.ActualReceivedId}" class="table table-bordered">
+                                        <table id="${stagesTableId}" class="table table-bordered">
                                             <thead>
                                                 <tr>
                                                     <th>Mã sản phẩm</th>
@@ -149,7 +185,7 @@
                                                     <th>Trạng thái lên rack</th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="stagesTableBody-${actualReceived.ActualReceivedId}">
+                                            <tbody id="${stagesTableBodyId}">
                                                 <!-- Giai đoạn sẽ được hiển thị ở đây -->
                                             </tbody>
                                         </table>
@@ -164,7 +200,6 @@
             // Fetch current plan details with dates
             getPlanDetailReceived().then(function (data) {
                 data.forEach(function (planDetail) {
-                    var modalId = 'planModal-' + planDetail.PlanDetailId;
 
                     // Calculate end time
                     var deliveryTimeParts = planDetail.DeliveryTime.split(':');
@@ -182,16 +217,18 @@
                     var formattedStart = start.toLocaleTimeString();
                     var formattedEnd = end.toLocaleTimeString();
 
+                    var modalId = 'planModal-' + planDetail.PlanDetailId;
+                    var planDetailsId = 'planDetails-' + planDetail.PlanDetailId;
+
                     var modalHtml = `
                 <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="planModalLabel" aria-hidden="true" data-plan="">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="planModalLabel">Chi tiết kế hoạch</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <p id="planDetails-${planDetail.PlanDetailId}"><strong>Nhà cung cấp:</strong> ${planDetail.SupplierName}<br><strong>Nhận lúc: </strong>${formattedStart}<br><strong>Kết thúc lúc: </strong>${formattedEnd}</p>
+                                <p id="${planDetailsId}"><strong>Nhà cung cấp:</strong> ${planDetail.SupplierName}<br><strong>Nhận lúc: </strong>${formattedStart}<br><strong>Kết thúc lúc: </strong>${formattedEnd}</p>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-warning" id="delayButton-${planDetail.PlanDetailId}">Delay</button>
@@ -208,13 +245,10 @@
     }
 
 
-    function formatDateToLocalString(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
 
+    /**
+     * Parse thời gian về dạng YY-MM-DDTHH:mm:ss
+     */
     function formatDateTime(date) {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -225,6 +259,11 @@
         return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
     }
 
+
+
+    /**
+     * Lấy thời gian thực cho indicator (cái dòng cột màu đỏ)
+     */
     function getFormattedNow() {
         var now = new Date();
         var year = now.getFullYear();
@@ -235,8 +274,11 @@
         var seconds = String(now.getSeconds()).padStart(2, '0');
         return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
     }
-    //Lấy thời gian thực cho Indicator
-    var now = getFormattedNow();
+
+
+    /**
+     * Lấy các supplier trong ngày hôm nay
+     */
     function loadSuppliersForToday() {
         fetch('/TLIPWarehouse/GetSuppliersForToday')
             .then(response => {
@@ -285,6 +327,10 @@
             });
     }
 
+
+    /**
+     * Chạy các block supplier theo kiểu marquee
+     */
     function startMarquee() {
         const marqueeContent = document.querySelector('.marquee-content');
         const supplierBlocks = Array.from(document.querySelectorAll('.supplier-block'));
@@ -315,9 +361,14 @@
     }
 
 
-
-
+    /**
+     * Hiển thị modal khi ấn vào block supplier
+     */
     function showSupplierModal(supplierCode) {
+        var existingModal = document.getElementById('supplierModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
         fetch(`/TLIPWarehouse/GetActualReceivedBySupplier?supplierCode=${supplierCode}`)
             .then(response => response.json())
             .then(result => {
@@ -326,13 +377,13 @@
                 }
 
                 var data = result.data;
+                console.log('Actual received data:', data);
                 var modalContent = `
             <div class="modal fade" id="supplierModal" tabindex="-1" aria-labelledby="supplierModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="supplierModalLabel">Chi tiết nhà cung cấp <strong>${supplierCode}</strong></h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <table class="table table-bordered">
@@ -382,11 +433,6 @@
     }
 
 
-
-
-
-
-
     function getActualReceived() {
         return fetch('/TLIPWarehouse/GetActualReceived')
             .then(response => response.json());
@@ -395,53 +441,49 @@
         return fetch('/TLIPWarehouse/GetCurrentPlanDetailsWithDates')
             .then(response => response.json());
     }
-
-    function getAllActualReceivedLast7Days() {
-        return fetch('/TLIPWarehouse/GetAllActualReceivedLast7Days')
-            .then(response => response.json());
-    }
-   /* function getIncompleteActualReceived() {
-        return fetch('/TLIPWarehouse/GetActualReceived')
-            .then(response => response.json())
-            .then(data => {
-                return data.filter(actualReceived => {
-                    const completionPercentage = calculateCompletionPercentage(actualReceived.ActualDetails);
-                    return completionPercentage < 100;
-                });
-            });
-    }*/
     function getPlanDetailReceivedInHistory() {
         return fetch('/TLIPWarehouse/GetPlanActualDetailsInHistory')
             .then(response => response.json());
     }
 
-    function calculateCompletionPercentage(actualDetails) {
-        const completedItems = actualDetails.filter(detail => detail.QuantityRemain === 0).length;
-        const totalItems = actualDetails.length;
-        return (completedItems / totalItems) * 100;
-    }
 
+    /**
+     * Tính phần trăm hoàn thành được cấp lên rack
+     */
     function calculateOnRackCompletionPercentage(actualDetails) {
         const completedItems = actualDetails.filter(detail => detail.QuantityScan != 0).length;
         const totalItems = actualDetails.length;
         return (completedItems / totalItems) * 100;
     }
 
+     function getTagNameRules() {
+        return fetch('/TLIPWarehouse/GetTagNameRule')
+            .then(response => response.json());
+    }
 
+    /**
+     * Khởi tạo sự kiện để hiển thị lên lịch
+     */
     function fetchEvents(fetchInfo, successCallback, failureCallback) {
-        Promise.all([getActualReceived(), getPlanDetailReceived(), getPlanDetailReceivedInHistory()])
-            .then(([actualReceivedData, planDetailData, planDetailHistoryData]) => {
+        Promise.all([getActualReceived(), getPlanDetailReceived(), getPlanDetailReceivedInHistory(), getTagNameRules()])
+            .then(([actualReceivedData, planDetailData, planDetailHistoryData, tagNameRules]) => {
                 const events = [];
 
                 // Process actual received data if not null or empty
                 if (actualReceivedData && actualReceivedData.length > 0) {
                     actualReceivedData.forEach(actualReceived => {
+                        const eventId = `actual-${actualReceived.ActualReceivedId}`;
+                        let existingEvent = calendar.getEventById(eventId);
+                        if (existingEvent) {
+                            existingEvent.remove();
+                        }
                         //console.log("actualReceived:", actualReceived);
                         const start = new Date(actualReceived.ActualDeliveryTime);
                         let end = new Date(start);
 
                         const completionPercentage = calculateOnRackCompletionPercentage(actualReceived.ActualDetails);
-                        let eventColor = completionPercentage === 100 ? '#3E7D3E' : '#C7B44F';
+
+                        let eventColor = actualReceived.IsCompleted  ? '#3E7D3E' : '#C7B44F';
 
                         if (!actualReceived.IsCompleted) {
                             if (completionPercentage === 0 && !actualReceived.ActualLeadTime) {
@@ -469,13 +511,19 @@
                         const formattedEnd = formatDateTime(end);
                         const modalId = `eventModal-${actualReceived.ActualReceivedId}`;
 
+                        let tagName = actualReceived.SupplierCode;
+                        const rule = tagNameRules.find(rule => rule.SupplierCode === actualReceived.SupplierCode);
+                        if (rule) {
+                            tagName = rule.TagName;
+                        }
+
                         events.push({
                             id: `actual-${actualReceived.ActualReceivedId}`,
                             title: actualReceived.SupplierName,
                             start: formattedStart,
                             end: formattedEnd,
                             backgroundColor: eventColor,
-                            resourceId: `${actualReceived.SupplierCode}_Actual`,
+                            resourceId: `${tagName}_Actual`,
                             extendedProps: {
                                 actualReceivedId: actualReceived.ActualReceivedId,
                                 supplierCode: actualReceived.SupplierCode,
@@ -483,7 +531,9 @@
                                 asnNumber: actualReceived.AsnNumber,
                                 doNumber: actualReceived.DoNumber,
                                 invoice: actualReceived.Invoice,
+                                actualLeadTime: actualReceived.ActualLeadTime,
                                 completionPercentage: completionPercentage,
+                                isCompleted: actualReceived.IsCompleted,
                                 modalId: modalId
                             }
                         });
@@ -511,12 +561,18 @@
                         const formattedEnd = formatDateTime(end);
                         const modalId = `planModal-${planDetail.PlanDetailId}`;
 
+                        let tagName = planDetail.SupplierCode;
+                        const rule = tagNameRules.find(rule => rule.SupplierCode === planDetail.SupplierCode);
+                        if (rule) {
+                            tagName = rule.TagName;
+                        }
+
                         events.push({
                             id: `plan-${planDetail.PlanDetailId}`,
                             title: planDetail.SupplierName,
                             start: formattedStart,
                             end: formattedEnd,
-                            resourceId: `${planDetail.SupplierCode}_Plan`,
+                            resourceId: `${tagName}_Plan`,
                             extendedProps: {
                                 planDetailId: planDetail.PlanDetailId,
                                 supplierCode: planDetail.SupplierCode,
@@ -549,12 +605,18 @@
                         const formattedEnd = formatDateTime(end);
                         const modalId = `planModal-${planDetail.PlanDetailId}`;
 
+                        let tagName = planDetail.SupplierCode;
+                        const rule = tagNameRules.find(rule => rule.SupplierCode === planDetail.SupplierCode);
+                        if (rule) {
+                            tagName = rule.TagName;
+                        }
+
                         events.push({
                             id: `plan-${planDetail.PlanDetailId}`,
                             title: planDetail.SupplierName,
                             start: formattedStart,
                             end: formattedEnd,
-                            resourceId: `${planDetail.SupplierCode}_Plan`,
+                            resourceId: `${tagName}_Plan`,
                             extendedProps: {
                                 planDetailId: planDetail.PlanDetailId,
                                 supplierCode: planDetail.SupplierCode,
@@ -595,7 +657,7 @@
         //Gọi Indicator
         nowIndicator: true,
         //set Indicator với thời gian thực
-        now: now,
+        now: getFormattedNow(),
         timeZone: 'Asia/Bangkok',
         locale: 'en-GB',
         aspectRatio: 2.0,
@@ -733,7 +795,8 @@
             const asnNumber = info.event.extendedProps.asnNumber;
             const doNumber = info.event.extendedProps.doNumber;
             const invoice = info.event.extendedProps.invoice;
-
+            const actualLeadTime = info.event.extendedProps.actualLeadTime;
+            const isCompleted = info.event.extendedProps.isCompleted;
 
             const supplierCode = info.event.extendedProps.supplierCode;
             const supplierName = info.event.title;
@@ -754,15 +817,18 @@
                 minute: '2-digit'
             });
 
-            const eventDetails = `
+            let eventDetails = `
                 <strong>Nhà cung cấp:</strong> ${supplierName} - ${supplierCode}<br>
                 <i><strong>ASN Number:</strong></i> ${asnNumber}<br>
                 <i><strong>DO Number:</strong></i> ${doNumber}<br>
                 <i><strong>Invoice:</strong></i> ${invoice}<br>
 
                 <i><strong>Nhận lúc:</strong></i> ${formattedStart}<br>
-                <i><strong>Kết thúc lúc:</strong></i> ${formattedEnd}
-            `;
+                <i><strong>Kết thúc lúc:</strong></i> ${formattedEnd}`;
+
+            if (isCompleted) {
+                eventDetails += `<br><i><strong>Thời gian xử lý:</strong></i> ${actualLeadTime}`;
+            }
             const eventModalElement = document.getElementById(`eventModal-${actualReceivedId}`);
             const planModalElement = document.getElementById(`planModal-${planDetailReceiveId}`);
 
@@ -841,12 +907,12 @@
 
     });
 
-  
+    /**
+    * Hiển thị được các chi tiết ASN trong bảng modal
+    */
     function populateStagesTable(asnDetails, actualReceivedId) {
         const stagesTableBodyId = `stagesTableBody-${actualReceivedId}`;
         const stagesTableBody = document.getElementById(stagesTableBodyId);
-        //let totalItems = asnDetails.length;
-        //let completedItems = 0;
 
         if (stagesTableBody) {
             stagesTableBody.innerHTML = '';
@@ -854,9 +920,7 @@
                 const row = document.createElement('tr');
                 const isOnRackDone = detail.QuantityScan != 0;
                 const isHandleDone = detail.QuantityRemain === 0;
-                //if (isDone) {
-                //    completedItems++;
-                //}
+
                 row.innerHTML = `
                 <td>${detail.PartNo}</td>
                 <td>${detail.Quantity}</td>
@@ -873,7 +937,7 @@
                     iconOnRackDone.classList.add('fa', 'fa-check-circle');
                     iconOnRackDone.style.color = 'green';
                     iconOnRackDone.style.marginLeft = '8px';
-                    statusCellOnRackDone.appendChild(iciconOnRackDoneon);
+                    statusCellOnRackDone.appendChild(iconOnRackDone);
                 } 
                 else {
                     let gifImage = document.createElement('img');
@@ -898,7 +962,6 @@
         }
 
         // Tính toán phần trăm hoàn thành
-        //let completionPercentage = (completedItems / totalItems) * 100;
         let completionPercentage = calculateOnRackCompletionPercentage(asnDetails);;
 
         // Cập nhật giao diện để hiển thị phần trăm hoàn thành
@@ -927,7 +990,9 @@
 
 
 
-
+    /**
+     * Lấy chi tiết thực tế và hiển thị lên bảng modal
+     */
     function fetchAndPopulateStagesTable(actualReceivedId) {
         fetch(`/TLIPWarehouse/GetActualDetailsByReceivedId?actualReceivedId=${actualReceivedId}`)
             .then(response => response.json())
@@ -940,12 +1005,15 @@
     }
 
 
+
+    /**
+     * Cập nhật sự kiện actual khi các thông tin thay đổi
+     */
     function updateCalendarEvent(actualReceived) {
         const start = new Date(actualReceived.ActualDeliveryTime);
         const end = new Date(start);
 
         if (actualReceived.ActualLeadTime) {
-            //console.log("ActualLeadTime:", actualReceived.ActualLeadTime);
             const leadTimeParts = actualReceived.ActualLeadTime.split(':');
             const hours = parseInt(leadTimeParts[0], 10);
             const minutes = parseInt(leadTimeParts[1], 10);
@@ -958,27 +1026,22 @@
         } else {
             end.setHours(end.getHours() + 1);
         }
-        //console.log("end 2:", end);
 
 
         const formattedStart = formatDateTime(start);
         const formattedEnd = formatDateTime(end);
-        console.log("formattedEnd:", formattedEnd);
 
         let existingEvent = calendar.getEventById(`actual-${actualReceived.ActualReceivedId}`);
 
         const modalId = `eventModal-${actualReceived.ActualReceivedId}`;
         const completionPercentage = calculateOnRackCompletionPercentage(actualReceived.ActualDetails);
 
-        if (!actualReceived.IsCompleted) {
+        
             if (existingEvent) {
                 existingEvent.setExtendedProp({ completionPercentage: completionPercentage });
                 if (completionPercentage < 100) {
-                    console.log("Đã set được end");
                     existingEvent.setEnd(formattedEnd);
-                } else if (completionPercentage === 100) {
-                    existingEvent.setProp('backgroundColor', '#3E7D3E');
-                }
+                } 
             } else {
                 calendar.addEvent({
                     id: `actual-${actualReceived.ActualReceivedId}`,
@@ -999,17 +1062,15 @@
                     }
                 });
             }
-        } else {
-            if (existingEvent) {
-                if (completionPercentage === 100) {
-                    existingEvent.setProp('backgroundColor', '#3E7D3E');
-                }
-            }
-        }
-
 
         updateEventDetails(actualReceived);
     }
+
+
+
+    /**
+     * Hiển thị và cập nhật phần thông tin về Supplier, giờ đến và giờ kết thúc
+     */
     function updateEventDetails(actualReceived) {
         const start = new Date(actualReceived.ActualDeliveryTime);
         const end = new Date(start);
@@ -1070,9 +1131,11 @@
     }
 
 
-
     calendar.render();
 
+    /**
+     * Lấy ngày hiện tại để trả về resource controller để hiển thị dynamic theo ngày
+     */
     function getCurrentDate(dateNow) {
 
         const today = new Date().toISOString().split('T')[0];
@@ -1091,6 +1154,9 @@
 
 
 
+    /**
+     * Định nghĩa ra resource để hiển thị trên lịch (FullCalendar)
+     */
     function fetchResources(weekdayId) {
         return fetch(`/api/ResourcesReceivedTLIP?weekdayId=${weekdayId}`)
             .then(response => response.json());
@@ -1111,24 +1177,4 @@
     }
     setInterval(updateTime, 1000);
     updateTime();
-
-    /*    //HÀM XỬ LÝ SỰ KIỆN KHI ẤN DELAY
-        document.getElementById('delayButton').addEventListener('click', async function () {
-            const supplierId = document.getElementById('eventModal').getAttribute('data-actual');
-            console.log("supplierId:", supplierId);
-            const response = await fetch('/api/tlipwarehouse/delaySupplier', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(supplierId)
-            });
-    
-            const data = await response.json();
-            if (data.success) {
-                console.log('Delay processed successfully.');
-            } else {
-                console.error('Failed to process delay.');
-            }
-        });*/
 });

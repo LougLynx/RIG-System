@@ -40,6 +40,9 @@ public partial class Plandetailreceivedtlip
 
     public int? OccurrencesPerMonth { get; set; }
 
+    [StringLength(100)]
+    public string? TagName { get; set; }
+
     [InverseProperty("PlanDetail")]
     public virtual ICollection<Historyplanreceivedtlip> Historyplanreceivedtlips { get; set; } = new List<Historyplanreceivedtlip>();
 

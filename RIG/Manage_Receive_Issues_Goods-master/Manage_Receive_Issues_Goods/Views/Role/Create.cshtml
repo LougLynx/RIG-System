@@ -1,0 +1,35 @@
+﻿@model List<Microsoft.AspNetCore.Identity.IdentityRole>
+
+<h2 class="my-4">Create Role</h2>
+
+<form asp-action="Create" method="post" class="mb-4">
+    <div class="form-group">
+        <label for="roleName">Role Name</label>
+        <input type="text" class="form-control" id="roleName" name="roleName" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
+
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-info">@ViewBag.Message</div>
+}
+
+<h3 class="my-4">Existing Roles</h3>
+<table class="table table-striped bg-white">
+    <thead>
+        <tr>
+            <th>Role Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var role in Model)
+        {
+            <tr>
+                <td>@role.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a href="/Config/Portal" class="btn btn-secondary mt-4">Back</a>

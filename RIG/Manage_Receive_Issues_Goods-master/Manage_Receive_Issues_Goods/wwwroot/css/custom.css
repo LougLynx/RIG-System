@@ -63,46 +63,5 @@ body {
 .fc-timeline-header-row.fc-timeline-header-row-chrono {
     width: 100%;
 }
-/*.centered-event {
-    text-align: center;
-}
 
-.event-title {
-    font-size: 1.2em;
-    font-weight: bold;
-}
-
-.event-supplier-code {
-    font-size: 0.9em;
-    color: gray;
-}
-
-.event-completion {
-    font-size: 0.9em;
-    color: green;
-}
-.centered-event {
-    position: relative;
-}
-
-.event-gif {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 20px; 
-    height: 20px; 
-}
-
-.bold-title {
-    font-weight: bold;
-}
-
-.centered-event {
-    display: flex;
-    align-items: center;
-}
-
-.event-title {
-    display: inline-block;
-}*/
 

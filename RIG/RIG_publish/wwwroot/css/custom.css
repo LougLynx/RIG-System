@@ -41,21 +41,6 @@ body {
     text-align: center;
 }
 
-#suppliersListContent {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px; /* Adjust the gap between blocks as needed */
-}
-
-.supplier-block {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    text-align: center;
-    min-width: 100px; /* Adjust the minimum width as needed */
-}
-
 .event-tooltip {
     position: absolute;
     background-color: #fff;
@@ -78,33 +63,5 @@ body {
 .fc-timeline-header-row.fc-timeline-header-row-chrono {
     width: 100%;
 }
-.centered-event {
-    text-align: center;
-}
 
-.event-title {
-    font-size: 1.2em;
-    font-weight: bold;
-}
-
-.event-supplier-code {
-    font-size: 0.9em;
-    color: gray;
-}
-
-.event-completion {
-    font-size: 0.9em;
-    color: green;
-}
-.centered-event {
-    position: relative;
-}
-
-.event-gif {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 20px; /* Adjust the size as needed */
-    height: 20px; /* Adjust the size as needed */
-}
 

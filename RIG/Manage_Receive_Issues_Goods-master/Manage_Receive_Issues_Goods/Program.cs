@@ -38,6 +38,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
     .AddRoles<IdentityRole>() 
     .AddEntityFrameworkStores<RigContext>();
 
+
 // Configure cookie settings for HTTP
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -61,6 +62,8 @@ builder.Services.AddScoped<ISchedulereceivedTLIPService, SchedulereceivedTLIPSer
 builder.Services.AddHostedService<DataFetchingBackgroundService>();
 
 builder.Services.AddScoped<TLIPWarehouseController>();
+
+builder.Services.AddScoped<RoleController>();
 
 // Register ILogger
 /*builder.Services.AddLogging();*/
@@ -93,6 +96,7 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
