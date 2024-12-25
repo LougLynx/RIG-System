@@ -1,9 +1,10 @@
-﻿@using Manage_Receive_Issues_Goods.DTO
-@model IEnumerable<PlanDetailDTO>
+﻿@using Manage_Receive_Issues_Goods.DTO.RDTD_DTO
+@model IEnumerable<PlanDetailRDTD_DTO>
 
 @{
-	ViewData["Title"] = "RECEIVED Goods Schedule (Denso)";
+	ViewData["Title"] = "ISSUED Goods Schedule (TLIP)";
 	var planDetailsJson = ViewData["PlanDetailsJson"];
+	var pastPlanDetailsJson = ViewData["PastPlanDetailsJson"];
 	var currentPlanEffectiveDate = ViewData["CurrentPlanEffectiveDate"];
 	var nextPlanEffectiveDate = ViewData["NextPlanEffectiveDate"];
 }
@@ -18,13 +19,9 @@
 </head>
 <body>
 	<div style="display: flex; gap: 10px;">
-		<a class="nav-link btn btn-dark" asp-area="" asp-controller="DensoWarehouse" asp-action="ScheduleReceive">Received</a>
-		<a class="nav-link btn btn-dark" asp-area="" asp-controller="DensoWarehouse" asp-action="ScheduleIssued">Issued</a>
-		<a class="nav-link btn btn-dark" asp-area="" asp-controller="RITD" asp-action="ChangePlan">Plan</a>
+		<a class="nav-link btn btn-dark" asp-area="" asp-controller="TLIPWarehouse" asp-action="ChangePlanIssued">Plan</a>
+		<a class="nav-link btn btn-dark" asp-area="" asp-controller="RDTD" asp-action="DashboardRDTD">Dashboard</a>
 	</div>
-
-	<!-- Title with Real-time Clock -->
-	<i> <h1 class="center-align"><span id="currentTime"></span></h1> </i>
 
 	<!-- Calendar -->
 	<div id='calendar'></div>
@@ -83,10 +80,15 @@
 
 
 	<script>
+
 		var planDetails = @Html.Raw(planDetailsJson);
 		var currentPlanEffectiveDate = '@currentPlanEffectiveDate';
 		var nextPlanEffectiveDate = '@nextPlanEffectiveDate';
+			var pastPlanDetails = @Html.Raw(pastPlanDetailsJson);
 	</script>
-	<script src="~/js/tlip/calendarIssuesTLIP.js"></script>
+
+	<script src="~/js/tlip/calendarIssuedTLIP.js"></script>
+	@* <script src="~/dist/js/calendarReceiveDenso.bundle.js"></script> *@
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.2/signalr.min.js"></script>
 </body>
 </html>

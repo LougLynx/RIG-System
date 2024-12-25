@@ -31,24 +31,6 @@ body {
     background-color: whitesmoke;
 }
 
-.highlighted-event {
-    border: 4px solid black; 
-}
-
-
-
-.center-align {
-    text-align: center;
-}
-
-.event-tooltip {
-    position: absolute;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    padding: 5px;
-    z-index: 1000;
-    pointer-events: none;
-}
 .fc-event-main .centered-event {
     white-space: nowrap;
     overflow: hidden;

@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
+using System.Numerics;
 using System.Threading.Tasks;
-using Manage_Receive_Issues_Goods.DTO;
+using Manage_Receive_Issues_Goods.DTO.TLIPDTO.Received;
 using Manage_Receive_Issues_Goods.Models;
 using Manage_Receive_Issues_Goods.Repositories;
 using Manage_Receive_Issues_Goods.Repository;
@@ -19,6 +20,14 @@ namespace Manage_Receive_Issues_Goods.Services
             _repository = repository;
         }
 
+        public async Task<IEnumerable<Planreceivetlip>> GetAllPlansAsync()
+        {
+            return await _repository.GetAllPlansAsync();
+        }
+        public async Task<Planreceivetlip> GetCurrentPlanAsync()
+        {
+            return await _repository.GetCurrentPlanAsync();
+        }
         public async Task<IEnumerable<Actualreceivedtlip>> GetAllActualReceivedAsync()
         {
             return await _repository.GetAllActualReceivedAsync();
@@ -184,20 +193,20 @@ namespace Manage_Receive_Issues_Goods.Services
             await _repository.UpdateActualReceivedAsync(actualReceived);
         }
 
-        public async Task<IEnumerable<Actualreceivedtlip>> GetAllActualReceivedLast7DaysAsync()
-        {
-            return await _repository.GetAllActualReceivedLast7DaysAsync();
-        }
+        //public async Task<IEnumerable<Actualreceivedtlip>> GetAllActualReceivedLast7DaysAsync()
+        //{
+        //    return await _repository.GetAllActualReceivedLast7DaysAsync();
+        //}
 
         public async Task<IEnumerable<Actualreceivedtlip>> GetAllActualReceivedAsyncById(int actualReceivedId)
         {
             return await _repository.GetAllActualReceivedAsyncById(actualReceivedId);
         }
 
-        public async Task<IEnumerable<Actualreceivedtlip>> GetActualReceivedAsyncByInfor(string asnNumber, string doNumber, string invoice)
-        {
-            return await _repository.GetActualReceivedAsyncByInfor(asnNumber, doNumber, invoice);
-        }
+        //public async Task<IEnumerable<Actualreceivedtlip>> GetActualReceivedAsyncByInfor(string asnNumber, string doNumber, string invoice)
+        //{
+        //    return await _repository.GetActualReceivedAsyncByInfor(asnNumber, doNumber, invoice);
+        //}
 
         public async Task UpdateActualReceivedCompletionAsync(int actualReceivedId, bool isCompleted)
         {
@@ -268,6 +277,19 @@ namespace Manage_Receive_Issues_Goods.Services
             return await _repository.GetAllTagNameRuleAsync();
         }
 
+        public async Task AddPlanAsync(Planreceivetlip plan)
+        {
+             await _repository.AddPlanAsync(plan);
+        }
+        public async Task<int> GetPlanIdByDetailsAsync(string planName, DateOnly effectiveDate)
+        {
+            return await _repository.GetPlanIdByDetailsAsync(planName, effectiveDate);
+        }
+        public async Task AddPlanDetailAsync(Plandetailreceivedtlip planDetail)
+        {
+            await _repository.AddPlanDetailAsync(planDetail);
+        }
+
         public async Task UpdateActualLeadTime(Actualreceivedtlip actualReceived, DateTime leadTimeUpdate)
         {
             
@@ -284,7 +306,7 @@ namespace Manage_Receive_Issues_Goods.Services
                 if (existingActualReceived != null)
                 {
                     var leadTime = leadTimeUpdate - existingActualReceived.ActualDeliveryTime;
-                    existingActualReceived.ActualLeadTime = TimeOnly.FromTimeSpan(leadTime);
+                    existingActualReceived.ActualLeadTime = leadTime;
                     await UpdateActualReceivedAsync(existingActualReceived);
                 }
             }
@@ -293,6 +315,36 @@ namespace Manage_Receive_Issues_Goods.Services
                 Console.WriteLine($"Error updating ActualLeadTime: {ex.Message}");
             }
         }
+
+        public async Task UpdateStorageTime(Actualreceivedtlip actualReceived, DateTime storageTimeUpdate)
+        {
+            if (actualReceived == null || actualReceived.ActualReceivedId <= 0)
+            {
+                Console.WriteLine("Invalid ActualReceived entry.");
+                return;
+            }
+
+            try
+            {
+                var existingActualReceived = await _repository.GetActualReceivedWithSupplierAsync(actualReceived.ActualReceivedId);
+
+                if (existingActualReceived != null)
+                {
+                    var leadTime = storageTimeUpdate - (existingActualReceived.ActualDeliveryTime + existingActualReceived.ActualLeadTime.GetValueOrDefault());
+                    existingActualReceived.ActualStorageTime = leadTime;
+                    await _repository.UpdateActualReceivedAsync(existingActualReceived);
+                }
+                else
+                {
+                    Console.WriteLine($"ActualReceived entry with ID {actualReceived.ActualReceivedId} not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating ActualStorageTime: {ex.Message}");
+            }
+        }
+
 
         public async Task<List<Actualreceivedtlip>> GetIncompleteActualReceived()
         {
@@ -304,8 +356,100 @@ namespace Manage_Receive_Issues_Goods.Services
             return incompleteActualReceivedList;
         }
 
+        public async Task<List<Actualreceivedtlip>> GetUnstoredActualReceived()
+        {
+            var actualReceivedList = await GetAllActualReceivedAsync();
+
+            var unstoredActualReceivedList = actualReceivedList
+                .Where(actualReceived => actualReceived.IsCompleted &&
+                                         actualReceived.Actualdetailtlips.Any(detail => detail.StockInStatus == false &&
+                                                                                         (string.IsNullOrEmpty(detail.StockInLocation) || detail.StockInLocation == null)))
+                .ToList();
+
+            return unstoredActualReceivedList;
+        }
 
 
+        public async Task UpdateActualDetailReceivedAsync(string partNo, int quantity, int quantityRemain, int quantityScan, int actualReceivedId, bool? stockInStatus, string? stockInLocation)
+        {
+            await _repository.UpdateActualDetailReceivedAsync(partNo, quantity, quantityRemain, quantityScan, actualReceivedId, stockInStatus, stockInLocation);
+        }
+        public async Task<Actualdetailtlip> GetActualDetailByParametersAsync(string partNo, int quantity, int quantityRemain, int quantityScan, int actualReceivedId)
+        {
+            return await _repository.GetActualDetailByParametersAsync(partNo, quantity, quantityRemain, quantityScan, actualReceivedId);
+        }
+        public async Task DeleteActualDetailsByReceivedIdAsync(int actualReceivedId)
+        {
+            await _repository.DeleteActualDetailsByReceivedIdAsync(actualReceivedId);
+        }
+        public async Task<IEnumerable<TripCountForChartTLIPDTO>> GetTotalTripsPlanForBarChartAsync(int planId, string supplierCode = null)
+        {
+            return await _repository.GetTotalTripsPlanForBarChartAsync(planId, supplierCode);
+        }
+
+        public async Task<IEnumerable<TripCountForChartTLIPDTO>> GetTotalTripsActualForBarChartAsync(int planId, int? month = null, string supplierCode = null)
+        {
+            return await _repository.GetTotalTripsActualForBarChartAsync(planId, month, supplierCode);
+
+        }
+        public async Task<IEnumerable<AverageLeadTimeDTO>> GetAverageLeadTimePlanForChartAsync(int planId, string supplierCode = null)
+        {
+            return await _repository.GetAverageLeadTimePlanForChartAsync(planId, supplierCode);
+        }
+        public async Task<IEnumerable<AverageLeadTimeDTO>> GetFastestActualLeadTimeForChartAsync(int planId, int? month = null, string supplierCode = null)
+        {
+            return await _repository.GetFastestActualLeadTimeForChartAsync(planId, month, supplierCode);
+        }
+
+        public async Task<IEnumerable<AverageLeadTimeDTO>> GetSlowestActualLeadTimeForChartAsync(int planId, int? month = null, string supplierCode = null)
+        {
+            return await _repository.GetSlowestActualLeadTimeForChartAsync(planId, month, supplierCode);
+        }
+
+        public async Task<IEnumerable<AverageLeadTimeDTO>> GetAverageActualLeadTimeForChartAsync(int planId, int? month = null, string supplierCode = null)
+        {
+            return await _repository.GetAverageActualLeadTimeForChartAsync(planId, month, supplierCode);
+        }
+
+        public async Task<IEnumerable<LateDeliveryTLIPDTO>> GetLateDeliveriesForChartAsync(int month, int planId, string supplierCode = null)
+        {
+            return await _repository.GetLateDeliveriesForChartAsync(month, planId, supplierCode);
+        }
+
+
+
+
+        public async Task<IEnumerable<TagnamereceivetlipDTO>> GetAllTagNamesAsync()
+        {
+            return await _repository.GetAllTagNamesAsync();
+        }
+
+        public async Task AddTagNameAsync(Tagnamereceivetlip tagName)
+        {
+            await _repository.AddTagNameAsync(tagName);
+        }
+        public async Task UpdateTagNameAsync(Tagnamereceivetlip tagName)
+        {
+            await _repository.UpdateTagNameAsync(tagName);
+        }
+        public async Task DeleteTagNameAsync(string tagName)
+        {
+            await _repository.DeleteTagNameAsync(tagName);
+        }
+
+        public async Task AddSupplierAsync(Supplier supplier)
+        {
+            await _repository.AddSupplierAsync(supplier);
+        }
+        public async Task DeleteSupplierAsync(string supplierCode)
+        {
+            await _repository.DeleteSupplierAsync(supplierCode);
+
+        }
+        public async Task UpdateSupplierAsync(Supplier supplier)
+        {
+            await _repository.UpdateSupplierAsync(supplier);
+        }
 
         public ActualReceivedTLIPDTO MapToActualReceivedTLIPDTO(Actualreceivedtlip entity)
         {
@@ -314,6 +458,7 @@ namespace Manage_Receive_Issues_Goods.Services
                 ActualReceivedId = entity.ActualReceivedId,
                 ActualDeliveryTime = entity.ActualDeliveryTime,
                 ActualLeadTime = entity.ActualLeadTime,
+                ActualStorageTime = entity.ActualStorageTime,
                 SupplierCode = entity.SupplierCode,
                 SupplierName = entity.SupplierCodeNavigation?.SupplierName,
                 TagName = entity.TagName,
@@ -323,6 +468,7 @@ namespace Manage_Receive_Issues_Goods.Services
                 IsCompleted = entity.IsCompleted,
                 CompletionPercentage = CalculateCompletionPercentage(entity),
                 OnRackCompletionPercentage = CalculateOnRackCompletionPercentage(entity),
+                PlanId = entity.PlanId,
                 ActualDetails = entity.Actualdetailtlips.Select(d => new ActualDetailTLIPDTO
                 {
                     ActualDetailId = d.ActualDetailId,
@@ -330,13 +476,16 @@ namespace Manage_Receive_Issues_Goods.Services
                     Quantity = d.Quantity ?? 0,
                     QuantityRemain = d.QuantityRemain ?? 0,
                     QuantityScan = d.QuantityScan ?? 0,
-                    ActualReceivedId = d.ActualReceivedId
+                    ActualReceivedId = d.ActualReceivedId,
+                    StockInStatus = d.StockInStatus,
+                    StockInLocation = d.StockInLocation
+
                 }).ToList()
             };
         }
-        public PlanDetailTLIPDTO MapToPlanDetailTLIPDTO(Plandetailreceivedtlip entity)
+        public PlanDetailReceivedTLIPDTO MapToPlanDetailTLIPDTO(Plandetailreceivedtlip entity)
         {
-            return new PlanDetailTLIPDTO
+            return new PlanDetailReceivedTLIPDTO
             {
                 PlanDetailId = entity?.PlanDetailId ?? 0,
                 PlanId = entity?.PlanId ?? 0,
@@ -353,19 +502,24 @@ namespace Manage_Receive_Issues_Goods.Services
         private double CalculateOnRackCompletionPercentage(Actualreceivedtlip actualReceived)
         {
             var totalItems = actualReceived.Actualdetailtlips.Count;
-            var completedItems = actualReceived.Actualdetailtlips.Count(detail => detail.QuantityScan != 0);
+            var completedItems = actualReceived.Actualdetailtlips.Count(detail => detail.StockInStatus == true);
 
             if (totalItems == 0) return 0;
             return (completedItems / (double)totalItems) * 100;
         }
         private double CalculateCompletionPercentage(Actualreceivedtlip actualReceived)
         {
+            if (actualReceived.IsCompleted)
+            {
+                return 100;
+            }
             var totalItems = actualReceived.Actualdetailtlips.Count;
-            var completedItems = actualReceived.Actualdetailtlips.Count(detail => detail.QuantityScan == 0);
+            var completedItems = actualReceived.Actualdetailtlips.Count(detail => detail.QuantityScan != 0);
 
             if (totalItems == 0) return 0;
             return (completedItems / (double)totalItems) * 100;
         }
+
     }
 }
 

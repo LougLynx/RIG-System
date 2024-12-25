@@ -8,6 +8,7 @@ namespace Manage_Receive_Issues_Goods.Models;
 
 [Table("aspnetusers")]
 [Index("NormalizedEmail", Name = "EmailIndex")]
+[Index("EmployeeCode", Name = "EmployeeCode", IsUnique = true)]
 [Index("NormalizedUserName", Name = "UserNameIndex", IsUnique = true)]
 public partial class Aspnetuser
 {
@@ -46,6 +47,14 @@ public partial class Aspnetuser
     public bool LockoutEnabled { get; set; }
 
     public int AccessFailedCount { get; set; }
+
+    public string? EmployeeCode { get; set; }
+
+    [InverseProperty("User")]
+    public virtual ICollection<Actualsissuetlip> Actualsissuetlips { get; set; } = new List<Actualsissuetlip>();
+
+    [InverseProperty("User")]
+    public virtual ICollection<Actualsreceivedenso> Actualsreceivedensos { get; set; } = new List<Actualsreceivedenso>();
 
     [InverseProperty("User")]
     public virtual ICollection<Aspnetuserclaim> Aspnetuserclaims { get; set; } = new List<Aspnetuserclaim>();

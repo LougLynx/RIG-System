@@ -17,16 +17,16 @@ namespace Manage_Receive_Issues_Goods.Repository.Implementations
             _context = context;
         }
        
-        public async Task<IEnumerable<Planritddetail>> GetAllPlanDetailsAsync()
+        public async Task<IEnumerable<Planrdtddetail>> GetAllPlanDetailsAsync()
         {
             // Lấy ra danh sách tất cả các kế hoạch
-            var plans = await _context.Planritds
+            var plans = await _context.Planrdtds
                 .OrderBy(p => p.EffectiveDate)
                 .ToListAsync();
 
             if (plans == null || !plans.Any())
             {
-                return Enumerable.Empty<Planritddetail>();
+                return Enumerable.Empty<Planrdtddetail>();
             }
 
             var today = DateOnly.FromDateTime(DateTime.Now);
@@ -40,34 +40,36 @@ namespace Manage_Receive_Issues_Goods.Repository.Implementations
             if (closestPlan != null)
             {
                 //Trả về danh sách các chi tiết kế hoạch của kế hoạch gần nhất
-                return await _context.Planritddetails
+                return await _context.Planrdtddetails
                     .Where(pd => pd.PlanId == closestPlan.PlanId)
-                    .ToListAsync();
+					.ToListAsync();
             }
 
-            return Enumerable.Empty<Planritddetail>();
+            return Enumerable.Empty<Planrdtddetail>();
         }
     
-        public async Task<IEnumerable<Planritddetail>> GetPlanDetails(int planId)
+        public async Task<IEnumerable<Planrdtddetail>> GetPlanDetails(int planId)
         {
-            var planDetails = await _context.Planritddetails
+            return await _context.Planrdtddetails
                 .Where(d => d.PlanId == planId)
-                .ToListAsync();
-            return planDetails;
+				.ToListAsync();
         }
 
-        public async Task<Planritddetail> GetPlanDetailByIdAsync(int detailId)
+        public async Task<Planrdtddetail> GetPlanDetailByIdAsync(int detailId)
         {
-            return await _context.Planritddetails
-                .FirstOrDefaultAsync(d => d.PlanDetailId == detailId);
+            return await _context.Planrdtddetails
+				.FirstOrDefaultAsync(d => d.PlanDetailId == detailId);
         }
 
-        public async Task UpdatePlanDetailAsync(Planritddetail detail)
+
+		//để ý đoạn update thời gian thì phải sửa sang bảng plantimereceivedenso
+		public async Task UpdatePlanDetailAsync(Planrdtddetail detail)
         {
-            _context.Planritddetails.Update(detail);
+            _context.Planrdtddetails.Update(detail);
             await _context.SaveChangesAsync();
         }
     
+        // để ý đoạn add actual này link đến id của bảng plantimereceivedenso thay vì plandetail như trước
         public async Task AddActualAsync(Actualsreceivedenso actual)
         {
             _context.Actualsreceivedensos.Add(actual);
@@ -84,22 +86,22 @@ namespace Manage_Receive_Issues_Goods.Repository.Implementations
 			}
 		}
 
-        public async Task AddPlanAsync(Planritd plan)
+        public async Task AddPlanAsync(Planrdtd plan)
         {
-            _context.Planritds.Add(plan);
+            _context.Planrdtds.Add(plan);
             await _context.SaveChangesAsync();
         }
 
-        public async Task AddPlanDetailAsync(Planritddetail planDetail)
+        public async Task AddPlanDetailAsync(Planrdtddetail planDetail)
         {
-            _context.Planritddetails.Add(planDetail);
+            _context.Planrdtddetails.Add(planDetail);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<int> GetPlanIdByDetailsAsync(string planName, string planType, DateOnly effectiveDate)
+		public async Task<int> GetPlanIdByDetailsAsync(string planName, DateOnly effectiveDate)
         {
-            var plan = await _context.Planritds
-                .FirstOrDefaultAsync(p => p.PlanName == planName && p.PlanType == planType && p.EffectiveDate == effectiveDate);
+            var plan = await _context.Planrdtds
+                .FirstOrDefaultAsync(p => p.PlanName == planName && p.EffectiveDate == effectiveDate);
 
             if (plan != null)
             {
@@ -109,43 +111,45 @@ namespace Manage_Receive_Issues_Goods.Repository.Implementations
             return 0;  
         }
       
-        public async Task<Planritd> GetCurrentPlanAsync()
+        public async Task<Planrdtd> GetCurrentPlanAsync()
         {
             var today = DateOnly.FromDateTime(DateTime.Today);
-            return await _context.Planritds
+            return await _context.Planrdtds
                 .Where(p => p.EffectiveDate <= today)
                 .OrderByDescending(p => p.EffectiveDate)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<Planritd> GetNextPlanAsync()
+        public async Task<Planrdtd> GetNextPlanAsync()
         {
             var today = DateOnly.FromDateTime(DateTime.Today);
-            return await _context.Planritds
+            return await _context.Planrdtds
                 .Where(p => p.EffectiveDate > today)
                 .OrderBy(p => p.EffectiveDate)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<Planritddetail>> GetPlanDetailsBetweenDatesAsync(DateOnly startDate, DateOnly endDate)
+        public async Task<IEnumerable<Planrdtddetail>> GetPlanDetailsBetweenDatesAsync(DateOnly startDate, DateOnly endDate)
         {
-            return await _context.Planritddetails
-                .Include(pd => pd.Actualsreceivedensos)
+            return await _context.Planrdtddetails
+				.Include(pd => pd.Actualsreceivedensos)
+                .ThenInclude(a => a.User)
                 .Where(pd => pd.Plan.EffectiveDate >= startDate && pd.Plan.EffectiveDate < endDate)
                 .ToListAsync();
         }
-        public async Task<IEnumerable<Planritd>> GetFuturePlansAsync()
+        public async Task<IEnumerable<Planrdtd>> GetFuturePlansAsync()
         {
-            return await _context.Planritds
-                .Include(p => p.Planritddetails)
-                .Where(p => p.EffectiveDate > DateOnly.FromDateTime(DateTime.Now))
+            return await _context.Planrdtds
+                .Include(p => p.Planrdtddetails)
+				.Where(p => p.EffectiveDate > DateOnly.FromDateTime(DateTime.Now))
                 .ToListAsync();
         }
-        public async Task<IEnumerable<Planritddetail>> GetPastPlanDetailsAsync()
+        public async Task<IEnumerable<Planrdtddetail>> GetPastPlanDetailsAsync()
         {
             var today = DateOnly.FromDateTime(DateTime.Now);
-            return await _context.Planritddetails
-                .Include(p => p.Actualsreceivedensos)
+            return await _context.Planrdtddetails
+				.Include(p => p.Actualsreceivedensos)
+                .ThenInclude(a => a.User)
                 .Where(p => p.Plan.EffectiveDate < today)
                 .ToListAsync();
         }
@@ -153,12 +157,12 @@ namespace Manage_Receive_Issues_Goods.Repository.Implementations
     }
 
 
-    public static class DateTimeExtensions
+   /* public static class DateTimeExtensions
     {
         public static DateTime StartOfWeek(this DateTime dt, DayOfWeek startOfWeek)
         {
             int diff = (7 + (dt.DayOfWeek - startOfWeek)) % 7;
             return dt.AddDays(-1 * diff).Date;
         }
-    }
+    }*/
 }

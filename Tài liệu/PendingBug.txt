@@ -1,0 +1,25 @@
+
+- lỗi về việc chỉ fetch incomplete trong ngày hôm nay 
+  (khả năng này nếu trường hợp xuất hiện giữa đêm của ngày hôm nay 
+  và ngày hôm sau thì nếu ngày nay chưa xong thì ko fetch được nếu qua hôm sau)
+
+- kiểm tra lại phần toastr bị hiện khung trắng
+
+- hiện màu đỏ cho phần bị lỗi (trùng invoice)
+
+- làm phần thêm kế hoạch mới (Phần kế hoạch nên cho thêm tính năng save )
+
+-(Bug đang nghĩ cách) Nếu thay đổi kế hoạch mới thì lại không thể hiển thị
+  quá khứ của kế hoạch cũ (do phần resource của thư viện đang chưa nghĩ được logic)
+
+
+tìm bug phần dashboard (lỗi hiển thị - tại sao cột fastest của D04-HDVN lại cao nhất??) --- ??
+
+Tại sao hàng HDVN lại không được cập nhật - kiểm tra logic cập nhật status nhận nếu sever bị tắt
+
+Viết docs 
+
+Bật lại authorize
+
+
+

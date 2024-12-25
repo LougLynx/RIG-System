@@ -53,6 +53,7 @@ namespace Manage_Receive_Issues_Goods.Areas.Identity.Pages.Account
             returnUrl = returnUrl ?? Url.Content("~/");
 
             var user = await _userManager.FindByEmailAsync(email);
+
             if (user == null)
             {
                 return NotFound($"Unable to load user with email '{email}'.");

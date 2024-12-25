@@ -26,6 +26,11 @@ public partial class Actualdetailtlip
     [Column("ActualReceivedID")]
     public int ActualReceivedId { get; set; }
 
+    public bool? StockInStatus { get; set; }
+
+    [StringLength(255)]
+    public string? StockInLocation { get; set; }
+
     [ForeignKey("ActualReceivedId")]
     [InverseProperty("Actualdetailtlips")]
     public virtual Actualreceivedtlip ActualReceived { get; set; } = null!;

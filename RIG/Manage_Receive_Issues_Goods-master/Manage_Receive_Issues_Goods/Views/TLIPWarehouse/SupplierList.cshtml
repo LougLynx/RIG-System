@@ -11,7 +11,6 @@
     <title>@ViewData["Title"]</title>
 
     <style>
-
         body {
             font-family: "Lato", sans-serif;
             background-image: url('/images/white.jpg');
@@ -19,23 +18,36 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
             background-position: center;
-             }
-
+        }
     </style>
-
-
 </head>
 <body>
     <div style="display: flex; gap: 10px;">
-        <a class="nav-link btn btn-dark" asp-area="" asp-controller="TLIPWarehouse" asp-action="ScheduleReceive">Received</a>
-        <a class="nav-link btn btn-dark" asp-area="" asp-controller="TLIPWarehouse" asp-action="ScheduleIssued">Issued</a>
-        <a class="nav-link btn btn-dark" asp-area="" asp-controller="TLIPWarehouse" asp-action="SupplierList">Supplier List</a>
+        <a class="nav-link btn btn-dark" asp-area="" asp-controller="TLIPWarehouse" asp-action="ScheduleReceive">Back</a>
     </div>
+
+    <div>
+        <h2>Add New Supplier</h2>
+        <form asp-action="AddSupplier" asp-controller="TLIPWarehouse" method="post">
+            <div>
+                <label for="SupplierCode">Supplier Code:</label>
+                <input type="text" id="SupplierCode" name="SupplierCode" required />
+            </div>
+            <div>
+                <label for="SupplierName">Supplier Name:</label>
+                <input type="text" id="SupplierName" name="SupplierName" required />
+            </div>
+            <button type="submit" class="btn btn-primary">Add Supplier</button>
+        </form>
+    </div>
+
+
     <table class="table">
         <thead>
             <tr>
                 <th>Supplier Code</th>
                 <th>Supplier Name</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -44,12 +56,20 @@
                 <tr>
                     <td>@supplier.SupplierCode</td>
                     <td>@supplier.SupplierName</td>
+                    <td>
+                        <form asp-action="UpdateSupplier" method="post" style="display:inline;">
+                            <input type="hidden" name="SupplierCode" value="@supplier.SupplierCode" />
+                            <input type="text" name="SupplierName" value="@supplier.SupplierName" required />
+                            <button type="submit" class="btn btn-warning">Update</button>
+                        </form>
+                        <form asp-action="DeleteSupplier" method="post" style="display:inline;">
+                            <input type="hidden" name="SupplierCode" value="@supplier.SupplierCode" />
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
 </body>
 </html>
-
-
-

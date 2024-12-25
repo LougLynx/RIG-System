@@ -54,10 +54,27 @@ document.addEventListener('DOMContentLoaded', function () {
         hideLoading();
     }, 800); // Adjust the timeout duration as needed
 
-    // Show loading overlay on navigation
+    // Show loading overlay on navigation, excluding dropdown links
     document.querySelectorAll('a.nav-link').forEach(link => {
-        link.addEventListener('click', function () {
-            showLoading();
+        link.addEventListener('click', function (event) {
+            if (!link.classList.contains('dropdown-toggle')) {
+                showLoading();
+            }
+        });
+    });
+
+    // Adjust layout when dropdown is toggled
+    document.querySelectorAll('.dropdown-toggle').forEach(dropdown => {
+        dropdown.addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent default link behavior
+            const dropdownMenu = this.nextElementSibling;
+            if (dropdownMenu.classList.contains('show')) {
+                dropdownMenu.classList.remove('show');
+            } else {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('show'));
+                dropdownMenu.classList.add('show');
+            }
         });
     });
 });
+

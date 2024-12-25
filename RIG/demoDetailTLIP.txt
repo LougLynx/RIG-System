@@ -4,70 +4,51 @@
   "data": {
     "result": [
       {
-        "partNo": "VN270133-0010",
-        "asnNumber": "O4Y15K1M05A01",
-        "doNumber": "41115089",
-        "invoice": null,
-        "quantiy": 400,
-        "quantityRemain": 400,
-        "quantityScan": 0
-      },
-      {
-        "partNo": "VN197427-0090",
-        "asnNumber": "O4Y15K1M05A01",
-        "doNumber": "41115089",
-        "invoice": null,
-        "quantiy": 450,
-        "quantityRemain": 450,
-        "quantityScan": 0
-      },
-      {
-        "partNo": "VN012075-0040",
-        "asnNumber": "M4Y15K1M03A02",
-        "doNumber": "41115090",
-        "invoice": null,
-        "quantiy": 4000,
-        "quantityRemain": 4000,
-        "quantityScan": 0
-      },
-      {
-        "partNo": "VN082042-0070",
-        "asnNumber": "M4Y15K1M03A02",
-        "doNumber": "41115090",
-        "invoice": null,
-        "quantiy": 8000,
-        "quantityRemain": 8000,
-        "quantityScan": 0
+        "partNo": "VN012020-0380",
+        "asnNumber": "M4Z16K1M01A02",
+        "doNumber": "41216061",
+        "invoice": "",
+        "quantiy": 1296,
+        "quantityRemain": 1296,
+        "quantityScan": 0,
+        "stockInStatus": false,
+        "stockInLocation": ""
       },
       {
         "partNo": "VN012020-0390",
-        "asnNumber": "M4Y15K1M03A02",
-        "doNumber": "41115090",
-        "invoice": null,
-        "quantiy": 896,
-        "quantityRemain": 896,
-        "quantityScan": 0
+        "asnNumber": "M4Z16K1M01A02",
+        "doNumber": "41216061",
+        "invoice": "",
+        "quantiy": 512,
+        "quantityRemain": 512,
+        "quantityScan": 0,
+        "stockInStatus": false,
+        "stockInLocation": ""
       },
       {
-        "partNo": "VN082019-0011",
-        "asnNumber": "H4Y13K1M02A03",
-        "doNumber": "41115049",
-        "invoice": null,
-        "quantiy": 1344,
-        "quantityRemain": 1344,
-        "quantityScan": 0
+        "partNo": "VN082066-1470",
+        "asnNumber": "N4Z16K1M01A02",
+        "doNumber": "41216065",
+        "invoice": "",
+        "quantiy": 3200,
+        "quantityRemain": 3200,
+        "quantityScan": 0,
+        "stockInStatus": false,
+        "stockInLocation": ""
       },
       {
-        "partNo": "VN082017-0023",
-        "asnNumber": "H4Y13K1M02A03",
-        "doNumber": "41115049",
-        "invoice": null,
-        "quantiy": 1512,
-        "quantityRemain": 1512,
-        "quantityScan": 0
+        "partNo": "VN082066-1510",
+        "asnNumber": "N4Z16K1M01A02",
+        "doNumber": "41216065",
+        "invoice": "",
+        "quantiy": 2700,
+        "quantityRemain": 2700,
+        "quantityScan": 0,
+        "stockInStatus": false,
+        "stockInLocation": ""
       }
     ],
-    "id": 57261,
+    "id": 204875,
     "exception": null,
     "status": 5,
     "isCanceled": false,

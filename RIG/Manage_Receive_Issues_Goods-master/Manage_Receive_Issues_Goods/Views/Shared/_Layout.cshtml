@@ -12,19 +12,20 @@
     <link rel="stylesheet" href="~/css/custom.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.15/index.global.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
     <script src="~/js/_layout.js" asp-append-version="true"></script>
+    <script src="~/js/realTime.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
     <link rel="stylesheet" href="~/css/layout.css">
 </head>
@@ -36,15 +37,34 @@
         {
 
             <img src="~/images/defaultAvatar.png" alt="Avatar" class="rounded-circle" style="width: 250px; height: 250px; margin-left: -16px;" />
-            
+
             <h4 class="text-light text-center"><b>@User.Identity.Name</b></h4>
 
-        
             <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-            <a class="nav-link text-light" asp-area="" asp-controller="TLIPWarehouse" asp-action="ScheduleReceive">TLIP</a>
-            <a class="nav-link text-light" asp-area="" asp-controller="DensoWarehouse" asp-action="ScheduleReceive">Denso</a>
+
+            <div class="dropdown">
+                <a class="nav-link text-light dropdown-toggle" href="#" id="dropdownMenuLink" aria-haspopup="true" aria-expanded="false">
+                    TLIP
+                </a>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <a class="nav-link btn btn-dark" asp-area="" asp-controller="TLIPWarehouse" asp-action="ScheduleReceive">Received</a>
+                    <a class="nav-link btn btn-dark" asp-area="" asp-controller="TLIPWarehouse" asp-action="ScheduleIssued">Delivery</a>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <a class="nav-link text-light dropdown-toggle" href="#" id="dropdownMenuLink" aria-haspopup="true" aria-expanded="false">
+                    Denso
+                </a>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <a class="nav-link btn btn-dark" asp-area="" asp-controller="DensoWarehouse" asp-action="ScheduleReceive">Received</a>
+                    <a class="nav-link btn btn-dark" asp-area="" asp-controller="DensoWarehouse" asp-action="ScheduleIssued">Delivery</a>
+                </div>
+            </div>
+
+
+
             <a class="nav-link text-light" asp-area="" asp-controller="Config" asp-action="Portal">Config</a>
-            <a class="nav-link text-light" asp-area="" asp-controller="Important" asp-action="Index">Important</a>
 
             <form method="post" asp-controller="Account" asp-action="Logout">
                 <button type="submit" style="width:auto" class="nav-link btn btn-link py-0">
@@ -56,14 +76,15 @@
 
     <div id="main">
         <button class="openbtn" onclick="toggleNav()">☰ </button>
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2"><b>@ViewData["Title"]</b></h1>
+        <div class="d-flex justify-content-center align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <!-- Title with Real-time Clock -->
+            <h1 class="center-align" style="font-style: italic;"><span id="currentTime"></span></h1>
         </div>
         @RenderBody()
     </div>
 
     <div id="loadingOverlay" style="display: none;">
-        @* <img src="~/images/skibidi11.gif" alt="Loading..." /> *@
+          @* <img src="~/images/skibidi11.gif" alt="Loading..." /> *@
         @* <img src="~/images/loadingIcon.gif" alt="Loading..." /> *@
         <img src="~/images/densoDance.gif" alt="Loading..." />
     </div>

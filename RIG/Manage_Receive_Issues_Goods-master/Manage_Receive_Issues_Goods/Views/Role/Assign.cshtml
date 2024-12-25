@@ -78,7 +78,7 @@
                             {
                                 @foreach (var role in userRoles[user.UserName])
                                 {
-                                    <span class="badge badge-secondary">@role</span>
+                                    <span class="badge badge-secondary" style="color: black;">@role</span>
                                     <form asp-action="RemoveRole" method="post" class="d-inline">
                                         <input type="hidden" name="userName" value="@user.UserName" />
                                         <input type="hidden" name="roleName" value="@role" />
@@ -87,6 +87,7 @@
                                 }
                             }
                         </div>
+
                     </td>
                 </tr>
             }

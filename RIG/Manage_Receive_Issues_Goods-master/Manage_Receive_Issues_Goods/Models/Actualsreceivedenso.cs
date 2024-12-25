@@ -8,6 +8,7 @@ namespace Manage_Receive_Issues_Goods.Models;
 
 [Table("actualsreceivedenso")]
 [Index("PlanDetailId", Name = "PlanDetailID")]
+[Index("UserId", Name = "UserId")]
 public partial class Actualsreceivedenso
 {
     [Key]
@@ -15,12 +16,19 @@ public partial class Actualsreceivedenso
     public int ActualId { get; set; }
 
     [Column("PlanDetailID")]
-    public int PlanDetailId { get; set; }
+    public int? PlanDetailId { get; set; }
 
     [Column(TypeName = "datetime")]
-    public DateTime ActualTime { get; set; }
+    public DateTime? ActualTime { get; set; }
+
+    [StringLength(450)]
+    public string? UserId { get; set; }
 
     [ForeignKey("PlanDetailId")]
     [InverseProperty("Actualsreceivedensos")]
-    public virtual Planritddetail PlanDetail { get; set; } = null!;
+    public virtual Planrdtddetail? PlanDetail { get; set; }
+
+    [ForeignKey("UserId")]
+    [InverseProperty("Actualsreceivedensos")]
+    public virtual Aspnetuser? User { get; set; }
 }

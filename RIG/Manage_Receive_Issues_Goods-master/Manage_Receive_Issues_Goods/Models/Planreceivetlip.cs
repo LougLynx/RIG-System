@@ -19,5 +19,8 @@ public partial class Planreceivetlip
     public DateOnly EffectiveDate { get; set; }
 
     [InverseProperty("Plan")]
+    public virtual ICollection<Actualreceivedtlip> Actualreceivedtlips { get; set; } = new List<Actualreceivedtlip>();
+
+    [InverseProperty("Plan")]
     public virtual ICollection<Plandetailreceivedtlip> Plandetailreceivedtlips { get; set; } = new List<Plandetailreceivedtlip>();
 }

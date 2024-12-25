@@ -1,0 +1,101 @@
+﻿@{
+    var users = ViewBag.Users as List<Microsoft.AspNetCore.Identity.IdentityUser>;
+    var roles = ViewBag.Roles as List<Microsoft.AspNetCore.Identity.IdentityRole>;
+    var userRoles = ViewBag.UserRoles as Dictionary<string, IList<string>>;
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4">Assign Role</h2>
+
+    <form asp-action="Assign" method="post" class="mb-4">
+        <div class="form-group">
+            <label for="userName">User Name</label>
+            <select class="form-control" id="userName" name="userName" required>
+                <option value="">Select User</option>
+                @foreach (var user in users)
+                {
+                    <option value="@user.UserName">@user.UserName</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="roleName">Role Name</label>
+            <select class="form-control" id="roleName" name="roleName" required>
+                <option value="">Select Role</option>
+                @foreach (var role in roles)
+                {
+                    <option value="@role.Name">@role.Name</option>
+                }
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Assign</button>
+    </form>
+
+    @if (ViewBag.Message != null)
+    {
+        <div class="alert alert-info">@ViewBag.Message</div>
+    }
+
+    <h3 class="my-4">Existing Users and Roles</h3>
+    <table class="table table-striped bg-white">
+        <thead>
+            <tr>
+                <th>User Name</th>
+                <th>Roles</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in users)
+            {
+                <tr>
+                    <td>@user.UserName</td>
+                    <td>
+                        @if (userRoles.ContainsKey(user.UserName))
+                        {
+                            @string.Join(", ", userRoles[user.UserName])
+                        }
+                    </td>
+                    <td>
+                        <button class="btn btn-secondary btn-sm edit-button" data-username="@user.UserName">Edit</button>
+                    </td>
+                </tr>
+                <tr class="edit-row" id="edit-@user.UserName" style="display:none;">
+                    <td colspan="3">
+                        <div class="form-group">
+                            <label for="newRole-@user.UserName">Add Role</label>
+                            <select class="form-control" id="newRole-@user.UserName" name="newRole">
+                                <option value="">Select Role</option>
+                                @foreach (var role in roles)
+                                {
+                                    <option value="@role.Name">@role.Name</option>
+                                }
+                            </select>
+                            <button class="btn btn-primary btn-sm mt-2 add-role-button" data-username="@user.UserName">Add Role</button>
+                        </div>
+                        <div>
+                            @if (userRoles.ContainsKey(user.UserName))
+                            {
+                                @foreach (var role in userRoles[user.UserName])
+                                {
+                                    <span class="badge badge-secondary">@role</span>
+                                    <form asp-action="RemoveRole" method="post" class="d-inline">
+                                        <input type="hidden" name="userName" value="@user.UserName" />
+                                        <input type="hidden" name="roleName" value="@role" />
+                                        <button type="submit" class="btn btn-danger btn-sm ml-2">Remove</button>
+                                    </form>
+                                }
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a href="/Config/Portal" class="btn btn-secondary mt-4">Back</a>
+</div>
+
+@section Scripts {
+    <script src="~/js/role/assign.js"></script>
+}

@@ -1,0 +1,94 @@
+dotnet tool install --global dotnet-aspnet-codegenerator
+dotnet tool install --global dotnet-ef
+dotnet add package Microsoft.EntityFrameworkCore
+dotnet add package Microsoft.EntityFrameworkCore.Tools
+dotnet add package Microsoft.EntityFrameworkCore.Design
+dotnet add package Pomelo.EntityFrameworkCore.MySql --version 8.0.0
+---------------------------------------------------------------------------------------------
+
+"ConnectionStrings": {
+"DefaultConnection": "Server=localhost;Port=3306;Database=mvctutorial; User=root;Password=Pbei7955;"
+}
+
+---------------------------------------------------------------------------------------------
+dotnet ef dbcontext scaffold "Server=localhost;Port=3306;User=root;Password=Pbei7955;Database=rig""Pomelo.EntityFrameworkCore.MySql" -o Models -d
+dotnet ef dbcontext scaffold "Server=localhost;Port=3306;User=root;Password=Pbei7955;Database=rig;" "Pomelo.EntityFrameworkCore.MySql" -o Models -d --force
+
+
+---------------------------------------------------------------------------------------------
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+});
+
+---------------------------------------------------------------------------------------------
+
+dotnet ef migrations add init
+dotnet ef database update
+
+OR
+
+Add-Migration InitialCreate
+Update-Database
+
+---------------------------------------------------------------------------------------------
+
+Repository MVC pattern:
+•	Controllers: Handle HTTP requests and return views or data.
+•	Models: Define your data structures.
+•	Views: Define your UI using Razor syntax.
+•	Repositories: Handle data access logic.
+•	Services: Contain business logic.
+•	Data: Contains and migrations.
+
+
+
+IdentityDbContext
+
+ IdentityDbContext<ApplicationUser>
+
+  {
+      var builder = new ConfigurationBuilder()
+  .SetBasePath(Directory.GetCurrentDirectory())
+  .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+      IConfiguration configuration = builder.Build();
+      optionsBuilder.UseMySql(configuration.GetConnectionString("DefaultConnection"),
+          new MySqlServerVersion(new Version(8, 0, 21))); // Thay đổi phiên bản MySQL phù hợp
+  }
+///////////////////////////////////////////////////////////////////
+
+protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+{
+    // Xây dựng ConfigurationBuilder để trỏ đến file sharedappsettings.json
+    var sharedConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SharedConfig", "sharedappsettings.json");
+    if (!File.Exists(sharedConfigPath))
+    {
+        throw new FileNotFoundException($"Configuration file '{sharedConfigPath}' not found.");
+    }
+
+    var builder = new ConfigurationBuilder()
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile(sharedConfigPath, optional: false, reloadOnChange: true); // Sử dụng sharedappsettings.json
+
+    IConfiguration configuration = builder.Build();
+
+    // Lấy chuỗi kết nối từ sharedappsettings.json
+    var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+    if (string.IsNullOrEmpty(connectionString))
+    {
+        throw new InvalidOperationException("Connection string 'DefaultConnection' not found in sharedappsettings.json.");
+    }
+
+    // Cấu hình DbContext sử dụng MySQL với chuỗi kết nối từ sharedappsettings.json
+    optionsBuilder.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21))); // Thay đổi phiên bản MySQL phù hợp
+}
+
+
+  base.OnModelCreating(modelBuilder);
+
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
+nhớ chỉnh thành TimeSpan trong actualreceivetlip

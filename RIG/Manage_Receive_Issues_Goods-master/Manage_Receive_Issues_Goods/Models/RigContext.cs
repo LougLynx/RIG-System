@@ -21,7 +21,7 @@ public partial class RigContext : IdentityDbContext
 
     public virtual DbSet<Actualreceivedtlip> Actualreceivedtlips { get; set; }
 
-    public virtual DbSet<Actualsissuestlip> Actualsissuestlips { get; set; }
+    public virtual DbSet<Actualsissuetlip> Actualsissuetlips { get; set; }
 
     public virtual DbSet<Actualsreceivedenso> Actualsreceivedensos { get; set; }
 
@@ -43,13 +43,11 @@ public partial class RigContext : IdentityDbContext
 
     public virtual DbSet<Plandetailreceivedtlip> Plandetailreceivedtlips { get; set; }
 
+    public virtual DbSet<Planrdtd> Planrdtds { get; set; }
+
+    public virtual DbSet<Planrdtddetail> Planrdtddetails { get; set; }
+
     public virtual DbSet<Planreceivetlip> Planreceivetlips { get; set; }
-
-    public virtual DbSet<Planritd> Planritds { get; set; }
-
-    public virtual DbSet<Planritddetail> Planritddetails { get; set; }
-
-    public virtual DbSet<Statusesritd> Statusesritds { get; set; }
 
     public virtual DbSet<Supplier> Suppliers { get; set; }
 
@@ -59,16 +57,34 @@ public partial class RigContext : IdentityDbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        // Xây dựng ConfigurationBuilder để trỏ đến file sharedappsettings.json
+        var sharedConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SharedConfig", "sharedappsettings.json");
+        if (!File.Exists(sharedConfigPath))
+        {
+            throw new FileNotFoundException($"Configuration file '{sharedConfigPath}' not found.");
+        }
+
         var builder = new ConfigurationBuilder()
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile(sharedConfigPath, optional: false, reloadOnChange: true); // Sử dụng sharedappsettings.json
+
         IConfiguration configuration = builder.Build();
-        optionsBuilder.UseMySql(configuration.GetConnectionString("DefaultConnection"),
-            new MySqlServerVersion(new Version(8, 0, 21))); // Thay đổi phiên bản MySQL phù hợp
+
+        // Lấy chuỗi kết nối từ sharedappsettings.json
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new InvalidOperationException("Connection string 'DefaultConnection' not found in sharedappsettings.json.");
+        }
+
+        // Cấu hình DbContext sử dụng MySQL với chuỗi kết nối từ sharedappsettings.json
+        optionsBuilder.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 21))); // Thay đổi phiên bản MySQL phù hợp
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
         modelBuilder
             .UseCollation("utf8mb4_0900_ai_ci")
             .HasCharSet("utf8mb4");
@@ -76,6 +92,8 @@ public partial class RigContext : IdentityDbContext
         modelBuilder.Entity<Actualdetailtlip>(entity =>
         {
             entity.HasKey(e => e.ActualDetailId).HasName("PRIMARY");
+
+            entity.Property(e => e.StockInStatus).HasDefaultValueSql("'0'");
 
             entity.HasOne(d => d.ActualReceived).WithMany(p => p.Actualdetailtlips)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -86,27 +104,31 @@ public partial class RigContext : IdentityDbContext
         {
             entity.HasKey(e => e.ActualReceivedId).HasName("PRIMARY");
 
+            entity.HasOne(d => d.Plan).WithMany(p => p.Actualreceivedtlips)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_actualreceivedtlip_planreceivetlip");
+
             entity.HasOne(d => d.SupplierCodeNavigation).WithMany(p => p.Actualreceivedtlips)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("actualreceivedtlip_ibfk_1");
         });
 
-        modelBuilder.Entity<Actualsissuestlip>(entity =>
+        modelBuilder.Entity<Actualsissuetlip>(entity =>
         {
             entity.HasKey(e => e.ActualId).HasName("PRIMARY");
 
-            entity.HasOne(d => d.PlanDetail).WithMany(p => p.Actualsissuestlips)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("actualsissuestlip_ibfk_1");
+            entity.HasOne(d => d.PlanDetail).WithMany(p => p.Actualsissuetlips).HasConstraintName("actualsissuetlip_ibfk_1");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Actualsissuetlips).HasConstraintName("actualsissuetlip_ibfk_2");
         });
 
         modelBuilder.Entity<Actualsreceivedenso>(entity =>
         {
             entity.HasKey(e => e.ActualId).HasName("PRIMARY");
 
-            entity.HasOne(d => d.PlanDetail).WithMany(p => p.Actualsreceivedensos)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("actualsreceivedenso_ibfk_1");
+            entity.HasOne(d => d.PlanDetail).WithMany(p => p.Actualsreceivedensos).HasConstraintName("actualsreceivedenso_ibfk_1");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Actualsreceivedensos).HasConstraintName("actualsreceivedenso_ibfk_2");
         });
 
         modelBuilder.Entity<Aspnetrole>(entity =>
@@ -200,32 +222,21 @@ public partial class RigContext : IdentityDbContext
                 .HasConstraintName("plandetailreceivedtlip_ibfk_2");
         });
 
-        modelBuilder.Entity<Planreceivetlip>(entity =>
+        modelBuilder.Entity<Planrdtd>(entity =>
         {
             entity.HasKey(e => e.PlanId).HasName("PRIMARY");
         });
 
-        modelBuilder.Entity<Planritd>(entity =>
-        {
-            entity.HasKey(e => e.PlanId).HasName("PRIMARY");
-        });
-
-        modelBuilder.Entity<Planritddetail>(entity =>
+        modelBuilder.Entity<Planrdtddetail>(entity =>
         {
             entity.HasKey(e => e.PlanDetailId).HasName("PRIMARY");
 
-            entity.HasOne(d => d.Plan).WithMany(p => p.Planritddetails)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("planritddetails_ibfk_1");
-
-            entity.HasOne(d => d.StatusIssue).WithMany(p => p.PlanritddetailStatusIssues).HasConstraintName("planritddetails_ibfk_3");
-
-            entity.HasOne(d => d.StatusReceive).WithMany(p => p.PlanritddetailStatusReceives).HasConstraintName("planritddetails_ibfk_2");
+            entity.HasOne(d => d.Plan).WithMany(p => p.Planrdtddetails).HasConstraintName("planrdtddetails_ibfk_1");
         });
 
-        modelBuilder.Entity<Statusesritd>(entity =>
+        modelBuilder.Entity<Planreceivetlip>(entity =>
         {
-            entity.HasKey(e => e.StatusId).HasName("PRIMARY");
+            entity.HasKey(e => e.PlanId).HasName("PRIMARY");
         });
 
         modelBuilder.Entity<Supplier>(entity =>

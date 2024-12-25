@@ -1,0 +1,474 @@
+
+select * from PlanDetailReceivedTLIP;
+
+SELECT * FROM ActualReceivedTLIP;
+select * from ActualDetailTLIP ;
+select * from HistoryPlanReceivedTLIP;
+select * from TagNameReceiveTLIP ;
+
+
+INSERT INTO `PlanDetailReceivedTLIP`
+ (`PlanID`, `SupplierCode`,`DeliveryTime`, `WeekdayID`, `LeadTime`,`PlanType`, `WeekOfMonth`,`OccurrencesPerMonth`,`TagName`)
+ VALUES
+ -- -----------------------------------------------------------------------------------------------------------------------------
+ -- Thứ 2:-----------------------------------------------------------------------------------------------------------------------
+ (1, 'A01', '07:35:00', 1, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '07:35:00', 1, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending.........)
+ (1, 'A03', '07:35:00', 1, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL 
+ 
+ (1, 'G66/G68', '06:00:00', 1, '04:00:00', 'Weekly', NULL, NULL, 'G66/G68'), -- DNTH/DSTH
+ 
+ (1, 'E25', '10:35:00', 1, '02:00:00', 'Weekly', NULL, NULL, 'E25'), -- Kuroda
+ (1, 'D04', '10:35:00', 1, '02:00:00', 'Weekly', NULL, NULL, 'D04'),--  HAMADEN 
+ (1, 'TD60', '10:35:00', 1, '02:00:00', 'Weekly', NULL, NULL, 'TD60'),--  HAMADEN Trading 
+ (1, 'E12', '10:35:00', 1, '02:00:00', 'Weekly', NULL, NULL, 'E12'),-- Sanwa VN
+ (1, 'A08', '10:35:00', 1, '02:00:00', 'Weekly', NULL, NULL, 'A08'), -- Fukoku
+ (1, 'E01', '10:35:00', 1, '02:00:00', 'Weekly', NULL, NULL, 'E01'), -- Kyoshin VN
+ (1, 'E22', '10:35:00', 1, '02:00:00', 'Weekly', NULL, NULL, 'E22'), -- Ohashi Tekko
+ (1, 'A07', '10:35:00', 1, '02:00:00', 'Weekly', NULL, NULL, 'A07'), -- NSK VN
+ (1, 'B35', '10:35:00', 1, '02:00:00', 'Weekly', NULL, NULL, 'B35'), -- Ha Son
+ 
+ (1, 'A01', '11:05:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '11:05:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending........)
+ (1, 'A03', '11:05:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+-- (1, 'A01', '12:30:00', 1, '01:00:00', 'Weekly', NULL, NULL),-- DNJP Air (pending.............)
+  
+ (1, 'E15', '13:00:00', 1, '01:00:00', 'Weekly', NULL, NULL, 'E15'), -- Serteck
+ (1, 'E19', '13:00:00', 1, '01:00:00', 'Weekly', NULL, NULL, 'E19'), -- Fertile
+ (1, 'E05', '13:00:00', 1, '01:00:00', 'Weekly', NULL, NULL, 'E05'), -- Advanex
+ (1, 'E20', '13:00:00', 1, '01:00:00', 'Weekly', NULL, NULL, 'E20'), -- Curious
+ 
+ (1, 'A01', '13:30:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '13:30:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '13:30:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+ (1, 'I04', '14:30:00', 1, '02:00:00', 'Monthly', 2, NULL, 'I04'), -- Hokuriku (monthly)
+ 
+--  (1, 'I04', '14:30:00', 1, '02:00:00', 'Monthly', 2, NULL), -- Cryomax (monthly pending..............)
+ 
+ (1, 'A01', '15:30:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '15:30:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '15:30:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+ (1, 'A01', '16:30:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '16:30:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '16:30:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+ (1, 'E15', '16:30:00', 1, '01:00:00', 'Weekly', NULL, NULL, 'E15'), -- Surteck
+ -- (1, 'E15', '16:30:00', 1, '01:00:00', 'Weekly', NULL, NULL), -- Nippoo (pending................)
+ (1, 'D04', '16:30:00', 1, '01:00:00', 'Weekly', NULL, NULL, 'D04'), -- HDVN (ver 1)
+ (1, 'TD60', '16:30:00', 1, '01:00:00', 'Weekly', NULL, NULL, 'TD60'), -- HDVN trading (ver 1)
+ 
+ 
+ (1, 'D04', '18:00:00', 1, '01:30:00', 'Weekly', 3, NULL, 'D04'), -- HDVN (ver 1)
+ (1, 'TD60', '18:00:00', 1, '01:30:00', 'Weekly', 3, NULL, 'TD60'), -- HDVN trading (ver 1)
+ 
+ (1, 'A01', '19:00:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '19:00:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '19:00:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+ (1, 'A01', '19:30:00', 1, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '19:30:00', 1, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '19:30:00', 1, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ (1, 'D04', '19:30:00', 1, '01:00:00', 'Weekly', NULL, NULL, 'D04'), -- HDVN (ver 1)
+ (1, 'TD60', '19:30:00', 1, '01:00:00', 'Weekly', NULL, NULL, 'TD60'), -- HDVN trading (ver 1)
+ (1, 'E25', '19:30:00', 1, '01:00:00', 'Weekly', NULL, NULL, 'E25'), -- Kuroda
+ 
+ (1, 'A01', '23:30:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '23:30:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '23:30:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+ (1, 'A01', '02:30:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '02:30:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '02:30:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+ (1, 'A01', '05:20:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '05:20:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '05:20:00', 1, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+ 
+ -- (1, 'A01', '00:00:00', 1, '06:00:00', 'Weekly', NULL, NULL), -- DNJP (pending.....)
+ -- -------------------------------------------------------------------------------------------------------------------------------
+ -- Thứ 3: -------------------------------------------------------------------------------------------------------------------
+ (1, 'I24', '06:00:00', 2, '02:00:00', 'Monthly', 1, NULL, 'I24'), -- JONHSON ELECTRIC WORLD TRADE COMPANY
+ (1, 'I06', '06:00:00', 2, '02:00:00', 'Monthly', 1, NULL, 'I06'), -- HOINAK LIMITTED
+ (1, 'I14', '06:00:00', 2, '02:00:00', 'Monthly', 1, NULL, 'I14'), -- Hirata
+ (1, 'I18', '06:00:00', 2, '02:00:00', 'Monthly', 1, NULL, 'I18'), -- TDK
+ 
+ (1, 'A01', '07:30:00', 2, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '07:00:00', 2, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '07:00:00', 2, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+ (1, 'I05', '08:00:00', 2, '02:00:00', 'Weekly', NULL, NULL, 'I05'), -- NTA
+ 
+ (1, 'E25', '10:30:00', 2, '02:00:00', 'Weekly', NULL, NULL, 'E25'), -- Kuroda
+ (1, 'D04', '10:30:00', 2, '02:00:00', 'Weekly', NULL, NULL, 'D04'),--  HAMADEN (ver 1)
+ (1, 'E12', '10:30:00', 2, '02:00:00', 'Weekly', NULL, NULL, 'E12'),-- Sanwa VN
+ (1, 'E22', '10:30:00', 2, '02:00:00', 'Weekly', NULL, NULL, 'E22'),-- Ohashi Tekko VN
+ 
+ (1, 'A01', '11:00:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '11:00:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '11:00:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+-- (1, 'A02', '10:30:00', 2, '01:30:00', 'Bi-Monthly', NULL, NULL), -- DNIA Trading 2-3/M (pending.................)
+ 
+-- (1, 'A02', '12:30:00', 2, '01:30:00', 'Monthly', 1, NULL), -- DIAS monthly (pending.................)
+ 
+-- (1, 'A01', '12:30:00', 2, '01:00:00', 'Weekly', NULL, NULL),-- DNJP Air (pending.............)
+ 
+ (1, 'E15', '13:00:00', 2, '01:00:00', 'Weekly', NULL, NULL, 'E15'), -- Surteck
+ (1, 'E19', '13:00:00', 2, '01:00:00', 'Weekly', NULL, NULL, 'E19'), -- Fertile
+ 
+ (1, 'A01', '13:30:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '13:30:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '13:30:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+
+ (1, 'E27', '14:30:00', 2, '01:30:00', 'Weekly', NULL, NULL, 'HCM'), -- Chuburika (HCM)
+ (1, 'E13', '14:30:00', 2, '01:30:00', 'Weekly', NULL, NULL, 'HCM'), -- Kawasaki (HCM)
+ (1, 'E14', '14:30:00', 2, '01:30:00', 'Weekly', NULL, NULL, 'HCM'), -- Sanyo (HCM)
+ (1, 'E18', '14:30:00', 2, '01:30:00', 'Weekly', NULL, NULL, 'HCM'), -- Kurabe (HCM)
+ (1, 'E03', '14:30:00', 2, '01:30:00', 'Weekly', NULL, NULL, 'HCM'), -- Meinan (HCM)
+ (1, 'E02', '14:30:00', 2, '01:30:00', 'Weekly', NULL, NULL, 'HCM'), -- Maruei (HCM)
+ (1, 'E04', '14:30:00', 2, '01:30:00', 'Weekly', NULL, NULL, 'HCM'), -- Hariki (HCM)
+ (1, 'E30', '14:30:00', 2, '01:30:00', 'Weekly', NULL, NULL, 'HCM'), -- NOK (HCM)
+ -- (1, 'E27', '14:30:00', 2, '01:30:00', 'Weekly', NULL, NULL), -- G.S.Electech (HCM) (pending........)
+ (1, 'E26', '14:30:00', 2, '01:30:00', 'Weekly', NULL, NULL, 'HCM'), -- Mabuchi(HCM)
+ 
+ (1, 'E09', '15:00:00', 2, '01:00:00', 'Weekly', NULL, NULL, 'E09'), -- Vina Taiyo
+ (1, 'E24', '15:00:00', 2, '01:00:00', 'Weekly', NULL, NULL, 'E24'), -- Daito Rubber
+ 
+ (1, 'A01', '15:30:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '15:30:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '15:30:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+ (1, 'D04', '16:00:00', 2, '01:00:00', 'Weekly', NULL, NULL, 'D04'), -- Hamaden (ver 1)
+ -- (1, 'A02', '16:00:00', 2, '01:00:00', 'Weekly', NULL, NULL), -- TPR (pending..........)
+--  (1, 'A02', '16:00:00', 2, '01:00:00', 'Weekly', NULL, NULL), -- Nippo (pending..........)
+ (1, 'E15', '16:00:00', 2, '01:00:00', 'Weekly', NULL, NULL, 'E15'), -- Surteck 
+ 
+ (1, 'A01', '16:30:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '16:30:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '16:30:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+ (1, 'I15', '18:00:00', 2, '01:30:00', 'Monthly', 2, NULL, 'I15'), -- Miruko (monthly)
+ 
+ (1, 'A01', '19:00:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '19:00:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '19:00:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+ (1, 'A01', '19:30:00', 2, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '19:30:00', 2, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '19:30:00', 2, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ (1, 'D04', '19:30:00', 2, '01:00:00', 'Weekly', NULL, NULL, 'D04'), -- Hamaden (ver 1)
+ (1, 'E25', '19:30:00', 2, '01:00:00', 'Weekly', NULL, NULL, 'E25'), -- Kuroda  
+ 
+ (1, 'A01', '23:30:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '23:30:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '23:30:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+ -- (1, 'E25', '22:30:00', 2, '04:30:00', 'Weekly', NULL, NULL), -- DNJP  (pending........)
+ (1, 'G66/G68', '03:00:00', 2, '03:00:00', 'Weekly', NULL, NULL, 'G66/G68'), -- DSTH 
+ 
+ (1, 'A01', '02:30:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '02:30:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '02:30:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+  (1, 'A01', '05:20:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '05:20:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '05:20:00', 2, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+  -- -------------------------------------------------------------------------------------------------------------------------------
+ -- Thứ 4: -------------------------------------------------------------------------------------------------------------------
+ -- (1, 'A02', '06:00:00', 3, '00:30:00', 'Weekly', NULL, NULL), -- DNJP (pending..........)
+ 
+ (1, 'A01', '07:30:00', 3, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '07:30:00', 3, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '07:30:00', 3, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+ (1, 'E25', '10:30:00', 3, '02:00:00', 'Weekly', NULL, NULL, 'E25'), -- Kuroda
+ (1, 'D04', '10:30:00', 3, '02:00:00', 'Weekly', NULL, NULL, 'D04'),--  HAMADEN (ver 1)
+ (1, 'E12', '10:30:00', 3, '02:00:00', 'Weekly', NULL, NULL, 'E12'),-- Sanwa VN
+ (1, 'E22', '10:30:00', 3, '02:00:00', 'Weekly', NULL, NULL, 'E22'),-- Ohashi Tekko VN
+ 
+ (1, 'A01', '11:00:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '11:00:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '11:00:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+-- (1, 'A02', '11:00:00', 3, '01:30:00', 'Monthly', 2, NULL), -- DNWX
+ 
+  -- (1, 'A02', '12:30:00', 3, '01:00:00', 'Weekly', NULL , NULL), -- DNJP Air(pending...........)
+  
+  (1, 'E15', '13:00:00', 3, '01:00:00', 'Weekly', NULL , NULL, 'E15'), -- Surteck
+  (1, 'E19', '13:30:00', 3, '01:00:00', 'Weekly', NULL , NULL, 'E19'), -- Fertile
+  
+ (1, 'A01', '13:30:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '13:30:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '13:30:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+-- (1, 'A02', '14:30:00', 3, '00:30:00', 'Weekly', NULL, NULL), -- Fujikura (pending..........)
+ 
+ -- (1, 'A02', '15:00:00', 3, '01:30:00', 'Monthly', 2, NULL), -- Tsuchiya (pending..........)
+ 
+  (1, 'A01', '15:30:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '15:30:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '15:30:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+  (1, 'D04', '16:00:00', 3, '01:30:00', 'Weekly', NULL, NULL, 'D04'), -- Hamaden (ver 1)
+  (1, 'B372', '16:00:00', 3, '01:30:00', 'Weekly', NULL, NULL, 'B372'), -- Sertim 
+  (1, 'E23', '16:00:00', 3, '01:30:00', 'Weekly', NULL, NULL, 'E23'), -- Micro Techno
+  (1, 'E06', '16:00:00', 3, '01:30:00', 'Weekly', NULL, NULL, 'E06'), -- Atarih
+  (1, 'E29', '16:00:00', 3, '01:30:00', 'Weekly', NULL, NULL, 'E29'), -- Vietinak
+  -- (1, 'B372', '16:00:00', 3, '01:30:00', 'Weekly', NULL, NULL), -- Nippo (Pending........)
+  (1, 'E15', '16:00:00', 3, '01:30:00', 'Weekly', NULL, NULL, 'E15'), -- Surteck 
+ 
+ -- (1, 'D13', '18:00:00', 3, '02:00:00', 'Bi-Monthly', NULL, NULL), -- DNMX 2-3/M (pending.....................)
+  
+  (1, 'A01', '19:00:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+  (1, 'A02', '19:00:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+  (1, 'A03', '19:00:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+  
+  (1, 'H91', '19:30:00', 3, '02:30:00', 'Monthly', 3, NULL, 'H91'), -- Okaya (monthly)
+  (1, 'H96', '19:30:00', 3, '02:30:00', 'Monthly', 2, NULL, 'H96'), -- Itomol (monthly)
+  (1, 'G03', '19:30:00', 3, '02:30:00', 'Monthly', 3, NULL, 'G03'), -- SWS (monthly) 
+  
+  (1, 'A01', '19:30:00', 3, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+  (1, 'A02', '19:30:00', 3, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+  (1, 'A03', '19:30:00', 3, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+  (1, 'D04', '19:30:00', 3, '01:00:00', 'Weekly', NULL, NULL, 'D04'), -- Hamaden (ver 1)
+  (1, 'E25', '19:30:00', 3, '01:00:00', 'Weekly', NULL, NULL, 'E25'), -- Kuroda
+  
+  (1, 'I17', '22:30:00', 3, '02:30:00', 'Monthly', 1, NULL, 'I17'), -- Nissin (monthly)
+  (1, 'H93', '22:30:00', 3, '02:00:00', 'Monthly', 3, NULL, 'H93'), -- Sanko (monthly)
+  
+  (1, 'A01', '23:30:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+  (1, 'A02', '23:30:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+  (1, 'A03', '23:30:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+  
+  (1, 'I10', '00:30:00', 3, '01:00:00', 'Monthly', 3, NULL, 'I10'), -- SCHAEFFLER (monthly)
+  
+  (1, 'G66/G68', '02:00:00', 3, '03:30:00', 'Weekly', NULL , NULL, 'G66/G68'), -- DNTH/DSTH 
+  
+   (1, 'A01', '02:30:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+  (1, 'A02', '02:30:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+  (1, 'A03', '02:30:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+  
+   (1, 'A01', '05:20:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+  (1, 'A02', '05:20:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+  (1, 'A03', '05:20:00', 3, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+  
+   -- -------------------------------------------------------------------------------------------------------------------------------
+ -- Thứ 5: -------------------------------------------------------------------------------------------------------------------
+ -- (1, 'A02', '07:00:00', 4, '03:00:00', 'Weekly', NULL, NULL), -- DNKA (pending..........)
+  
+  (1, 'A01', '07:30:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+  (1, 'A02', '07:30:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+  (1, 'A03', '07:30:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+
+ (1, 'E25', '10:30:00', 4, '02:00:00', 'Weekly', NULL, NULL, 'E25'), -- Kuroda
+ (1, 'D04', '10:30:00', 4, '02:00:00', 'Weekly', NULL, NULL, 'D04'),--  HAMADEN (ver 1)
+ (1, 'E12', '10:30:00', 4, '02:00:00', 'Weekly', NULL, NULL, 'E12'),-- Sanwa VN
+ (1, 'E22', '10:30:00', 4, '02:00:00', 'Weekly', NULL, NULL, 'E22'),-- Ohashi Tekko VN
+ 
+ (1, 'A01', '11:00:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+  (1, 'A02', '11:00:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+  (1, 'A03', '11:00:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+  
+ -- (1, 'A02', '12:30:00', 4, '01:00:00', 'Weekly', NULL , NULL), -- DNJP Air(pending...........)
+  
+  (1, 'E15', '13:00:00', 4, '01:00:00', 'Weekly', NULL , NULL, 'E15'), -- Surteck
+  (1, 'E19', '13:30:00', 4, '01:00:00', 'Weekly', NULL , NULL, 'E19'), -- Fertile
+  
+ (1, 'A01', '13:30:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '13:30:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '13:30:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+--  (1, 'A02', '14:30:00', 4, '02:00:00', 'Bi-Monthly', NULL, NULL), -- DNTH/DELT(pending..........)
+  
+ (1, 'A01', '15:30:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '15:30:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '15:30:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+ (1, 'D04', '16:00:00', 4, '01:30:00', 'Weekly', NULL, NULL, 'D04'), -- Hamaden (ver 1)
+ (1, 'E21', '16:00:00', 4, '01:30:00', 'Weekly', NULL, NULL, 'E21'), -- (TOYO) DRILIBE VN
+ -- (1, 'A01', '16:00:00', 4, '01:30:00', 'Weekly', NULL, NULL), -- Nippo (pending.....)
+ (1, 'E15', '16:00:00', 4, '01:30:00', 'Weekly', NULL, NULL, 'E15'), -- Surteck
+
+  (1, 'A01', '16:30:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '16:30:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '16:30:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+-- (1, 'A02', '18:00:00', 4, '01:30:00', 'Weekly', NULL, NULL), -- Toyota Tsusho JP (pending..........)
+  
+ (1, 'A01', '19:00:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '19:00:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '19:00:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+ (1, 'A01', '19:30:00', 4, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '19:30:00', 4, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '19:30:00', 4, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ (1, 'D04', '19:30:00', 4, '01:00:00', 'Weekly', NULL, NULL, 'D04'), -- Hamaden (ver 1)
+ (1, 'E25', '19:30:00', 4, '01:00:00', 'Weekly', NULL, NULL, 'E25'), -- Kuroda
+    
+    -- DMNS (pending.........)
+   
+ (1, 'A01', '23:00:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '23:00:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '23:00:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+ -- (1, 'A02', '22:30:00', 4, '04:30:00', 'Weekly', NULL, NULL), -- DNJP (pending...........)
+  
+ (1, 'A01', '02:30:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '02:30:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '02:30:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+ (1, 'A01', '05:20:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '05:20:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '05:20:00', 4, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+ -- DNTH/DSTH (pending..........)
+ 
+    -- -------------------------------------------------------------------------------------------------------------------------------
+ -- Thứ 6: -------------------------------------------------------------------------------------------------------------------
+  (1, 'G05', '06:00:00', 5, '02:30:00', 'Weekly', NULL, NULL, 'G05'), -- Yamada
+  
+  (1, 'A01', '07:30:00', 5, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+  (1, 'A02', '07:30:00', 5, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+  (1, 'A03', '07:30:00', 5, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+  
+    -- DNJP trading (pending....)
+    
+  (1, 'E25', '10:30:00', 5, '02:00:00', 'Weekly', NULL, NULL, 'E25'), -- Kuroda
+ (1, 'D04', '10:30:00', 5, '02:00:00', 'Weekly', NULL, NULL, 'D04'),--  HAMADEN (ver 1)
+ (1, 'TD60', '10:30:00', 5, '02:00:00', 'Weekly', NULL, NULL, 'TD60'),--  HAMADEN trading (ver 1)
+ (1, 'E12', '10:30:00', 5, '02:00:00', 'Weekly', NULL, NULL, 'E12'),-- Sanwa VN
+ (1, 'E22', '10:30:00', 5, '02:00:00', 'Weekly', NULL, NULL, 'E22'),-- Ohashi Tekko VN
+ 
+ (1, 'A01', '11:00:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '11:00:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '11:00:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL 
+  
+ --  (1, 'A02', '12:30:00', 5, '01:00:00', 'Weekly', NULL , NULL), -- DNJP Air(pending...........)
+  
+  (1, 'E15', '13:00:00', 5, '01:00:00', 'Weekly', NULL , NULL, 'E15'), -- Surteck
+  (1, 'E19', '13:30:00', 5, '01:00:00', 'Weekly', NULL , NULL, 'E19'), -- Fertile
+  
+ (1, 'A01', '13:30:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '13:30:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '13:30:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+  
+-- DNMY Trading (pending.......)
+  
+   (1, 'E27', '14:30:00', 5, '01:30:00', 'Weekly', NULL, NULL, 'HCM'), -- Chuburika (HCM)
+ (1, 'E13', '14:30:00', 5, '01:30:00', 'Weekly', NULL, NULL, 'HCM'), -- Kawasaki (HCM)
+ (1, 'E14', '14:30:00', 5, '01:30:00', 'Weekly', NULL, NULL, 'HCM'), -- Sanyo (HCM)
+ (1, 'E18', '14:30:00', 5, '01:30:00', 'Weekly', NULL, NULL, 'HCM'), -- Kurabe (HCM)
+ (1, 'E03', '14:30:00', 5, '01:30:00', 'Weekly', NULL, NULL, 'HCM'), -- Meinan (HCM)
+ (1, 'E02', '14:30:00', 5, '01:30:00', 'Weekly', NULL, NULL, 'HCM'), -- Maruei (HCM)
+ (1, 'E04', '14:30:00', 5, '01:30:00', 'Weekly', NULL, NULL, 'HCM'), -- Hariki (HCM)
+ (1, 'E30', '14:30:00', 5, '01:30:00', 'Weekly', NULL, NULL, 'HCM'), -- NOK (HCM)
+-- (1, 'E27', '14:30:00', 5, '01:30:00', 'Weekly', NULL, NULL), -- G.S.Electech (HCM) (pending........)
+ (1, 'E26', '14:30:00', 5, '01:30:00', 'Weekly', NULL, NULL, 'HCM'), -- Mabuchi (HCM)
+ 
+  (1, 'A01', '15:30:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '15:30:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '15:30:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+  (1, 'D04', '16:00:00', 5, '01:30:00', 'Weekly', NULL, NULL, 'D04'), -- Hamaden (ver 1)
+  (1, 'TD60', '16:00:00', 5, '01:30:00', 'Weekly', NULL, NULL, 'TD60'), -- Hamaden trading (ver 1)
+--  (1, 'A01', '16:00:00', 5, '01:30:00', 'Weekly', NULL, NULL), -- Nippo (pending.....)
+ (1, 'E15', '16:00:00', 5, '01:30:00', 'Weekly', NULL, NULL, 'E15'), -- Surteck
+  (1, 'E23', '16:00:00', 5, '01:30:00', 'Weekly', NULL, NULL, 'E23'), -- Micro Techno
+  
+  (1, 'A01', '16:30:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '16:30:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '16:30:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+   (1, 'A01', '19:00:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '19:00:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '19:00:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+  (1, 'A01', '19:30:00', 5, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '19:30:00', 5, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '19:30:00', 5, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ (1, 'D04', '19:30:00', 5, '01:00:00', 'Weekly', NULL, NULL, 'D04'), -- Hamaden (ver 1)
+  (1, 'TD60', '19:30:00', 5, '01:00:00', 'Weekly', NULL, NULL, 'TD60'), -- Hamaden trading ((ver 1)
+ (1, 'E25', '19:30:00', 5, '01:00:00', 'Weekly', NULL, NULL, 'E25'), -- Kuroda
+ 
+  (1, 'B222', '20:00:00', 5, '02:00:00', 'Monthly', 3, NULL, 'B222'), -- ARMOR WEATHYSHINE
+  -- NOK monthly (pending.....)
+ (1, 'G02', '20:00:00', 5, '02:00:00', 'Monthly', 3, NULL, 'G02'), -- Hitachimetal
+   
+ (1, 'G06', '20:00:00', 5, '02:00:00', 'Weekly', NULL, NULL, 'G06'), -- Daiki
+    
+ (1, 'H98', '22:30:00', 5, '01:30:00', 'Monthly', 2, NULL, 'H98'), -- Mitsubishi
+    
+ (1, 'A01', '23:30:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '23:30:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '23:30:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+  (1, 'D08', '00:00:00', 5, '01:30:00', 'Weekly', NULL, NULL, 'D08'), -- Aine
+  
+  (1, 'G66/G68', '00:00:00', 5, '06:00:00', 'Weekly', NULL, NULL, 'G66/G68'), -- DNTH
+  
+ (1, 'A01', '02:30:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '02:30:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '02:30:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+  (1, 'A01', '05:20:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+ (1, 'A02', '05:20:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+ (1, 'A03', '05:20:00', 5, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+ 
+     -- -------------------------------------------------------------------------------------------------------------------------------
+ -- Thứ 7: -------------------------------------------------------------------------------------------------------------------
+  (1, 'A01', '07:30:00', 6, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+  (1, 'A02', '07:30:00', 6, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+  (1, 'A03', '07:30:00', 6, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+  
+  (1, 'E25', '10:30:00', 6, '02:00:00', 'Weekly', NULL, NULL, 'E25'), -- Kuroda
+  (1, 'D04', '10:30:00', 6, '02:00:00', 'Weekly', NULL, NULL, 'D04'), -- Hamaden(HDVN)
+  (1, 'E12', '10:30:00', 6, '02:00:00', 'Weekly', NULL, NULL, 'E12'), -- Sanwa VN
+  
+  (1, 'A01', '11:00:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+  (1, 'A02', '11:00:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+  (1, 'A03', '11:00:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+  
+  (1, 'E15', '13:00:00', 6, '01:00:00', 'Weekly', NULL , NULL, 'E15'), -- Surteck
+  (1, 'E19', '13:30:00', 6, '01:00:00', 'Weekly', NULL , NULL, 'E19'), -- Fertile
+  
+  (1, 'A01', '13:30:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+  (1, 'A02', '13:30:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+  (1, 'A03', '13:30:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+  
+  (1, 'A01', '15:30:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+  (1, 'A02', '15:30:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+  (1, 'A03', '15:30:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+  
+  (1, 'D04', '16:00:00', 6, '01:30:00', 'Weekly', NULL, NULL, 'D04'), -- Hamaden (HDVN)
+  (1, 'E15', '16:00:00', 6, '01:30:00', 'Weekly', NULL, NULL, 'E15'), -- Surteck
+  -- Nippo (pending..........)
+  
+  (1, 'A01', '16:30:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+  (1, 'A02', '16:30:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+  (1, 'A03', '16:30:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+  
+  (1, 'A01', '19:00:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+  (1, 'A02', '19:00:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+  (1, 'A03', '19:00:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+  
+  (1, 'A01', '19:30:00', 6, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+  (1, 'A02', '19:30:00', 6, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+  (1, 'A03', '19:30:00', 6, '01:00:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+  (1, 'D04', '19:30:00', 6, '01:00:00', 'Weekly', NULL, NULL, 'D04'), -- Hamaden (HDVN)
+  (1, 'E25', '19:30:00', 6, '01:00:00', 'Weekly', NULL, NULL, 'E25'), -- Kuroda
+  
+  (1, 'A01', '23:30:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+  (1, 'A02', '23:30:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+  (1, 'A03', '23:30:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+  
+  (1, 'A01', '02:30:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+  (1, 'A02', '02:30:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+  (1, 'A03', '02:30:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- HAL
+  
+  (1, 'A01', '05:00:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Ohara
+  (1, 'A02', '05:00:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'), -- Matsuo --Ogino(pending..........)
+  (1, 'A03', '05:00:00', 6, '00:30:00', 'Weekly', NULL, NULL, 'KCN'); -- HAL
+

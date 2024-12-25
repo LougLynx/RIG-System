@@ -1,0 +1,5 @@
+sc qc "DataFetchingWorkerService"
+
+sc delete "DataFetchingWorkerService"
+
+sc.exe create "RIGDataFetchingService" binPath= "D:\window_services\DataFetchingWorkerService.exe" start= auto
