@@ -15,6 +15,6 @@
   },
   "HubConnection": {
     "HubUrl": "https://localhost:7240/updateReceiveTLIPHub"
-   //"HubUr": "http:/10.73.131.39/updateReceiveTLIPHub"
+  //  "HubUr": "http:/10.73.131.39/updateReceiveTLIPHub"
   }
 }
