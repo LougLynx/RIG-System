@@ -35,15 +35,6 @@ Update-Database
 
 ---------------------------------------------------------------------------------------------
 
-Repository MVC pattern:
-•	Controllers: Handle HTTP requests and return views or data.
-•	Models: Define your data structures.
-•	Views: Define your UI using Razor syntax.
-•	Repositories: Handle data access logic.
-•	Services: Contain business logic.
-•	Data: Contains and migrations.
-
-
 
 IdentityDbContext
 
@@ -57,6 +48,8 @@ IdentityDbContext
       optionsBuilder.UseMySql(configuration.GetConnectionString("DefaultConnection"),
           new MySqlServerVersion(new Version(8, 0, 21))); // Thay đổi phiên bản MySQL phù hợp
   }
+
+
 ///////////////////////////////////////////////////////////////////
 
 protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

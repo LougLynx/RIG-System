@@ -1,0 +1,255 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36" version="24.7.14">
+  <diagram name="Page-1" id="74e2e168-ea6b-b213-b513-2b3c1d86103e">
+    <mxGraphModel dx="1764" dy="1693" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="77e6c97f196da883-1" value="Xuất hàng đúng" style="swimlane;html=1;childLayout=stackLayout;startSize=20;rounded=0;shadow=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=8;align=center;" parent="1" vertex="1">
+          <mxGeometry x="70" y="40" width="880" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="77e6c97f196da883-2" value="LOG" style="swimlane;html=1;startSize=20;" parent="77e6c97f196da883-1" vertex="1">
+          <mxGeometry y="20" width="160" height="880" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="77e6c97f196da883-2" source="MaelUOi9_Fcj_ionn7i3-1" target="MaelUOi9_Fcj_ionn7i3-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-1" value="Start" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="77e6c97f196da883-2">
+          <mxGeometry x="50" y="50" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-2" value="Nhận chỉ thị" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="77e6c97f196da883-2">
+          <mxGeometry x="20" y="140" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="77e6c97f196da883-3" value="IMEX" style="swimlane;html=1;startSize=20;" parent="77e6c97f196da883-1" vertex="1">
+          <mxGeometry x="160" y="20" width="170" height="880" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-31" value="Nhận mail stagging sheet" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="77e6c97f196da883-3">
+          <mxGeometry x="10" y="580" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="77e6c97f196da883-4" value="FIFO" style="swimlane;html=1;startSize=20;" parent="77e6c97f196da883-1" vertex="1">
+          <mxGeometry x="330" y="20" width="160" height="880" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-4" value="Upload kế hoạch" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="77e6c97f196da883-4">
+          <mxGeometry x="20" y="140" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="77e6c97f196da883-5" value="System" style="swimlane;html=1;startSize=20;" parent="77e6c97f196da883-1" vertex="1">
+          <mxGeometry x="490" y="20" width="180" height="880" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="77e6c97f196da883-5" source="MaelUOi9_Fcj_ionn7i3-17">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="90.00000000000023" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-17" value="Hiển thị kế hoạch lên bảng" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="77e6c97f196da883-5">
+          <mxGeometry x="30" y="140" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="77e6c97f196da883-5" source="MaelUOi9_Fcj_ionn7i3-20" target="MaelUOi9_Fcj_ionn7i3-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-20" value="Trong từng kế hoạch chia từng stage và estimate thời gian cho từng stage" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="77e6c97f196da883-5">
+          <mxGeometry x="25" y="250" width="130" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="77e6c97f196da883-5" source="MaelUOi9_Fcj_ionn7i3-21" target="MaelUOi9_Fcj_ionn7i3-27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-21" value="Khi đến thời gian theo kế hoạch sẽ hiện 1 tag ở phần &quot;Thực tế&quot; với status là màu xanh dương" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="77e6c97f196da883-5">
+          <mxGeometry x="20" y="350" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="77e6c97f196da883-5" source="MaelUOi9_Fcj_ionn7i3-27" target="MaelUOi9_Fcj_ionn7i3-29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-27" value="Confirm từng stage sau khi đã hoàn thành" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="77e6c97f196da883-5">
+          <mxGeometry x="20" y="470" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-29" value="Upload file Stagging kèm code" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="77e6c97f196da883-5">
+          <mxGeometry x="20" y="580" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-40" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="77e6c97f196da883-5" source="MaelUOi9_Fcj_ionn7i3-35" target="MaelUOi9_Fcj_ionn7i3-39">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-35" value="Upload load file Invoice" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="77e6c97f196da883-5">
+          <mxGeometry x="25" y="690" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-39" value="Tiếp tục confirm sau khi hoàn thành các giai đoạn" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="77e6c97f196da883-5">
+          <mxGeometry x="25" y="790" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="77e6c97f196da883-1" source="MaelUOi9_Fcj_ionn7i3-2" target="MaelUOi9_Fcj_ionn7i3-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="77e6c97f196da883-1" source="MaelUOi9_Fcj_ionn7i3-4" target="MaelUOi9_Fcj_ionn7i3-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="77e6c97f196da883-1" source="MaelUOi9_Fcj_ionn7i3-29" target="MaelUOi9_Fcj_ionn7i3-31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-33" value="Gửi mail cho IMEX" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="MaelUOi9_Fcj_ionn7i3-32">
+          <mxGeometry x="-0.1058" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-36" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="77e6c97f196da883-1" source="MaelUOi9_Fcj_ionn7i3-31" target="MaelUOi9_Fcj_ionn7i3-35">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="240" y="740" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-38" value="Gửi mail cho LOG" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="MaelUOi9_Fcj_ionn7i3-36">
+          <mxGeometry x="0.2412" y="4" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-43" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="77e6c97f196da883-1" source="MaelUOi9_Fcj_ionn7i3-39" target="MaelUOi9_Fcj_ionn7i3-41">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-44" value="Lưu các thời gian confirm&lt;div&gt;&amp;nbsp;và người confirm&amp;nbsp;&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="MaelUOi9_Fcj_ionn7i3-43">
+          <mxGeometry x="0.4346" y="2" relative="1" as="geometry">
+            <mxPoint y="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-46" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="77e6c97f196da883-1" source="MaelUOi9_Fcj_ionn7i3-27" target="MaelUOi9_Fcj_ionn7i3-41">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="730" y="520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="77e6c97f196da883-6" value="Database" style="swimlane;html=1;startSize=20;" parent="77e6c97f196da883-1" vertex="1">
+          <mxGeometry x="670" y="20" width="210" height="880" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-41" value="DB" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="77e6c97f196da883-6">
+          <mxGeometry x="100" y="440" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-47" value="Lưu các thời gian&lt;div&gt;&amp;nbsp;và người confirm&amp;nbsp;&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="77e6c97f196da883-6">
+          <mxGeometry x="50.002690552074455" y="469.9965665460844" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-48" value="Xuất hàng trễ" style="swimlane;html=1;childLayout=stackLayout;startSize=20;rounded=0;shadow=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=8;align=center;" vertex="1" parent="1">
+          <mxGeometry x="70" y="1010" width="990" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-49" value="LOG" style="swimlane;html=1;startSize=20;" vertex="1" parent="MaelUOi9_Fcj_ionn7i3-48">
+          <mxGeometry y="20" width="160" height="880" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="MaelUOi9_Fcj_ionn7i3-49" source="MaelUOi9_Fcj_ionn7i3-51" target="MaelUOi9_Fcj_ionn7i3-52">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-51" value="Start" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="MaelUOi9_Fcj_ionn7i3-49">
+          <mxGeometry x="50" y="50" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-52" value="Nhận chỉ thị" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="MaelUOi9_Fcj_ionn7i3-49">
+          <mxGeometry x="20" y="140" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-111" value="Nhận thông báo về delay" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="MaelUOi9_Fcj_ionn7i3-49">
+          <mxGeometry x="12.5" y="490" width="135" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-53" value="MAN" style="swimlane;html=1;startSize=20;" vertex="1" parent="MaelUOi9_Fcj_ionn7i3-48">
+          <mxGeometry x="160" y="20" width="170" height="880" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-89" value="Nhận thông báo về delay" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="MaelUOi9_Fcj_ionn7i3-53">
+          <mxGeometry x="17.5" y="490" width="135" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-55" value="FIFO" style="swimlane;html=1;startSize=20;" vertex="1" parent="MaelUOi9_Fcj_ionn7i3-48">
+          <mxGeometry x="330" y="20" width="160" height="880" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-56" value="Upload kế hoạch" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="MaelUOi9_Fcj_ionn7i3-55">
+          <mxGeometry x="20" y="140" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-70" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="MaelUOi9_Fcj_ionn7i3-48" source="MaelUOi9_Fcj_ionn7i3-52" target="MaelUOi9_Fcj_ionn7i3-56">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-71" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="MaelUOi9_Fcj_ionn7i3-48" source="MaelUOi9_Fcj_ionn7i3-56" target="MaelUOi9_Fcj_ionn7i3-59">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-57" value="System" style="swimlane;html=1;startSize=20;" vertex="1" parent="MaelUOi9_Fcj_ionn7i3-48">
+          <mxGeometry x="490" y="20" width="290" height="880" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-84" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="MaelUOi9_Fcj_ionn7i3-57" source="MaelUOi9_Fcj_ionn7i3-59" target="MaelUOi9_Fcj_ionn7i3-61">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-59" value="Hiển thị kế hoạch lên bảng" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="MaelUOi9_Fcj_ionn7i3-57">
+          <mxGeometry x="100" y="140" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-85" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="MaelUOi9_Fcj_ionn7i3-57" source="MaelUOi9_Fcj_ionn7i3-61" target="MaelUOi9_Fcj_ionn7i3-63">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-61" value="Trong từng kế hoạch chia từng stage và estimate thời gian cho từng stage" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="MaelUOi9_Fcj_ionn7i3-57">
+          <mxGeometry x="95" y="245" width="130" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-88" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="MaelUOi9_Fcj_ionn7i3-57" source="MaelUOi9_Fcj_ionn7i3-63" target="MaelUOi9_Fcj_ionn7i3-87">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-63" value="Khi đến thời gian theo kế hoạch sẽ hiện 1 tag ở phần &quot;Thực tế&quot; với status là màu xanh dương" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="MaelUOi9_Fcj_ionn7i3-57">
+          <mxGeometry x="90" y="360" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-119" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="MaelUOi9_Fcj_ionn7i3-57" source="MaelUOi9_Fcj_ionn7i3-87">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="160" y="630" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-120" value="Delay do lý do khách quan" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="MaelUOi9_Fcj_ionn7i3-119">
+          <mxGeometry x="-0.1603" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-87" value="Delay&amp;nbsp;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="MaelUOi9_Fcj_ionn7i3-57">
+          <mxGeometry x="120" y="480" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-123" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="MaelUOi9_Fcj_ionn7i3-57" source="MaelUOi9_Fcj_ionn7i3-117">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="160" y="710" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-117" value="Nêu lý do delay kèm thời gian bị delay" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="MaelUOi9_Fcj_ionn7i3-57">
+          <mxGeometry x="92.5" y="630" width="135" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-121" value="Tính toán lại thời gian từ giai đoạn bị delay" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="MaelUOi9_Fcj_ionn7i3-57">
+          <mxGeometry x="92.5" y="710" width="140" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-79" value="Database" style="swimlane;html=1;startSize=20;" vertex="1" parent="MaelUOi9_Fcj_ionn7i3-48">
+          <mxGeometry x="780" y="20" width="210" height="880" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-80" value="DB" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="MaelUOi9_Fcj_ionn7i3-79">
+          <mxGeometry x="100" y="440" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-112" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="MaelUOi9_Fcj_ionn7i3-48" source="MaelUOi9_Fcj_ionn7i3-87" target="MaelUOi9_Fcj_ionn7i3-89">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-113" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="MaelUOi9_Fcj_ionn7i3-48" source="MaelUOi9_Fcj_ionn7i3-87" target="MaelUOi9_Fcj_ionn7i3-111">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-114" value="Delay do hiệu suất làm việc" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="MaelUOi9_Fcj_ionn7i3-113">
+          <mxGeometry x="-0.5543" y="2" relative="1" as="geometry">
+            <mxPoint y="-2" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-124" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=-0.009;entryY=0.616;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="MaelUOi9_Fcj_ionn7i3-48" source="MaelUOi9_Fcj_ionn7i3-111" target="MaelUOi9_Fcj_ionn7i3-121">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="80" y="761" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-125" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=-0.019;entryY=0.661;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="MaelUOi9_Fcj_ionn7i3-48" source="MaelUOi9_Fcj_ionn7i3-89" target="MaelUOi9_Fcj_ionn7i3-121">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="245" y="760" />
+              <mxPoint x="580" y="760" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-126" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="MaelUOi9_Fcj_ionn7i3-48" source="MaelUOi9_Fcj_ionn7i3-121" target="MaelUOi9_Fcj_ionn7i3-80">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-127" value="Lưu lại thời gian cũ&amp;nbsp;&lt;div&gt;và thời gian mới&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="MaelUOi9_Fcj_ionn7i3-126">
+          <mxGeometry x="-0.4311" y="-4" relative="1" as="geometry">
+            <mxPoint x="-1" y="1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-128" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.283;entryY=1.009;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="MaelUOi9_Fcj_ionn7i3-48" source="MaelUOi9_Fcj_ionn7i3-117" target="MaelUOi9_Fcj_ionn7i3-80">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="MaelUOi9_Fcj_ionn7i3-129" value="Lưu lại lý do và thời gian" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="MaelUOi9_Fcj_ionn7i3-128">
+          <mxGeometry x="-0.2746" y="-2" relative="1" as="geometry">
+            <mxPoint x="10" y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

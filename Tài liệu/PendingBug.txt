@@ -13,13 +13,14 @@
   quá khứ của kế hoạch cũ (do phần resource của thư viện đang chưa nghĩ được logic)
 
 
-tìm bug phần dashboard (lỗi hiển thị - tại sao cột fastest của D04-HDVN lại cao nhất??) --- ??
-
 Tại sao hàng HDVN lại không được cập nhật - kiểm tra logic cập nhật status nhận nếu sever bị tắt
 
-Viết docs 
 
 Bật lại authorize
+
+Chỉnh lại exel detail function cho người sau
+
+
 
 
 
