@@ -9,7 +9,7 @@ using log4net;
 namespace DataFetchingWorkerService
 {
     public class DataTLIPWorker : BackgroundService
-    {
+    { 
         private static readonly ILog log = LogManager.GetLogger(typeof(DataTLIPWorker));
 
         private readonly ILogger<DataTLIPWorker> _logger;
