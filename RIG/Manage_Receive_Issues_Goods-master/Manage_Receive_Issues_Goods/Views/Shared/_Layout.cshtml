@@ -2,7 +2,7 @@
 @inject UserManager<IdentityUser> UserManager
 @inject SignInManager<IdentityUser> SignInManager
 
-<!DOCTYPE html>
+<!DOCTYPE html>     
 <html lang="en">
 <head>
     <!-- Existing links and scripts -->
@@ -31,12 +31,12 @@
 </head>
 <body onload="checkSidebarState(); highlightActiveLink();">
     <div id="mySidebar" class="sidebar">
-        <h1 class=" text-light"><b><i>DENSO</i> <br>Manage RIG</b></h1>
+        <h1 class=" text-light"><b> <img src="~/images/densoLogo.png"/><br>Manage RIG</b></h1>
 
         @if (SignInManager.IsSignedIn(User))
         {
 
-            <img src="~/images/defaultAvatar.png" alt="Avatar" class="rounded-circle" style="width: 250px; height: 250px; margin-left: -16px;" />
+            @* <img src="~/images/defaultAvatar.png" alt="Avatar" class="rounded-circle" style="width: 250px; height: 250px; margin-left: -16px;" /> *@
 
             <h4 class="text-light text-center"><b>@User.Identity.Name</b></h4>
 
@@ -67,7 +67,7 @@
             <a class="nav-link text-light" asp-area="" asp-controller="Config" asp-action="Portal">Config</a>
 
             <form method="post" asp-controller="Account" asp-action="Logout">
-                <button type="submit" style="width:auto" class="nav-link btn btn-link py-0">
+                <button type="submit" style="width:100px; height: 30px;" class="nav-link btn btn-link py-0">
                     Logout
                 </button>
             </form>
@@ -75,17 +75,18 @@
     </div>
 
     <div id="main">
-        <button class="openbtn" onclick="toggleNav()">☰ </button>
-        <div class="d-flex justify-content-center align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <!-- Title with Real-time Clock -->
-            <h1 class="center-align" style="font-style: italic;"><span id="currentTime"></span></h1>
+        <button class="openbtn" onclick="toggleNav()">☰</button>
+        <div class="container-fluid">
+            <div class="d-flex justify-content-center align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="center-align" style="font-style: italic;"><span id="currentTime"></span></h1>
+            </div>
+            <div class="content-wrapper">
+                @RenderBody()
+            </div>
         </div>
-        @RenderBody()
     </div>
 
     <div id="loadingOverlay" style="display: none;">
-          @* <img src="~/images/skibidi11.gif" alt="Loading..." /> *@
-        @* <img src="~/images/loadingIcon.gif" alt="Loading..." /> *@
         <img src="~/images/densoDance.gif" alt="Loading..." />
     </div>
 </body>
