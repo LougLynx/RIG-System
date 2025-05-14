@@ -165,9 +165,7 @@
 }
 
 #loadingOverlay img {
-    max-width: 150px;
     border-radius: 10px;
-    box-shadow: 0 0 30px rgba(255, 64, 129, 0.7);
     animation: pulse 1.5s infinite;
 }
 
