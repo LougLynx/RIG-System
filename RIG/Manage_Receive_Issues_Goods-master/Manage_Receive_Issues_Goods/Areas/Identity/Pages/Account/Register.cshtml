@@ -3,43 +3,124 @@
 @{
     ViewData["Title"] = "Register";
 }
-<div style="display: flex; gap: 10px;">
-    <a class="nav-link btn btn-dark" asp-page="./Login">Back</a>
-</div>
+
+<style>
+    body {
+        background: url('https://blog.dktcdn.net/files/kho-hang.jpg') no-repeat center center fixed;
+        background-size: cover;
+        min-height: 100vh;
+    }
+
+    .card {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        background: #fff;
+    }
+
+    .card-header {
+        background: linear-gradient(90deg, #232526 0%, #414345 100%);
+        color: #fff;
+        border-top-left-radius: 1rem;
+        border-top-right-radius: 1rem;
+        text-align: center;
+        padding: 1.5rem 1rem;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .form-floating > .form-control,
+    .form-floating > label {
+        border-radius: 0.5rem;
+    }
+
+    .form-control {
+        background-color: #f8f9fa;
+        color: #232526;
+        border: 1px solid #ced4da;
+        transition: border-color 0.2s;
+    }
+
+        .form-control:focus {
+            border-color: #232526;
+            box-shadow: 0 0 0 0.2rem rgba(35, 37, 38, 0.1);
+            background-color: #fff;
+        }
+
+    .form-label {
+        color: #232526;
+    }
+
+    .btn-primary {
+        background: linear-gradient(90deg, #232526 0%, #414345 100%);
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        transition: background 0.2s;
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #414345 0%, #232526 100%);
+        }
+
+    .text-danger {
+        color: #BA1414 !important;
+    }
+
+    .card-footer {
+        background: transparent;
+        border-bottom-left-radius: 1rem;
+        border-bottom-right-radius: 1rem;
+    }
+
+    .btn-link {
+        color: #414345;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+        .btn-link:hover {
+            color: #BA1414;
+            text-decoration: underline;
+        }
+</style>
 
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white text-center">
-                    <h2>@ViewData["Title"]</h2>
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h2 class="mb-0">@ViewData["Title"]</h2>
                 </div>
                 <div class="card-body">
                     <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-                        <h4 class="text-center mb-4">Create a new account</h4>
+                        <h4 class="text-center mb-4" style="color:black;">Create a new account</h4>
                         <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
                         <div class="form-floating mb-3">
                             <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                            <label asp-for="Input.Email">Email</label>
+                            <label asp-for="Input.Email" class="form-label">Email</label>
                             <span asp-validation-for="Input.Email" class="text-danger"></span>
                         </div>
 
                         <div class="form-floating mb-3">
                             <input asp-for="Input.UserName" class="form-control" autocomplete="username" aria-required="true" placeholder="dmvn12345" />
-                            <label asp-for="Input.UserName">Employee Code</label>
+                            <label asp-for="Input.UserName" class="form-label">Employee Code</label>
                             <span asp-validation-for="Input.UserName" class="text-danger"></span>
                         </div>
 
                         <div class="form-floating mb-3">
-                            <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                            <label asp-for="Input.Password">Password</label>
+                            <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" type="password" />
+                            <label asp-for="Input.Password" class="form-label">Password</label>
                             <span asp-validation-for="Input.Password" class="text-danger"></span>
                         </div>
 
                         <div class="form-floating mb-3">
-                            <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                            <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                            <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" type="password" />
+                            <label asp-for="Input.ConfirmPassword" class="form-label">Confirm Password</label>
                             <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
                         </div>
 
@@ -47,7 +128,7 @@
                     </form>
                 </div>
                 <div class="card-footer text-center">
-                    <a class="nav-link btn btn-link" asp-page="./Login">Back to Login</a>
+                    <a class="btn btn-link" asp-page="./Login">Back to Login</a>
                 </div>
             </div>
         </div>

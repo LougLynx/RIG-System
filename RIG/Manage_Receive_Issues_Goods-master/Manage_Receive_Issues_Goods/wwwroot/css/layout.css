@@ -1,13 +1,13 @@
 ﻿body {
     font-family: 'Poppins', 'Segoe UI', sans-serif;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/images/gate.jpg');
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.3)), url('https://blog.dktcdn.net/files/kho-hang.jpg');
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-position: center;
     color: #f8f9fa;
 }
-
+   
 .sidebar {
     height: 100%;
     width: 0;
