@@ -2,6 +2,10 @@
 @inject UserManager<IdentityUser> UserManager
 @inject SignInManager<IdentityUser> SignInManager
 
+@{
+    var isAdmin = User.IsInRole("Admin");
+}
+
 <!DOCTYPE html>     
 <html lang="en">
 <head>
@@ -67,7 +71,18 @@
                 </div>
             </div>
 
-            <a class="nav-link text-light" asp-area="" asp-controller="Config" asp-action="Portal">Config</a>
+            @if (isAdmin)
+            {
+                <div class="dropdown">
+                    <a class="nav-link text-light dropdown-toggle" href="#" id="configDropdown" aria-haspopup="true" aria-expanded="false">
+                        Config
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="configDropdown">
+                        <a class="nav-link btn btn-dark" asp-area="" asp-controller="Role" asp-action="Create">Create</a>
+                        <a class="nav-link btn btn-dark" asp-area="" asp-controller="Role" asp-action="Assign">Assign</a>
+                    </div>
+                </div>
+            }
 
             <form method="post" asp-controller="Account" asp-action="Logout">
                 <button type="submit" style="width:100px; height: 30px;" class="nav-link btn btn-link py-0">
