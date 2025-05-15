@@ -45,8 +45,6 @@
 
         @if (SignInManager.IsSignedIn(User))
         {
-            @* <img src="~/images/defaultAvatar.png" alt="Avatar" class="rounded-circle" style="width: 250px; height: 250px; margin-left: -16px;" /> *@
-
             <h4 class="text-light text-center"><b>@(User?.Identity?.Name ?? "User")</b></h4>
 
             <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
@@ -71,15 +69,13 @@
                 </div>
             </div>
 
-            @if (isAdmin)
-            {
                 <div class="dropdown">
                     <a class="nav-link text-light dropdown-toggle" href="#" id="configDropdown" aria-haspopup="true" aria-expanded="false">
                         Config
                     </a>
                     <div class="dropdown-menu" aria-labelledby="configDropdown">
-                        <a class="nav-link btn btn-dark" asp-area="" asp-controller="Role" asp-action="Create">Create</a>
-                        <a class="nav-link btn btn-dark" asp-area="" asp-controller="Role" asp-action="Assign">Assign</a>
+                        <a class="nav-link btn btn-dark" asp-area="" asp-controller="Role" asp-action="Create">Create role</a>
+                        <a class="nav-link btn btn-dark" asp-area="" asp-controller="Role" asp-action="Assign">Assign role</a>
                     </div>
                 </div>
             }
@@ -89,7 +85,6 @@
                     Logout
                 </button>
             </form>
-        }
     </div>
 
     <div id="main">
