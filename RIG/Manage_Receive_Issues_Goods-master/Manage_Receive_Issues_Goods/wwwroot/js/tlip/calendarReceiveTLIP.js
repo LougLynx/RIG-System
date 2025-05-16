@@ -1107,22 +1107,22 @@
     }
 
 
-    let isUserInteracting = false;
-    let autoScrollInterval;
+    //let isUserInteracting = false;
+    //let autoScrollInterval;
 
     // Hàm tự động cuộn để đưa thời gian hiện tại vào giữa màn hình
-    function autoScrollToCurrentTime(calendarEl) {
-        if (!isUserInteracting) {
-            const scrollContainer = calendarEl.querySelector('.fc-scroller.fc-timegrid-body'); // Vùng cuộn ngang
-            const nowIndicator = calendarEl.querySelector('.fc-now-indicator-line'); // Dòng đỏ hiện tại
+    //function autoScrollToCurrentTime(calendarEl) {
+    //    if (!isUserInteracting) {
+    //        const scrollContainer = calendarEl.querySelector('.fc-scroller.fc-timegrid-body'); // Vùng cuộn ngang
+    //        const nowIndicator = calendarEl.querySelector('.fc-now-indicator-line'); // Dòng đỏ hiện tại
 
-            if (scrollContainer && nowIndicator) {
-                const indicatorPosition = nowIndicator.offsetLeft; // Vị trí ngang của dòng đỏ
-                const containerWidth = scrollContainer.offsetWidth; // Chiều rộng vùng hiển thị
-                scrollContainer.scrollLeft = indicatorPosition - containerWidth / 2; // Đưa dòng đỏ vào giữa
-            }
-        }
-    }
+    //        if (scrollContainer && nowIndicator) {
+    //            const indicatorPosition = nowIndicator.offsetLeft; // Vị trí ngang của dòng đỏ
+    //            const containerWidth = scrollContainer.offsetWidth; // Chiều rộng vùng hiển thị
+    //            scrollContainer.scrollLeft = indicatorPosition - containerWidth / 2; // Đưa dòng đỏ vào giữa
+    //        }
+    //    }
+    //}
 
     //KHỞI TẠO LỊCH
     var calendar = new FullCalendar.Calendar(calendarEl, {

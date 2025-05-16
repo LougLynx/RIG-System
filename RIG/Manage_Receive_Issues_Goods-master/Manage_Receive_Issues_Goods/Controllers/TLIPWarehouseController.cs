@@ -350,6 +350,11 @@ namespace Manage_Receive_Issues_Goods.Controllers
             ViewData["PastPlanDetailsJson"] = JsonSerializer.Serialize(pastPlanDetails);
             return View(planDetails);
         }
+        public async Task<IActionResult> ChangePlanReceived()
+        {
+            var suppliers = await _schedulereceivedService.GetAllSuppliersAsync();
+            return View(suppliers);
+        }
 
         [HttpGet]
         public async Task<IActionResult> GetUpdatedEventsIssued()
