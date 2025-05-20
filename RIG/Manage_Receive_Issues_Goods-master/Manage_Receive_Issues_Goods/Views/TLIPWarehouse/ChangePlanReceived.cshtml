@@ -72,7 +72,11 @@
         </div>
         <div style="color: red"><i> Cho file Excel đã xuất vào đây để đọc lịch trình</i></div>
     </div>
-
+    <form method="post" asp-controller="TLIPWarehouse" asp-action="ReadFileExcel"
+          enctype="multipart/form-data">
+        <input type="file" name="file" class="form-control" />
+        <button type="submit" name="Upload" class="btn btn-primary">Upload</button>
+    </form>
 
 
     <!-- Modal Submit kế hoạch -->

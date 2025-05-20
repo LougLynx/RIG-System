@@ -50,6 +50,7 @@ public partial class Plandetailreceivedtlip
     [InverseProperty("Plandetailreceivedtlips")]
     public virtual Planreceivetlip Plan { get; set; } = null!;
 
+    [NotMapped]
     [ForeignKey("SupplierCode")]
     [InverseProperty("Plandetailreceivedtlips")]
     public virtual Supplier SupplierCodeNavigation { get; set; } = null!;

@@ -9,6 +9,8 @@ using Manage_Receive_Issues_Goods.Service;
 using System.Security.Claims;
 using Manage_Receive_Issues_Goods.DTO.TLIPDTO.Received;
 using Manage_Receive_Issues_Goods.DTO.RDTD_DTO;
+using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 
 namespace Manage_Receive_Issues_Goods.Controllers
@@ -20,23 +22,23 @@ namespace Manage_Receive_Issues_Goods.Controllers
         private readonly IScheduleIssuedTLIPService _scheduleissuesService;
         private readonly IHubContext<UpdateIssueTLIPHub> _hubIssuedContext;
         private readonly ILogger<TLIPWarehouseController> _logger;
-		private readonly I_RDTDService _rdtdService;
+        private readonly I_RDTDService _rdtdService;
 
-		private readonly RigContext _context;
+        private readonly RigContext _context;
         public TLIPWarehouseController(
             ISchedulereceivedTLIPService schedulereceivedService,
             IScheduleIssuedTLIPService scheduleissuesService,
             IHubContext<UpdateIssueTLIPHub> hubIssuedContext,
             ILogger<TLIPWarehouseController> logger,
-			I_RDTDService rdtdService,
-			RigContext context)
+            I_RDTDService rdtdService,
+            RigContext context)
         {
             _schedulereceivedService = schedulereceivedService;
             _scheduleissuesService = scheduleissuesService;
             _hubIssuedContext = hubIssuedContext;
             _logger = logger;
-			_rdtdService = rdtdService;
-			_context = context;
+            _rdtdService = rdtdService;
+            _context = context;
         }
 
         //Lịch nhận
@@ -96,7 +98,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
 
 
 
-// ////////////////////////////////////////////////////////////////////////////////////////// hàm test
+        // ////////////////////////////////////////////////////////////////////////////////////////// hàm test
         [HttpGet]
         public async Task<JsonResult> GetUnstoredActualReceived()
         {
@@ -131,9 +133,9 @@ namespace Manage_Receive_Issues_Goods.Controllers
 
             return Json(actualReceivedDTO);
         }
-       
 
-// ////////////////////////////////////////////////////////////////////////////////////////// hàm test
+
+        // ////////////////////////////////////////////////////////////////////////////////////////// hàm test
 
 
         [HttpGet]
@@ -370,7 +372,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
                 PlanDetailId = detail.PlanDetailId,
                 PlanTimeIssued = detail.PlanTimeIssued,
                 PlanTimeReceived = detail.PlanTimeReceived,
-				PlanDetailName = detail.PlanDetailName,
+                PlanDetailName = detail.PlanDetailName,
                 Actuals = detail.Actuals?.Where(actual => actual.ActualTime.Date == today).ToList()
             }).ToList();
 
@@ -560,7 +562,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
                     d.PlanDetailName,
                     d.PlanTimeIssued,
                     d.PlanTimeReceived
-				})
+                })
                 .ToList();
 
             return Json(result);
@@ -652,7 +654,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
         public async Task<JsonResult> GetCombinedLateDeliveryForChart(int planId, int month, string supplierCode = null)
         {
             var tripCountsActual = await _schedulereceivedService.GetTotalTripsActualForBarChartAsync(planId, month, supplierCode);
-            var lateDeliveries = await _schedulereceivedService.GetLateDeliveriesForChartAsync( month, planId , supplierCode);
+            var lateDeliveries = await _schedulereceivedService.GetLateDeliveriesForChartAsync(month, planId, supplierCode);
 
             var combinedLeadTimeCounts = tripCountsActual
                .Select(plan => new CombinedLateDeliveryTLIPDTO
@@ -668,7 +670,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
         }
 
 
-        
+
 
 
         // Hiển thị danh sách các supplier 
@@ -820,5 +822,80 @@ namespace Manage_Receive_Issues_Goods.Controllers
             await _context.SaveChangesAsync();
             return Ok("Tag name detail deleted successfully.");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> ReadFileExcel(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file uploaded.");
+            }
+
+            var planDetails = new List<Plandetailreceivedtlip>();
+
+            try
+            {
+                using (var stream = new MemoryStream())
+                {
+                    await file.CopyToAsync(stream);
+                    stream.Position = 0;
+
+                    using (var package = new XLWorkbook(stream))
+                    {
+                        var worksheet = package.Worksheet(1);
+                        if (worksheet == null)
+                        {
+                            return BadRequest("No worksheet found in Excel file.");
+                        }
+
+                        var rows = worksheet.RangeUsed().RowsUsed().Skip(1);
+
+                        // Lấy PlanId mới nhất (giả sử đã add plan mới vào DB trước khi upload file)
+                        var latestPlan = await _context.Planreceivetlips
+                            .OrderByDescending(p => p.PlanId)
+                            .FirstOrDefaultAsync();
+                        int planId = latestPlan.PlanId;
+                       
+                        foreach (var row in rows)
+                        {
+                            var tagName = row.Cell(1).GetValue<string>();
+                            var deliveryTimeValue = row.Cell(2).GetValue<DateTime>();
+                            var deliveryTime = TimeOnly.FromDateTime(deliveryTimeValue);
+                            var weekdayId = row.Cell(3).GetValue<int>();
+                            var leadTimeValue = row.Cell(4).GetValue<DateTime>();
+                            var leadTime = TimeOnly.FromDateTime(leadTimeValue);
+                            var planType = row.Cell(5).GetValue<string>();
+                            var weekOfMonth = row.Cell(6).GetValue<int?>();
+
+                          //
+                            var supplierCodes = (await _context.Tagnamereceivetlips.Where(sc => sc.TagName == tagName).Select(sc => sc.SupplierCode).ToListAsync()).DefaultIfEmpty(tagName).ToList();
+                            foreach (var sup in supplierCodes)
+                            {
+                                planDetails.Add(new Plandetailreceivedtlip
+                                {
+                                    SupplierCode = sup,
+                                    PlanId = planId,
+                                    TagName = tagName,
+                                    DeliveryTime = deliveryTime,
+                                    WeekdayId = weekdayId,
+                                    LeadTime = leadTime,
+                                    PlanType = planType,
+                                    WeekOfMonth = weekOfMonth
+                                });
+                            }
+                        }
+                        _context.Plandetailreceivedtlips.AddRange(planDetails);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                return Ok(planDetails);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error reading Excel file.");
+                return Ok($"Error submitting data: {ex.Message}");
+            }
+        }
+
     }
 }
