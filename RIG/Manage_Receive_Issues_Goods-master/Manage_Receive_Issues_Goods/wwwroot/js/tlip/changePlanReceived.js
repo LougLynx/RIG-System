@@ -258,55 +258,56 @@
 
     // Đọc file excel
     // -----------------------------------------------------------------
-    inputExcel.addEventListener('change', function (e) {
-        var file = e.target.files[0];
-        var reader = new FileReader();
-        reader.onload = function (e) {
-            var data = new Uint8Array(e.target.result);
-            var workbook = XLSX.read(data, { type: 'array' });
-            var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-            var jsonData = XLSX.utils.sheet_to_json(firstSheet);
+    //inputExcel.addEventListener('change', function (e) {
+    //    var file = e.target.files[0];
+    //    var reader = new FileReader();
+    //    reader.onload = function (e) {
+    //        var data = new Uint8Array(e.target.result);
+    //        var workbook = XLSX.read(data, { type: 'array' });
+    //        var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+    //        var jsonData = XLSX.utils.sheet_to_json(firstSheet);
 
-            var events = jsonData.map(function (item) {
-                var resourceId;
-                switch (item['Thứ']) {
-                    case 'Thứ 2': resourceId = '1'; break;
-                    case 'Thứ 3': resourceId = '2'; break;
-                    case 'Thứ 4': resourceId = '3'; break;
-                    case 'Thứ 5': resourceId = '4'; break;
-                    case 'Thứ 6': resourceId = '5'; break;
-                    case 'Thứ 7': resourceId = '6'; break;
-                    default: resourceId = ''; break;
-                }
-                return {
-                    title: item['Nhà Cung Cấp'],
-                    start: parseExcelDate(item['Giờ Nhận']),
-                    end: parseExcelDate(item['Giờ Kết Thúc']),
-                    resourceId: resourceId/*,
-                    backgroundColor: item['BackgroundColor'],
-                    borderColor: item['BorderColor']*/
-                };
-            });
-            console.log(events);
+    //        var events = jsonData.map(function (item) {
+    //            var resourceId;
+    //            switch (item['Thứ']) {
+    //                case 'Thứ 2': resourceId = '1'; break;
+    //                case 'Thứ 3': resourceId = '2'; break;
+    //                case 'Thứ 4': resourceId = '3'; break;
+    //                case 'Thứ 5': resourceId = '4'; break;
+    //                case 'Thứ 6': resourceId = '5'; break;
+    //                case 'Thứ 7': resourceId = '6'; break;
+    //                default: resourceId = ''; break;
+    //            }
+    //            return {
+    //                title: item['Nhà Cung Cấp'],
+    //                start: parseExcelDate(item['Giờ Nhận']),
+    //                end: parseExcelDate(item['Giờ Kết Thúc']),
+    //                resourceId: resourceId/*,
+    //                backgroundColor: item['BackgroundColor'],
+    //                borderColor: item['BorderColor']*/
+    //            };
+    //        });
+    //        console.log(events);
 
-            calendar.removeAllEvents();
-            calendar.addEventSource(events);
+    //        calendar.removeAllEvents();
+    //        calendar.addEventSource(events);
 
-            // Điền tên file vào phần nhập tên kế hoạch
-            var fileName = file.name.split('.').slice(0, -1).join('.');
-            planNameInput.value = fileName;
+    //        // Điền tên file vào phần nhập tên kế hoạch
+    //        var fileName = file.name.split('.').slice(0, -1).join('.');
+    //        planNameInput.value = fileName;
 
-            // Provide visual feedback
-            feedbackEl.innerText = 'Events successfully loaded from Excel file!';
-            feedbackEl.style.color = 'green';
-        };
-        reader.readAsArrayBuffer(file);
-    });
+    //        // Provide visual feedback
+    //        feedbackEl.innerText = 'Events successfully loaded from Excel file!';
+    //        feedbackEl.style.color = 'green';
+    //    };
+    //    reader.readAsArrayBuffer(file);
+    //});
 
     // Hiển modal khi ấn nút submit
     // -----------------------------------------------------------------
     document.getElementById('submit-plan').addEventListener('click', function () {
         var planName = planNameInput.value.trim();
+        console.log(inputExcel);
         if (!planName) {
             alert('Vui lòng nhập tên kế hoạch trước khi submit kế hoạch.');
             return;
@@ -335,57 +336,77 @@
 
     // Gửi dữ liệu plan về back end để add vào database
     // -----------------------------------------------------------------
-    document.getElementById('save-date').addEventListener('click', function () {
+    document.getElementById('save-date').addEventListener('click', async function () {
         var selectedDate = document.getElementById('datepicker').value;
-        if (selectedDate) {
-            var dateParts = selectedDate.split('-');
-            var formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
-
-            var events = calendar.getEvents();
-            var planDetails = events.map(function (event) {
-                var supplierCodeMatch = event.title.match(/\(([^)]+)\)/);
-                var supplierCode = supplierCodeMatch ? supplierCodeMatch[1] : '';
-
-                return {
-                    SupplierCode: supplierCode,
-                    DeliveryTime: formatDateTimeToExcel(event.start),
-                    LeadTime: calculateLeadTime(event.start, event.end),
-                    WeekdayId: event.getResources().map(function (resource) {
-                        return resource.id;
-                    }).join(', ')
-                };
-            });
-
-            var requestData = {
-                PlanName: planNameInput.value,
-                EffectiveDate: formattedDate,
-                PlanDetails: planDetails
-            };
-
-            console.log('Request data:', JSON.stringify(requestData));
-            fetch('/TLIPWarehouse/ChangePlanReceived', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Plan changed successfully!');
-                        // Optionally, refresh the page or update the UI
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-
-            $('#dateModal').modal('hide');
-        } else {
+        if (!selectedDate) {
             alert('Please select a date.');
+            return;
         }
+
+        var dateParts = selectedDate.split('-');
+        var formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+
+        var events = calendar.getEvents();
+        var planDetails = events.map(function (event) {
+            var supplierCodeMatch = event.title.match(/\(([^)]+)\)/);
+            var supplierCode = supplierCodeMatch ? supplierCodeMatch[1] : '';
+
+            return {
+                SupplierCode: supplierCode,
+                DeliveryTime: formatDateTimeToExcel(event.start),
+                LeadTime: calculateLeadTime(event.start, event.end),
+                WeekdayId: event.getResources().map(function (resource) {
+                    return resource.id;
+                }).join(', ')
+            };
+        });
+
+        var requestData = {
+            PlanName: planNameInput.value,
+            EffectiveDate: formattedDate,
+            PlanDetails: planDetails
+        };
+
+        try {
+            // 1. Save plan data
+            const response = await fetch('/TLIPWarehouse/ChangePlanReceived', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData)
+            });
+            const data = await response.json();
+
+            if (!data.success) {
+                alert('Error: ' + data.message);
+                return;
+            }
+
+            // 2. If Excel file is selected, upload it
+            var file = inputExcel.files[0];
+            if (file) {
+                var formData = new FormData();
+                formData.append('file', file);
+
+                const uploadResponse = await fetch('/TLIPWarehouse/ReadFileExcel', {
+                    method: 'POST',
+                    body: formData
+                });
+                const uploadResult = await uploadResponse.text();
+                alert(uploadResult);
+            } else {
+                alert('Plan changed successfully!');
+            }
+
+            // Optionally, refresh the page or update the UI here
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        }
+
+        $('#dateModal').modal('hide');
     });
+
 
 
 

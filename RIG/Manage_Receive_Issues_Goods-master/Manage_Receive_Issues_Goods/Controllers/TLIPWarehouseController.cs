@@ -10,7 +10,6 @@ using System.Security.Claims;
 using Manage_Receive_Issues_Goods.DTO.TLIPDTO.Received;
 using Manage_Receive_Issues_Goods.DTO.RDTD_DTO;
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
 
 
 namespace Manage_Receive_Issues_Goods.Controllers
@@ -888,7 +887,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
                         await _context.SaveChangesAsync();
                     }
                 }
-                return Ok(planDetails);
+                return Ok("Update successfully.");
             }
             catch (Exception ex)
             {

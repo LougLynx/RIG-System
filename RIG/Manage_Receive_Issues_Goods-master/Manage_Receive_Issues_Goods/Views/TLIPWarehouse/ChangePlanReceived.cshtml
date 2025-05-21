@@ -20,7 +20,7 @@
         <div id='external-events'>
             <p>
                 <strong>Danh sách Nhà Cung Cấp</strong>
-                <i><p style="color: blue">Vui lòng search để hiện Nhà Cung Cấp!!!</p></i>
+                <i><p style="color: blue">Vui lòng search để hiện Nhà Cung Cấp!!!</p></i>   
             </p>
             <p>
                 <input type="text" id="search-supplier" class="form-control" placeholder="Search by Supplier Name or Code">
@@ -33,11 +33,6 @@
                     </div>
                 }
             </div>
-            @*<p>
-            <input type='checkbox' id='drop-remove' />
-            <label for='drop-remove'>remove after drop</label>
-            </p> *@
-
 
             <p>
                 <label for='color-picker'>Chọn màu:</label>
@@ -63,20 +58,14 @@
         <div>
             <button id="export-excel" class="btn btn-primary">Export to Excel</button>
             <button id="export-ppt" class="btn btn-secondary">Export to PowerPoint</button>
-                <a href="~/assets/Form_input.xlsx" download class="btn btn-info">
-                    Tải form Excel mẫu
-                </a>
-             <button id="submit-plan" class="btn btn-success">Submit</button>
-            <br>
-            <input type="file" id="input-excel" accept=".xlsx, .xls" class="mt-2">
+            <a href="~/assets/Form_input.xlsx" download class="btn btn-info">
+                Tải form Excel mẫu
+            </a>
+            <input type="file" id="input-excel" accept=".xlsx, .xls" class="form-control" style="width:20%">
+            <button id="submit-plan" class="btn btn-success">Submit</button>
         </div>
-        <div style="color: red"><i> Cho file Excel đã xuất vào đây để đọc lịch trình</i></div>
     </div>
-    <form method="post" asp-controller="TLIPWarehouse" asp-action="ReadFileExcel"
-          enctype="multipart/form-data">
-        <input type="file" name="file" class="form-control" />
-        <button type="submit" name="Upload" class="btn btn-primary">Upload</button>
-    </form>
+
 
 
     <!-- Modal Submit kế hoạch -->

@@ -299,7 +299,6 @@
                 events.push(actualReceived);
             }
             existingEvent.setExtendedProp('events', events);
-
         } else {
             console.error(`Event with ActualReceivedId ${actualReceived.ActualReceivedId} not found.`);
         }
@@ -1222,8 +1221,6 @@
         </div>`
             };
         },
-
-
 
         //Sắp xếp theo thứ tự theo order(Plan trước Actual sau)
         resourceOrder: 'order',
