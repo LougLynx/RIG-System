@@ -226,12 +226,12 @@
         });
 
         var ws = XLSX.utils.json_to_sheet(data);
-/*
-        // Ẩn các cột BackgroundColor và BorderColor
-        ws['!cols'] = [];
-        ws['!cols'][4] = { hidden: true }; // Ẩn cột ResourceId
-        ws['!cols'][5] = { hidden: true }; // Ẩn cột BackgroundColor
-        ws['!cols'][6] = { hidden: true }; // Ẩn cột BorderColor*/
+        /*
+                // Ẩn các cột BackgroundColor và BorderColor
+                ws['!cols'] = [];
+                ws['!cols'][4] = { hidden: true }; // Ẩn cột ResourceId
+                ws['!cols'][5] = { hidden: true }; // Ẩn cột BackgroundColor
+                ws['!cols'][6] = { hidden: true }; // Ẩn cột BorderColor*/
 
         var wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Events');
@@ -338,6 +338,10 @@
     // -----------------------------------------------------------------
     document.getElementById('save-date').addEventListener('click', async function () {
         var selectedDate = document.getElementById('datepicker').value;
+        var file = inputExcel.files[0];
+        if (!file) { alert("Nofile!"); return };
+        var formData = new FormData();
+        formData.append('file', file);
         if (!selectedDate) {
             alert('Please select a date.');
             return;
@@ -369,39 +373,33 @@
 
         try {
             // 1. Save plan data
-            const response = await fetch('/TLIPWarehouse/ChangePlanReceived', {
+            await fetch('/TLIPWarehouse/ChangePlanReceived', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestData)
-            });
-            const data = await response.json();
-
-            if (!data.success) {
-                alert('Error: ' + data.message);
-                return;
-            }
-
-            // 2. If Excel file is selected, upload it
-            var file = inputExcel.files[0];
-            if (file) {
-                var formData = new FormData();
-                formData.append('file', file);
-
-                const uploadResponse = await fetch('/TLIPWarehouse/ReadFileExcel', {
-                    method: 'POST',
-                    body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        throw new Error(data.message);
+                    }
                 });
-                const uploadResult = await uploadResponse.text();
-                alert(uploadResult);
-            } else {
-                alert('Plan changed successfully!');
-            }
+            // 2. If Excel file is selected, upload it
+            await fetch('/TLIPWarehouse/ReadFileExcel', {
+                method: 'POST',
+                body: formData
+            })
+                .then(uploadResponse => uploadResponse.text())
+                .then(uploadResult => {
+                    alert(uploadResult);
+                })
+
 
             // Optionally, refresh the page or update the UI here
 
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred. Please try again.');
+            alert(`An error occurred. Please try again.\n Detail: ${error.message}`);
         }
 
         $('#dateModal').modal('hide');

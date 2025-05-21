@@ -892,7 +892,8 @@ namespace Manage_Receive_Issues_Goods.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error reading Excel file.");
-                return Ok($"Error submitting data: {ex.Message}");
+                return BadRequest
+                    ($"Error submitting data: {ex.Message}");
             }
         }
 
