@@ -79,6 +79,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    <h5>Kế hoạch <span id="modal-plan-name"></span> bắt đầu từ:</h5>
                     <input type="text" id="datepicker" class="form-control" placeholder="dd-MM-YYYY">
                 </div>
                 <div class="modal-footer">
@@ -94,6 +95,13 @@
         <script src="~/js/tlip/changePlanReceived.js"></script>
         <script>
             $(document).ready(function () {
+                //
+            $('#submit-plan').on('click', function () {
+                var planName = $('#plan-name').val();
+                $('#modal-plan-name').text(planName ? planName : 'Chưa nhập tên');
+                $('#dateModal').modal('show');
+            });
+
                 $('#search-supplier').on('keyup', function () {
                     var value = $(this).val().toLowerCase();
                     if (value) {
