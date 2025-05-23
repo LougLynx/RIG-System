@@ -831,8 +831,66 @@ namespace Manage_Receive_Issues_Goods.Controllers
             }
 
             var planDetails = new List<Plandetailreceivedtlip>();
+            //var failedRows = new List<object>();
 
-            try
+            //            foreach (var row in rows)
+            //            {
+            //                var tagName = row.Cell(1).GetValue<string>();
+            //                var deliveryTimeValue = row.Cell(2).GetValue<DateTime>();
+            //                var deliveryTime = TimeOnly.FromDateTime(deliveryTimeValue);
+            //                var weekdayId = row.Cell(3).GetValue<int>();
+            //                var leadTimeValue = row.Cell(4).GetValue<DateTime>();
+            //                var leadTime = TimeOnly.FromDateTime(leadTimeValue);
+            //                var planType = row.Cell(5).GetValue<string>();
+            //                var weekOfMonth = row.Cell(6).GetValue<int?>();
+
+            //                var supplierCodes = (await _context.Tagnamereceivetlips
+            //                    .Where(sc => sc.TagName == tagName)
+            //                    .Select(sc => sc.SupplierCode)
+            //                    .ToListAsync())
+            //                    .DefaultIfEmpty(tagName)
+            //                    .ToList();
+
+            //                foreach (var sup in supplierCodes)
+            //                {
+            //                    var detail = new Plandetailreceivedtlip
+            //                    {
+            //                        SupplierCode = sup,
+            //                        PlanId = planId,
+            //                        TagName = tagName,
+            //                        DeliveryTime = deliveryTime,
+            //                        WeekdayId = weekdayId,
+            //                        LeadTime = leadTime,
+            //                        PlanType = planType,
+            //                        WeekOfMonth = weekOfMonth
+            //                    };
+
+            //                    try
+            //                    {
+            //                        _context.Plandetailreceivedtlips.Add(detail);
+            //                        await _context.SaveChangesAsync();
+            //                    }
+            //                    catch (Exception ex)
+            //                    {
+            //                        failedRows.Add(new
+            //                        {
+            //                            SupplierCode = sup,
+            //                            TagName = tagName,
+            //                            DeliveryTime = deliveryTime.ToString(),
+            //                            WeekdayId = weekdayId,
+            //                            LeadTime = leadTime.ToString(),
+            //                            PlanType = planType,
+            //                            WeekOfMonth = weekOfMonth,
+            //                            Error = ex.InnerException?.Message ?? ex.Message
+            //                        });
+            //                        // Rollback the failed entity from the context
+            //                        _context.Entry(detail).State = EntityState.Detached;
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    }
+                try
             {
                 using (var stream = new MemoryStream())
                 {
@@ -854,7 +912,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
                             .OrderByDescending(p => p.PlanId)
                             .FirstOrDefaultAsync();
                         int planId = latestPlan.PlanId;
-                       
+
                         foreach (var row in rows)
                         {
                             var tagName = row.Cell(1).GetValue<string>();
@@ -866,7 +924,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
                             var planType = row.Cell(5).GetValue<string>();
                             var weekOfMonth = row.Cell(6).GetValue<int?>();
 
-                          //
+                            //
                             var supplierCodes = (await _context.Tagnamereceivetlips.Where(sc => sc.TagName == tagName).Select(sc => sc.SupplierCode).ToListAsync()).DefaultIfEmpty(tagName).ToList();
                             foreach (var sup in supplierCodes)
                             {
@@ -884,7 +942,8 @@ namespace Manage_Receive_Issues_Goods.Controllers
                             }
                         }
                         _context.Plandetailreceivedtlips.AddRange(planDetails);
-                        await _context.SaveChangesAsync();
+                        _context.SaveChanges();
+
                     }
                 }
                 return Ok("Update successfully.");
@@ -896,6 +955,7 @@ namespace Manage_Receive_Issues_Goods.Controllers
                     ($"Error submitting data: {ex.Message}");
             }
         }
+        
 
     }
 }
